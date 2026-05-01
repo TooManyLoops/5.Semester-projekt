@@ -7,6 +7,6 @@ namespace Vagtplanlægnings_modul.Controllers
     [ApiController]
     public class GitHubRuleTestController : ControllerBase
     {
-        //Hvis du finder denne controller, og den ikke er slettet. Så slet den gerne :D.
+        //Hvis du finder denne controller, og den ikke er slettet. Så slet den gerne :D. xdd
     }
 }
