@@ -1,0 +1,6 @@
+@Vagtplanlægnings_modul_HostAddress = http://localhost:5208
+
+GET {{Vagtplanlægnings_modul_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
