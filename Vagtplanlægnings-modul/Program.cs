@@ -1,18 +1,26 @@
 using Microsoft.EntityFrameworkCore;
-using Vagtplanlægnings_modul.EF_Core;
+using Vagtplanlægnings_modul.Data;
 
-DotNetEnv.Env.Load();
+DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 var ConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-builder.Services.AddDbContext<EntityFrameworkContext>(options =>
-    options.UseSqlServer(
-        ConnectionString,
-        o => o.UseCompatibilityLevel(160)));
+if (string.IsNullOrWhiteSpace(ConnectionString))
+{
+    throw new InvalidOperationException(
+        $"CONNECTION_STRING not found. Current directory: {Directory.GetCurrentDirectory()}"
+    );
+}
+
+builder.Services.AddDbContext<TimegripDbContext>(options =>
+    options.UseSqlServer(ConnectionString, o => o.UseCompatibilityLevel(160))
+);
+
 // Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
