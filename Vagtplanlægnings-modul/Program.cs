@@ -1,7 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using Vagtplanlægnings_modul.EF_Core;
+
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var ConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
+builder.Services.AddDbContext<EntityFrameworkContext>(options =>
+    options.UseSqlServer(
+        ConnectionString,
+        o => o.UseCompatibilityLevel(160)));
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
