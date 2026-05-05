@@ -1,9 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Vagtplanlægnings_modul.Data;
+using Vagtplanlægnings_modul.Endpoints;
+using Vagtplanlægnings_modul.Models;
+using Vagtplanlægnings_modul.Services;
 
 DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<EmployeeService>();
 
 var ConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
@@ -37,5 +42,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapUserEndpoint();
 
 app.Run();

@@ -9,4 +9,5 @@ public class TimegripDbContext : DbContext
         : base(options) { }
 
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<Employment> Employments { get; set; }
 }

@@ -30,7 +30,7 @@ public class Employee
 
     [Required]
     [Column("employeeStatus")]
-    public EmployeeStatus status { get; set; }
+    public EmployeeStatus Status { get; set; }
 
     [Required]
     [DataType(DataType.Date)]

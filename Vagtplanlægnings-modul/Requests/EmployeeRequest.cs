@@ -1,0 +1,12 @@
+using Vagtplanlægnings_modul.Enums;
+
+namespace Vagtplanlægnings_modul.Requests;
+
+public class EmployeeRequest
+{
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string PhoneNumber { get; set; } = null!;
+    public EmployeeStatus EmployeeStatus { get; set; }
+}

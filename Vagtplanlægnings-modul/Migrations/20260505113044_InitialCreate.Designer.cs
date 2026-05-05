@@ -12,7 +12,7 @@ using Vagtplanlægnings_modul.Data;
 namespace Vagtplanlægnings_modul.Migrations
 {
     [DbContext(typeof(TimegripDbContext))]
-    [Migration("20260505103633_InitialCreate")]
+    [Migration("20260505113044_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -62,7 +62,46 @@ namespace Vagtplanlægnings_modul.Migrations
 
                     b.HasKey("EmployeeId");
 
-                    b.ToTable("pizzas");
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.Employment", b =>
+                {
+                    b.Property<Guid>("EmploymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("EmploymentType")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("WeeklyHours")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmploymentId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Employments");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.Employment", b =>
+                {
+                    b.HasOne("Vagtplanlægnings_modul.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 #pragma warning restore 612, 618
         }
