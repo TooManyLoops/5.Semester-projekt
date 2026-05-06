@@ -53,7 +53,7 @@ namespace Vagtplanlægnings_modul.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("phoneNr");
 
-                    b.Property<int>("status")
+                    b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasColumnName("employeeStatus");
 

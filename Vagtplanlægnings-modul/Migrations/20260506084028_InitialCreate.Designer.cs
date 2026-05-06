@@ -12,7 +12,7 @@ using Vagtplanlægnings_modul.Data;
 namespace Vagtplanlægnings_modul.Migrations
 {
     [DbContext(typeof(TimegripDbContext))]
-    [Migration("20260505113044_InitialCreate")]
+    [Migration("20260506084028_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -56,7 +56,7 @@ namespace Vagtplanlægnings_modul.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("phoneNr");
 
-                    b.Property<int>("status")
+                    b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasColumnName("employeeStatus");
 
