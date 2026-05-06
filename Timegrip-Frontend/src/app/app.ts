@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,33 @@ export class App {
     firstName: '',
     lastName: '',
     email: '',
-    phone: ''
+    phoneNumber: '',
+    employeeStatus: 1
   };
 
-  createEmployee() {
-    alert('Save blev klikket');
-    console.log(this.employee);
+  constructor(private http: HttpClient) { }
+
+  addEmployee() {
+
+    alert('addEmployee bliver kaldt');
+
+    this.http.post('https://localhost:7129/Employees/', this.employee)
+      .subscribe(
+        {
+          next: response => {
+            alert('Employee oprettet');
+            console.log(response);
+          },
+          error: error => {
+            alert('Fejl ved oprettelse');
+            console.error(error);
+            console.log('STATUS:', error.status);
+            console.log('VALIDATION ERROR:', error.error);
+            console.log('DATA SENDT:', this.employee);
+          }
+
+        });
   }
 }
+
+
