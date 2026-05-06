@@ -13,4 +13,6 @@ public class TimegripDbContext : DbContext
     public DbSet<Role> Roles { get; set; }
     
     public DbSet<EmployeeRole> EmployeeRoles { get; set; }
+    
+    public DbSet<Employment> Employments { get; set; }
 }
