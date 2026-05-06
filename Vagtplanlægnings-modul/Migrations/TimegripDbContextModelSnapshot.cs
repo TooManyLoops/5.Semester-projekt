@@ -59,7 +59,74 @@ namespace Vagtplanlægnings_modul.Migrations
 
                     b.HasKey("EmployeeId");
 
-                    b.ToTable("pizzas");
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.EmployeeRole", b =>
+                {
+                    b.Property<Guid>("EmployeeRoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("EmployeeRoleId");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("isPrimary")
+                        .HasColumnType("bit")
+                        .HasColumnName("isPrimary");
+
+                    b.HasKey("EmployeeRoleId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("EmployeeRoles");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.Role", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("role_Id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("role_name");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.EmployeeRole", b =>
+                {
+                    b.HasOne("Vagtplanlægnings_modul.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vagtplanlægnings_modul.Models.Role", "role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("role");
                 });
 #pragma warning restore 612, 618
         }
