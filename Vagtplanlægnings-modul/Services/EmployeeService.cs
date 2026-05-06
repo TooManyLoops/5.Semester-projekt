@@ -1,4 +1,5 @@
 using Vagtplanlægnings_modul.Data;
+using Vagtplanlægnings_modul.Enums;
 using Vagtplanlægnings_modul.Models;
 using Vagtplanlægnings_modul.Requests;
 using Vagtplanlægnings_modul.Responses;
@@ -31,5 +32,16 @@ public class EmployeeService(TimegripDbContext context)
             EmployeeStatus = employee.Status,
             PhoneNumber = employee.PhoneNumber,
         };
+    }
+
+    public async Task<List<EmployeeStatusResponse>> GetEmployeeStatuses()
+    {
+        return Enum.GetValues<EmployeeStatus>()
+            .Select(status => new EmployeeStatusResponse
+            {
+                Value = (int)status,
+                Name = status.ToString(),
+            })
+            .ToList();
     }
 }
