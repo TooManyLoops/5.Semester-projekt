@@ -17,14 +17,28 @@ public static class EmployeeEndpoints
         var employeeEndpoint = app.MapGroup("/Employees");
         employeeEndpoint.MapPost("/", CreateEmployee).WithName("CreateEmployee");
         employeeEndpoint.MapGet("/statuses", GetEmployeeStatuses).WithName("GetEmployeeStatuses");
-        employeeEndpoint.MapGet("/", GetEmployees).WithName("GetEmployees");
+        employeeEndpoint.MapGet("/all", GetAllEmployees).WithName("GetEmployees");
+        employeeEndpoint.MapGet("/{employeeId}", GetEmployee).WithName("GetEmployee");
 
         return app;
     }
 
-    public static async Task<IResult> GetEmployees(EmployeeService service)
+    public static async Task<IResult> GetEmployee(EmployeeService service, Guid employeeId)
     {
-        var result = await service.GetEmployees();
+        var result = await service.GetEmployee(employeeId);
+
+        if (result is null)
+        {
+            return TypedResults.NotFound(
+                new { Message = "Employee was not found.", EmployeeId = employeeId }
+            );
+        }
+        return TypedResults.Ok(result);
+    }
+
+    public static async Task<IResult> GetAllEmployees(EmployeeService service)
+    {
+        var result = await service.GetAllEmployees();
         return TypedResults.Ok(result);
     }
 
@@ -40,8 +54,15 @@ public static class EmployeeEndpoints
             return TypedResults.BadRequest(validationResults);
         }
 
-        var result = await service.CreateEmployee(request);
-        return TypedResults.Created($"/Employees/{result.EmployeeId}", result);
+        try
+        {
+            var result = await service.CreateEmployee(request);
+            return TypedResults.Created($"/Employees/{result.EmployeeId}", result);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return TypedResults.Conflict(exception.Message);
+        }
     }
 
     public static async Task<IResult> GetEmployeeStatuses(EmployeeService service)
