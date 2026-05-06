@@ -5,16 +5,11 @@ namespace Vagtplanlægnings_modul.Models;
 
 public class EmployeeRoleRequest
 {
-    [Key]
-    [Column("EmployeeRoleId")]
     public Guid EmployeeRoleId  { get; set; }
     
-    [ForeignKey("EmployeeId")]
-    public Employee Employee { get; set; }
+    public Guid EmployeeId { get; set; }
     
-    [ForeignKey("RoleId")]
-    public Role role { get; set; }
+    public Guid roleId { get; set; }
     
-    [Column("isPrimary")]
     public bool isPrimary { get; set; }
 }

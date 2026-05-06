@@ -9,7 +9,7 @@ public static class EmployeeRoleEndpoints
 {
     public static WebApplication MapEmployeeRoleEndpoint(this WebApplication app)
     {
-        var userEmployeeRoleEndpoint = app.MapGroup("/Roles");
+        var userEmployeeRoleEndpoint = app.MapGroup("/EmployeeRoles");
         userEmployeeRoleEndpoint.MapPost("/", CreateEmployeeRole).WithName("CreateEmployeeRole");
         return app;
     }

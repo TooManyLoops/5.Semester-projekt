@@ -12,6 +12,7 @@ builder.Services.AddScoped<EmployeeService>();
 
 builder.Services.AddScoped<RoleService>();
 
+builder.Services.AddScoped<EmployeeRoleService>();
 
 var ConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
@@ -49,5 +50,7 @@ app.MapControllers();
 app.MapUserEndpoint();
 
 app.MapRoleEndpoint();
+
+app.MapEmployeeRoleEndpoint();
 
 app.Run();

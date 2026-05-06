@@ -9,9 +9,9 @@ public class EmployeeRoleResponse
  
     public Guid EmployeeRoleId  { get; set; }
     
-    public Employee Employee { get; set; }
+    public Guid EmployeeId { get; set; }
     
-    public Role role { get; set; }
+    public Guid roleId { get; set; }
     
     public bool isPrimary { get; set; }
 }

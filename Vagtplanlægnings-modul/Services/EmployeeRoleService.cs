@@ -13,8 +13,9 @@ public class EmployeeRoleService(TimegripDbContext context)
     {
         var employeeRole = new EmployeeRole()
         {
-            Employee = request.Employee,
-            role = request.role,
+            EmployeeRoleId = request.EmployeeRoleId,
+            EmployeeId = request.EmployeeId,
+            RoleId = request.roleId,
             isPrimary = request.isPrimary
         };
 
@@ -24,8 +25,8 @@ public class EmployeeRoleService(TimegripDbContext context)
         return new EmployeeRoleResponse
         {
             EmployeeRoleId = employeeRole.EmployeeRoleId,
-            Employee = employeeRole.Employee,
-            role = employeeRole.role,
+            EmployeeId = employeeRole.EmployeeId,
+            roleId = employeeRole.RoleId,
             isPrimary = employeeRole.isPrimary
         };
 

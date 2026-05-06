@@ -12,10 +12,10 @@ public class EmployeeRole
     
     
     [ForeignKey("EmployeeId")]
-    public Employee Employee { get; set; }
+    public Guid EmployeeId { get; set; }
     
     [ForeignKey("RoleId")]
-    public Role role { get; set; }
+    public Guid RoleId { get; set; }    
     
     [Column("isPrimary")]
     public bool isPrimary { get; set; }
