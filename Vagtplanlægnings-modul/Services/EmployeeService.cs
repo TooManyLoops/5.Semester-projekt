@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Vagtplanlægnings_modul.Data;
 using Vagtplanlægnings_modul.Enums;
 using Vagtplanlægnings_modul.Models;
@@ -43,5 +44,21 @@ public class EmployeeService(TimegripDbContext context)
                 Name = status.ToString(),
             })
             .ToList();
+    }
+
+    public async Task<List<EmployeeResponse>> GetEmployees()
+    {
+        return await context
+            .Employees.Select(employee => new EmployeeResponse
+            {
+                EmployeeId = employee.EmployeeId,
+                Email = employee.Email,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                HiredAt = employee.HiredAt,
+                EmployeeStatus = employee.Status,
+                PhoneNumber = employee.PhoneNumber,
+            })
+            .ToListAsync();
     }
 }

@@ -17,8 +17,15 @@ public static class EmployeeEndpoints
         var employeeEndpoint = app.MapGroup("/Employees");
         employeeEndpoint.MapPost("/", CreateEmployee).WithName("CreateEmployee");
         employeeEndpoint.MapGet("/statuses", GetEmployeeStatuses).WithName("GetEmployeeStatuses");
+        employeeEndpoint.MapGet("/", GetEmployees).WithName("GetEmployees");
 
         return app;
+    }
+
+    public static async Task<IResult> GetEmployees(EmployeeService service)
+    {
+        var result = await service.GetEmployees();
+        return TypedResults.Ok(result);
     }
 
     public static async Task<IResult> CreateEmployee(
