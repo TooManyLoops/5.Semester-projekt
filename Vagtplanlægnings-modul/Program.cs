@@ -10,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<EmployeeService>();
 
+builder.Services.AddScoped<RoleService>();
+
+builder.Services.AddScoped<EmployeeRoleService>();
+
 var ConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
 if (string.IsNullOrWhiteSpace(ConnectionString))
@@ -44,5 +48,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapEmployeeEndpoint();
+app.MapUserEndpoint();
+
+app.MapRoleEndpoint();
+
+app.MapEmployeeRoleEndpoint();
 
 app.Run();
