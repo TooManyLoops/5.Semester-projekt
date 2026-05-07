@@ -12,10 +12,12 @@ namespace Vagtplanlægnings_modul.Models
         [Column("shift_Id")]
         public Guid ShiftId { get; set; }
 
+ 
         [ForeignKey("shift_Id")]
         public Shift Shift { get; set; } = null!;
 
         [Column("employeeRole_Id")]
+
         public Guid EmployeeRoleId { get; set; }
 
         [Column("Status")]
