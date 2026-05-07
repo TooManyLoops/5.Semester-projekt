@@ -12,6 +12,20 @@ namespace Vagtplanlægnings_modul.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "EmployeeRoles",
+                columns: table => new
+                {
+                    EmployeeRole_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    isPrimary = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeRoles", x => x.EmployeeRole_Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -26,6 +40,19 @@ namespace Vagtplanlægnings_modul.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employees", x => x.employee_Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    role_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    role_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.role_Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,7 +87,13 @@ namespace Vagtplanlægnings_modul.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "EmployeeRoles");
+
+            migrationBuilder.DropTable(
                 name: "Employments");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Employees");
