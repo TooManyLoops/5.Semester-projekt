@@ -33,15 +33,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:56284")
+        policy.WithOrigins("http://localhost:62892")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
-
-app.UseHttpsRedirection();
 
 app.UseCors("AllowAngularFrontend");
 

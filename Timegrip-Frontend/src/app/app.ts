@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './app.html',
   standalone: false,
   styleUrl: './app.css'
+
 })
 export class App {
   employee = {
@@ -22,7 +23,7 @@ export class App {
 
     alert('addEmployee bliver kaldt');
 
-    this.http.post('https://localhost:7129/Employees/', this.employee)
+    this.http.post('http://localhost:5208/Employees/', this.employee)
       .subscribe(
         {
           next: response => {
