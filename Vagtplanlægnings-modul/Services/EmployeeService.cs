@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Vagtplanlægnings_modul.Data;
+using Vagtplanlægnings_modul.Enums;
 using Vagtplanlægnings_modul.Models;
 using Vagtplanlægnings_modul.Requests;
 using Vagtplanlægnings_modul.Responses;
@@ -9,9 +11,20 @@ public class EmployeeService(TimegripDbContext context)
 {
     public async Task<EmployeeResponse> CreateEmployee(EmployeeRequest request)
     {
+        var email = request.Email.Trim();
+
+        var emailAlreadyExists = await context.Employees.AnyAsync(employee =>
+            employee.Email == email
+        );
+
+        if (emailAlreadyExists)
+        {
+            throw new InvalidOperationException("An employee with this email already exists.");
+        }
+
         var employee = new Employee()
         {
-            Email = request.Email,
+            Email = email,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Status = request.EmployeeStatus,
@@ -31,5 +44,50 @@ public class EmployeeService(TimegripDbContext context)
             EmployeeStatus = employee.Status,
             PhoneNumber = employee.PhoneNumber,
         };
+    }
+
+    public async Task<List<EmployeeStatusResponse>> GetEmployeeStatuses()
+    {
+        return Enum.GetValues<EmployeeStatus>()
+            .Select(status => new EmployeeStatusResponse
+            {
+                Value = (int)status,
+                Name = status.ToString(),
+            })
+            .ToList();
+    }
+
+    public async Task<List<EmployeeResponse>> GetAllEmployees()
+    {
+        return await context
+            .Employees.Select(employee => new EmployeeResponse
+            {
+                EmployeeId = employee.EmployeeId,
+                Email = employee.Email,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                HiredAt = employee.HiredAt,
+                EmployeeStatus = employee.Status,
+                PhoneNumber = employee.PhoneNumber,
+            })
+            .ToListAsync();
+    }
+
+    public async Task<EmployeeResponse?> GetEmployee(Guid employeeId)
+    {
+        return await context
+            .Employees.AsNoTracking()
+            .Where(employee => employee.EmployeeId == employeeId)
+            .Select(employee => new EmployeeResponse
+            {
+                EmployeeId = employee.EmployeeId,
+                Email = employee.Email,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                HiredAt = employee.HiredAt,
+                EmployeeStatus = employee.Status,
+                PhoneNumber = employee.PhoneNumber,
+            })
+            .FirstOrDefaultAsync();
     }
 }

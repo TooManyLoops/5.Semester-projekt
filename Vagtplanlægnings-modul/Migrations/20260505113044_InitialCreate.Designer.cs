@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vagtplanlægnings_modul.Data;
 
@@ -11,9 +12,11 @@ using Vagtplanlægnings_modul.Data;
 namespace Vagtplanlægnings_modul.Migrations
 {
     [DbContext(typeof(TimegripDbContext))]
-    partial class TimegripDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505113044_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

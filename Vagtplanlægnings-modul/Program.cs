@@ -43,6 +43,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapUserEndpoint();
+app.MapEmployeeEndpoint();
 
 app.Run();
