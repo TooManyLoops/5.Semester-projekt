@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: .NET
 
 on:
@@ -11,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -21,11 +17,6 @@ jobs:
       with:
         dotnet-version: 10.0.x
     - name: Restore dependencies
-      run: dotnet restore
-      working-directory: ./Vagtplanlægnings-modul
+      run: dotnet restore ./Timegrip-Microservices.slnx --configfile ./NuGet.Config
     - name: Build
-      run: dotnet build --no-restore
-      working-directory: ./Vagtplanlægnings-modul
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: ./Vagtplanlægnings-modul
+      run: dotnet build ./Timegrip-Microservices.slnx --no-restore

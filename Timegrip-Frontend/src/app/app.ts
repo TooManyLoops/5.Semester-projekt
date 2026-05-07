@@ -23,7 +23,7 @@ export class App {
 
     alert('addEmployee bliver kaldt');
 
-    this.http.post('http://localhost:5208/Employees/', this.employee)
+    this.http.post('http://localhost:5000/api/employees/', this.employee)
       .subscribe(
         {
           next: response => {
