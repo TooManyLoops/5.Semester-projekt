@@ -6,10 +6,10 @@ namespace Vagtplanlægnings_modul.Endpoints
 {
     public static class ShiftEndpoints
     {
-        public static WebApplication MapUserEndpoint(this WebApplication app)
+        public static WebApplication MapShiftEndpoints(this WebApplication app)
         {
-            var userEndpoint = app.MapGroup("/Shift");
-            userEndpoint.MapPost("/", CreateShift).WithName("CreateShift");
+            var ShiftEndpoint = app.MapGroup("/Shift");
+            ShiftEndpoint.MapPost("/", CreateShift).WithName("CreateShift");
 
             return app;
         }

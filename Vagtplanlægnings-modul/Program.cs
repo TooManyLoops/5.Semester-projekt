@@ -53,4 +53,6 @@ app.MapRoleEndpoint();
 
 app.MapEmployeeRoleEndpoint();
 
+app.MapShiftEndpoints();
+
 app.Run();
