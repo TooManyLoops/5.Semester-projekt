@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Vagtplanlægnings_modul.Data;
 using Vagtplanlægnings_modul.Endpoints;
 using Vagtplanlægnings_modul.Models;
@@ -24,7 +25,15 @@ if (string.IsNullOrWhiteSpace(ConnectionString))
 }
 
 builder.Services.AddDbContext<TimegripDbContext>(options =>
-    options.UseSqlServer(ConnectionString, o => o.UseCompatibilityLevel(160))
+    options.UseSqlServer(ConnectionString, o => o.UseCompatibilityLevel(160).MigrationsHistoryTable(
+            tableName: HistoryRepository.DefaultTableName,
+            schema: "Employee"))
+);
+
+builder.Services.AddDbContext<ShiftDbContext>(options =>
+    options.UseSqlServer(ConnectionString, o => o.UseCompatibilityLevel(160).MigrationsHistoryTable(
+            tableName: HistoryRepository.DefaultTableName,
+            schema: "Shift"))
 );
 
 // Add services to the container.

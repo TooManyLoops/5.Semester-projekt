@@ -15,12 +15,12 @@ namespace Vagtplanlægnings_modul.Endpoints
         }
 
         public static async Task<IResult> CreateShift(
-            EmployeeService service,
-            EmployeeRequest request
+            ShiftService service,
+            ShiftRequest request
         )
         {
-            var result = await service.CreateEmployee(request);
-            return TypedResults.Created($"/Employees/{result.EmployeeId}", result);
+            var result = await service.CreateShift(request);
+            return TypedResults.Ok(result);
         }
 
     }

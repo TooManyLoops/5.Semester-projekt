@@ -12,7 +12,7 @@ using Vagtplanlægnings_modul.Data;
 namespace Vagtplanlægnings_modul.Migrations
 {
     [DbContext(typeof(TimegripDbContext))]
-    [Migration("20260506084028_InitialCreate")]
+    [Migration("20260507101833_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -65,6 +65,28 @@ namespace Vagtplanlægnings_modul.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.EmployeeRole", b =>
+                {
+                    b.Property<Guid>("EmployeeRoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("EmployeeRole_Id");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("isPrimary")
+                        .HasColumnType("bit")
+                        .HasColumnName("isPrimary");
+
+                    b.HasKey("EmployeeRoleId");
+
+                    b.ToTable("EmployeeRoles");
+                });
+
             modelBuilder.Entity("Vagtplanlægnings_modul.Models.Employment", b =>
                 {
                     b.Property<Guid>("EmploymentId")
@@ -91,6 +113,28 @@ namespace Vagtplanlægnings_modul.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("Employments");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.Role", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("role_Id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("role_name");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Vagtplanlægnings_modul.Models.Employment", b =>
