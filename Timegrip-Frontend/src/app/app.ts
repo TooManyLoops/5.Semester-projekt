@@ -1,10 +1,21 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Header } from './header/header';
+import { RouterOutlet } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-root',
+  imports: [
+    Header,
+    RouterOutlet,
+    FormsModule,
+    HttpClientModule
+  ],
+  standalone: true,
   templateUrl: './app.html',
-  standalone: false,
   styleUrl: './app.css'
 
 })
