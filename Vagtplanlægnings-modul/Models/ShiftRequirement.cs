@@ -5,22 +5,19 @@ namespace Vagtplanlægnings_modul.Models
 {
     public class ShiftRequirement
     {
-        //[Key]
-        //[Column("ShiftRequirement_Id")]
+        [Key]
+        [Column("ShiftRequirement_Id")]
         public Guid ShiftRequirementId { get; set; } = Guid.NewGuid();
 
-        //[Required]
-        //[Column("FK_Shift_Id")]
-        //[ForeignKey("Shift")]
         public Guid ShiftId { get; set; }
+
+        [ForeignKey("ShiftId")]
         public Shift Shift { get; set; }
 
-        //[Required]
-        //[Column("FK_Role_Id")]
+        [Column("Role_Id")]
         public Guid RoleId { get; set; }
 
-        //[Required]
-        //[Column("Amount")]
+        [Column("Amount")]
         public byte Amount { get; set; }
 
     }

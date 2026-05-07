@@ -12,7 +12,7 @@ using Vagtplanlægnings_modul.Data;
 namespace Vagtplanlægnings_modul.Migrations
 {
     [DbContext(typeof(TimegripDbContext))]
-    [Migration("20260507101833_InitialCreate")]
+    [Migration("20260507110005_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -78,11 +78,18 @@ namespace Vagtplanlægnings_modul.Migrations
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("Role_Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("isPrimary")
                         .HasColumnType("bit")
                         .HasColumnName("isPrimary");
 
                     b.HasKey("EmployeeRoleId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("Role_Id");
 
                     b.ToTable("EmployeeRoles");
                 });
@@ -135,6 +142,25 @@ namespace Vagtplanlægnings_modul.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.EmployeeRole", b =>
+                {
+                    b.HasOne("Vagtplanlægnings_modul.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vagtplanlægnings_modul.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("Role_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Vagtplanlægnings_modul.Models.Employment", b =>
