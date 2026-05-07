@@ -48,7 +48,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapEmployeeEndpoint();
-app.MapUserEndpoint();
 
 app.MapRoleEndpoint();
 
