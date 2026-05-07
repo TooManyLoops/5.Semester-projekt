@@ -13,7 +13,7 @@ namespace Vagtplanlægnings_modul.Models
         //[Column("FK_Shift_Id")]
         //[ForeignKey("Shift")]
         public Guid ShiftId { get; set; }
-        public Shift Shift { get; set; }
+        public Shift Shift { get; set; } = null!;
 
         //[Required]
         //[Column("FK_Role_Id")]
@@ -22,6 +22,5 @@ namespace Vagtplanlægnings_modul.Models
         //[Required]
         //[Column("Amount")]
         public byte Amount { get; set; }
-
     }
 }

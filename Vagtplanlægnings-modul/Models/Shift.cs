@@ -8,14 +8,12 @@ namespace Vagtplanlægnings_modul.Models
     {
         [Key]
         [Column("Shift_Id")]
-        public Guid ShiftId { get; set; } = Guid.NewGuid();
+        public Guid ShiftId { get; set; }
 
-       
-        [Column("StartTime")]
+        [Column("startTime")]
         public DateTime StartTime { get; set; }
 
-        
-        [Column("EndTime")]
+        [Column("endTime")]
         public DateTime EndTime { get; set; }
     }
 }

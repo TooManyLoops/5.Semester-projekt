@@ -5,11 +5,12 @@ namespace Vagtplanlægnings_modul.Models;
 
 public class EmployeeRoleRequest
 {
-    public Guid EmployeeRoleId  { get; set; }
-    
+    [Required]
     public Guid EmployeeId { get; set; }
+    [Required]
     
     public Guid roleId { get; set; }
+    [Required]
     
     public bool isPrimary { get; set; }
 }

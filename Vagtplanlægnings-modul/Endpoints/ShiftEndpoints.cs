@@ -14,14 +14,10 @@ namespace Vagtplanlægnings_modul.Endpoints
             return app;
         }
 
-        public static async Task<IResult> CreateShift(
-            ShiftService service,
-            ShiftRequest request
-        )
+        public static async Task<IResult> CreateShift(ShiftService service, ShiftRequest request)
         {
             var result = await service.CreateShift(request);
             return TypedResults.Ok(result);
         }
-
     }
 }

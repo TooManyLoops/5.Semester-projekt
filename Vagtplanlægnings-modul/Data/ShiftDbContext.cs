@@ -10,5 +10,4 @@ public class ShiftDbContext : DbContext
 
     public DbSet<Shift> Shifts { get; set; }
     public DbSet<ShiftAssignment> ShiftAssignments { get; set; }
-
 }
