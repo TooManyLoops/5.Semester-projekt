@@ -12,7 +12,7 @@ using Vagtplanlægnings_modul.Data;
 namespace Vagtplanlægnings_modul.Migrations.ShiftDb
 {
     [DbContext(typeof(ShiftDbContext))]
-    [Migration("20260507102007_ShiftCreate")]
+    [Migration("20260507112101_ShiftCreate")]
     partial class ShiftCreate
     {
         /// <inheritdoc />
@@ -20,36 +20,10 @@ namespace Vagtplanlægnings_modul.Migrations.ShiftDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("shift")
                 .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Vagtplanlægnings_modul.Models.EmployeeRole", b =>
-                {
-                    b.Property<Guid>("EmployeeRoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("EmployeeRole_Id");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("isPrimary")
-                        .HasColumnType("bit")
-                        .HasColumnName("isPrimary");
-
-                    b.HasKey("EmployeeRoleId");
-
-                    b.ToTable("EmployeeRoles", "dbo", t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
-                });
 
             modelBuilder.Entity("Vagtplanlægnings_modul.Models.Shift", b =>
                 {
@@ -68,7 +42,7 @@ namespace Vagtplanlægnings_modul.Migrations.ShiftDb
 
                     b.HasKey("ShiftId");
 
-                    b.ToTable("Shifts", "shift");
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("Vagtplanlægnings_modul.Models.ShiftAssignment", b =>
@@ -84,11 +58,10 @@ namespace Vagtplanlægnings_modul.Migrations.ShiftDb
 
                     b.Property<Guid>("EmployeeRoleId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("FK_EmployeeRole_Id");
+                        .HasColumnName("EmployeeRole_Id");
 
                     b.Property<Guid>("ShiftId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("FK_Shift_Id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint")
@@ -96,21 +69,49 @@ namespace Vagtplanlægnings_modul.Migrations.ShiftDb
 
                     b.HasKey("ShiftAssignmentId");
 
-                    b.HasIndex("EmployeeRoleId");
+                    b.HasIndex("ShiftId");
+
+                    b.ToTable("ShiftAssignments");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.ShiftRequirement", b =>
+                {
+                    b.Property<Guid>("ShiftRequirementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ShiftRequirement_Id");
+
+                    b.Property<byte>("Amount")
+                        .HasColumnType("tinyint")
+                        .HasColumnName("Amount");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Role_Id");
+
+                    b.Property<Guid>("ShiftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ShiftRequirementId");
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("ShiftAssignments", "shift");
+                    b.ToTable("ShiftRequirements");
                 });
 
             modelBuilder.Entity("Vagtplanlægnings_modul.Models.ShiftAssignment", b =>
                 {
-                    b.HasOne("Vagtplanlægnings_modul.Models.EmployeeRole", null)
+                    b.HasOne("Vagtplanlægnings_modul.Models.Shift", "Shift")
                         .WithMany()
-                        .HasForeignKey("EmployeeRoleId")
+                        .HasForeignKey("ShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Shift");
+                });
+
+            modelBuilder.Entity("Vagtplanlægnings_modul.Models.ShiftRequirement", b =>
+                {
                     b.HasOne("Vagtplanlægnings_modul.Models.Shift", "Shift")
                         .WithMany()
                         .HasForeignKey("ShiftId")

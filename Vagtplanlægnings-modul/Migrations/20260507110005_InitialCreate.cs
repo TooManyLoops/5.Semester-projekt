@@ -12,20 +12,6 @@ namespace Vagtplanlægnings_modul.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "EmployeeRoles",
-                columns: table => new
-                {
-                    EmployeeRole_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    isPrimary = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeRoles", x => x.EmployeeRole_Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -76,6 +62,43 @@ namespace Vagtplanlægnings_modul.Migrations
                         principalColumn: "employee_Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeRoles",
+                columns: table => new
+                {
+                    EmployeeRole_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Role_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    isPrimary = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeRoles", x => x.EmployeeRole_Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeRoles_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "employee_Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EmployeeRoles_Roles_Role_Id",
+                        column: x => x.Role_Id,
+                        principalTable: "Roles",
+                        principalColumn: "role_Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeRoles_EmployeeId",
+                table: "EmployeeRoles",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeRoles_Role_Id",
+                table: "EmployeeRoles",
+                column: "Role_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employments_EmployeeId",
