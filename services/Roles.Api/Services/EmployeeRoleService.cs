@@ -26,10 +26,32 @@ public class EmployeeRoleService(RolesDbContext context)
 
     public async Task<List<EmployeeRoleResponse>> GetEmployeeRoles(Guid employeeId)
     {
-        return await context.EmployeeRoles.AsNoTracking()
+        return await context
+            .EmployeeRoles.AsNoTracking()
             .Where(employeeRole => employeeRole.EmployeeId == employeeId)
             .Select(employeeRole => ToResponse(employeeRole))
             .ToListAsync();
+    }
+
+    public async Task<EmployeeRoleResponse?> UpdateEmployeeRole(
+        Guid employeeRoleId,
+        UpdateEmployeeRoleRequest request
+    )
+    {
+        var employeeRole = await context.EmployeeRoles.FindAsync(employeeRoleId);
+
+        if (employeeRole is null)
+        {
+            return null;
+        }
+
+        if (request.IsPrimary is not null)
+        {
+            employeeRole.IsPrimary = request.IsPrimary.Value;
+        }
+
+        await context.SaveChangesAsync();
+        return ToResponse(employeeRole);
     }
 
     private static EmployeeRoleResponse ToResponse(EmployeeRole employeeRole)

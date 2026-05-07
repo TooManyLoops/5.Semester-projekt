@@ -15,6 +15,9 @@ public static class EmployeeRoleEndpoints
             .MapGet("/employee/{employeeId:guid}", GetEmployeeRoles)
             .WithName("GetEmployeeRoles");
 
+        employeeRoles
+            .MapPatch("/{employeeRoleId:guid}", UpdateEmployeeRole)
+            .WithName("UpdateEmployeeRole");
         return app;
     }
 
@@ -41,6 +44,21 @@ public static class EmployeeRoleEndpoints
     {
         var result = await service.GetEmployeeRoles(employeeId);
         return TypedResults.Ok(result);
+    }
+
+    private static async Task<IResult> UpdateEmployeeRole(
+        EmployeeRoleService service,
+        Guid employeeRoleId,
+        UpdateEmployeeRoleRequest request
+    )
+    {
+        var result = await service.UpdateEmployeeRole(employeeRoleId, request);
+
+        return result is null
+            ? TypedResults.NotFound(
+                new { Message = "Employee role was not found.", EmployeeRoleId = employeeRoleId }
+            )
+            : TypedResults.Ok(result);
     }
 
     private static List<ValidationResult> Validate<T>(T model)

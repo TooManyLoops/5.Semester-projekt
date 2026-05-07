@@ -13,7 +13,9 @@ public class EmployeeService(EmployeesDbContext context)
     {
         var email = request.Email.Trim();
 
-        var emailAlreadyExists = await context.Employees.AnyAsync(employee => employee.Email == email);
+        var emailAlreadyExists = await context.Employees.AnyAsync(employee =>
+            employee.Email == email
+        );
 
         if (emailAlreadyExists)
         {
@@ -51,20 +53,25 @@ public class EmployeeService(EmployeesDbContext context)
 
     public async Task<List<EmployeeResponse>> GetAllEmployees()
     {
-        return await context.Employees.AsNoTracking()
+        return await context
+            .Employees.AsNoTracking()
             .Select(employee => ToResponse(employee))
             .ToListAsync();
     }
 
     public async Task<EmployeeResponse?> GetEmployee(Guid employeeId)
     {
-        return await context.Employees.AsNoTracking()
+        return await context
+            .Employees.AsNoTracking()
             .Where(employee => employee.EmployeeId == employeeId)
             .Select(employee => ToResponse(employee))
             .FirstOrDefaultAsync();
     }
 
-    public async Task<EmployeeResponse?> UpdateEmployee(Guid employeeId, UpdateEmployeeRequest request)
+    public async Task<EmployeeResponse?> UpdateEmployee(
+        Guid employeeId,
+        UpdateEmployeeRequest request
+    )
     {
         var employee = await context.Employees.FindAsync(employeeId);
 
