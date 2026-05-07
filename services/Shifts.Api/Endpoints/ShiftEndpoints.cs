@@ -17,7 +17,7 @@ public static class ShiftEndpoints
         return app;
     }
 
-    private static async Task<IResult> CreateShift(ShiftService service, ShiftRequest request)
+    private static async Task<IResult> CreateShift(ShiftLogic logic, ShiftRequest request)
     {
         var validationResults = Validate(request);
 
@@ -26,8 +26,19 @@ public static class ShiftEndpoints
             return TypedResults.BadRequest(validationResults);
         }
 
-        var result = await service.CreateShift(request);
-        return TypedResults.Created($"/shifts/{result.ShiftId}", result);
+        try
+        {
+            var result = await logic.CreateShift(request);
+            return TypedResults.Created($"/shifts/{result.ShiftId}", result);
+        }
+        catch (ArgumentException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return TypedResults.Problem("Der skete en uventet fejl");
+        }
     }
 
     private static async Task<IResult> GetShifts(ShiftService service)

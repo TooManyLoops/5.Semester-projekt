@@ -9,7 +9,7 @@ namespace Timegrip.Shifts.Api.Services;
 public class ShiftService(ShiftsDbContext context)
 {
     public async Task<ShiftResponse> CreateShift(ShiftRequest request)
-    {
+    {   
         var shift = new Shift
         {
             ShiftId = request.ShiftId ?? Guid.NewGuid(),
@@ -21,6 +21,42 @@ public class ShiftService(ShiftsDbContext context)
         await context.SaveChangesAsync();
 
         return ToResponse(shift);
+    }
+
+    public async Task<ShiftResponse> CreateShiftWithRequirements(ShiftRequest request)
+    {
+        await using var transaction = await context.Database.BeginTransactionAsync();
+        try
+        {
+            var shift = new Shift
+            {
+                ShiftId = request.ShiftId ?? Guid.NewGuid(),
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+            };
+            context.Shifts.Add(shift);
+
+            foreach (var requirement in request.Requirements)
+            {
+                var shiftRequirement = new ShiftRequirement
+                {
+                    ShiftId = shift.ShiftId,
+                    RequirementId = requirement.RequirementId ?? Guid.NewGuid(),
+                    Amount = requirement.Amount,
+                    RoleId = requirement.RoleId,
+                };
+                context.ShiftRequirements.Add(shiftRequirement);
+            }
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return ToResponse(shift);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }        
     }
 
     public async Task<List<ShiftResponse>> GetShifts()

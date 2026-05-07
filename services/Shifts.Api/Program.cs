@@ -9,6 +9,7 @@ DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<ShiftService>();
+builder.Services.AddScoped<ShiftLogic>();
 builder.Services.AddDbContext<ShiftsDbContext>(options =>
     options.UseSqlServer(GetConnectionString(), sql =>
         sql.UseCompatibilityLevel(160)
