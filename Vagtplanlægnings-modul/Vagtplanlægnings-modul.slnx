@@ -1,3 +1,7 @@
 <Solution>
+  <Project Path="../Timegrip-Frontend/Timegrip-Frontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
   <Project Path="Vagtplanlægnings-modul.csproj" />
 </Solution>
