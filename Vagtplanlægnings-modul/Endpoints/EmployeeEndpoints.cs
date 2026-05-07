@@ -19,8 +19,27 @@ public static class EmployeeEndpoints
         employeeEndpoint.MapGet("/statuses", GetEmployeeStatuses).WithName("GetEmployeeStatuses");
         employeeEndpoint.MapGet("/all", GetAllEmployees).WithName("GetEmployees");
         employeeEndpoint.MapGet("/{employeeId}", GetEmployee).WithName("GetEmployee");
+        employeeEndpoint.MapPut("/{employeeId}", UpdateEmployee).WithName("UpdateEmployee");
 
         return app;
+    }
+
+    public static async Task<IResult> UpdateEmployee(
+        EmployeeService service,
+        Guid employeeId,
+        UpdateEmployeeRequest request
+    )
+    {
+        var result = await service.UpdateEmployee(employeeId, request);
+
+        if (result is null)
+        {
+            return TypedResults.NotFound(
+                new { Message = "Employee was not found.", EmployeeId = employeeId }
+            );
+        }
+
+        return TypedResults.Ok(result);
     }
 
     public static async Task<IResult> GetEmployee(EmployeeService service, Guid employeeId)

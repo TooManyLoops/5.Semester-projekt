@@ -90,4 +90,54 @@ public class EmployeeService(TimegripDbContext context)
             })
             .FirstOrDefaultAsync();
     }
+
+    public async Task<EmployeeResponse?> UpdateEmployee(
+        Guid employeeId,
+        UpdateEmployeeRequest request
+    )
+    {
+        var employee = await context.Employees.FindAsync(employeeId);
+
+        if (employee is null)
+        {
+            return null;
+        }
+
+        if (request.Email is not null)
+        {
+            employee.Email = request.Email.Trim();
+        }
+
+        if (request.FirstName is not null)
+        {
+            employee.FirstName = request.FirstName;
+        }
+
+        if (request.LastName is not null)
+        {
+            employee.LastName = request.LastName;
+        }
+
+        if (request.EmployeeStatus.HasValue)
+        {
+            employee.Status = request.EmployeeStatus.Value;
+        }
+
+        if (request.PhoneNumber is not null)
+        {
+            employee.PhoneNumber = request.PhoneNumber;
+        }
+
+        await context.SaveChangesAsync();
+        return new EmployeeResponse
+        {
+            EmployeeId = employee.EmployeeId,
+            Email = employee.Email,
+            FirstName = employee.FirstName,
+            LastName = employee.LastName,
+            HiredAt = employee.HiredAt,
+            EmployeeStatus = employee.Status,
+            PhoneNumber = employee.PhoneNumber,
+        };
+    }
 }
