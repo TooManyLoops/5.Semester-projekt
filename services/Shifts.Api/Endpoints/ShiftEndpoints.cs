@@ -17,7 +17,7 @@ public static class ShiftEndpoints
         return app;
     }
 
-    private static async Task<IResult> CreateShift(ShiftLogic logic, ShiftRequest request)
+    private static async Task<IResult> CreateShift(ShiftService service, ShiftRequest request)
     {
         var validationResults = Validate(request);
 
@@ -28,7 +28,7 @@ public static class ShiftEndpoints
 
         try
         {
-            var result = await logic.CreateShift(request);
+            var result = await Service.ValidateCreateShift(request);
             return TypedResults.Created($"/shifts/{result.ShiftId}", result);
         }
         catch (ArgumentException ex)

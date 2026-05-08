@@ -8,6 +8,20 @@ namespace Timegrip.Shifts.Api.Services;
 
 public class ShiftService(ShiftsDbContext context)
 {
+
+    public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
+    {
+        if (request.Requirements is not null && request.Requirements.Any())
+        {
+            if (request.Requirements.Any(r =>
+                r.RoleId == Guid.Empty ||
+                r.Amount == 0))
+                throw new ArgumentException("Alle felter i Requirements skal være udfyldt");
+            return await CreateShiftWithRequirements(request);
+        }
+        return await CreateShift(request);
+    }
+
     public async Task<ShiftResponse> CreateShift(ShiftRequest request)
     {   
         var shift = new Shift
