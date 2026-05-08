@@ -1,3 +1,5 @@
+using Timegrip.Shifts.Api.Models;
+
 namespace Timegrip.Shifts.Api.Responses;
 
 public class ShiftResponse

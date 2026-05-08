@@ -28,7 +28,7 @@ public static class ShiftEndpoints
 
         try
         {
-            var result = await Service.ValidateCreateShift(request);
+            var result = await service.ValidateCreateShift(request);
             return TypedResults.Created($"/shifts/{result.ShiftId}", result);
         }
         catch (ArgumentException ex)

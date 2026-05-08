@@ -11,9 +11,9 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
-        if (request.Requirements is not null && request.Requirements.Any())
+        if (request.ShiftRequirements is not null && request.ShiftRequirements.Any())
         {
-            if (request.Requirements.Any(r =>
+            if (request.ShiftRequirements.Any(r =>
                 r.RoleId == Guid.Empty ||
                 r.Amount == 0))
                 throw new ArgumentException("Alle felter i Requirements skal være udfyldt");
@@ -50,12 +50,12 @@ public class ShiftService(ShiftsDbContext context)
             };
             context.Shifts.Add(shift);
 
-            foreach (var requirement in request.Requirements)
+            foreach (var requirement in request.ShiftRequirements)
             {
                 var shiftRequirement = new ShiftRequirement
                 {
                     ShiftId = shift.ShiftId,
-                    RequirementId = requirement.RequirementId ?? Guid.NewGuid(),
+                    RequirementId = new Guid.NewGuid(),
                     Amount = requirement.Amount,
                     RoleId = requirement.RoleId,
                 };
