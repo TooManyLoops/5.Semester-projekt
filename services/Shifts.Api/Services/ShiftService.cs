@@ -54,8 +54,7 @@ public class ShiftService(ShiftsDbContext context)
             {
                 var shiftRequirement = new ShiftRequirement
                 {
-                    ShiftId = shift.ShiftId,
-                    RequirementId = new Guid.NewGuid(),
+                    ShiftId = shift.ShiftId,                    
                     Amount = requirement.Amount,
                     RoleId = requirement.RoleId,
                 };

@@ -12,7 +12,7 @@ using Timegrip.Shifts.Api.Data;
 namespace Timegrip.Shifts.Api.Migrations
 {
     [DbContext(typeof(ShiftsDbContext))]
-    [Migration("20260507121729_InitialCreate")]
+    [Migration("20260511180347_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

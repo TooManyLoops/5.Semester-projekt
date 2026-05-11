@@ -7,7 +7,7 @@ public class ShiftRequirement
 {
     [Key]
     [Column("ShiftRequirement_Id")]
-    public Guid ShiftRequirementId { get; set; } = Guid.NewGuid();
+    public Guid ShiftRequirementId { get; set; }
 
     public Guid ShiftId { get; set; }
 

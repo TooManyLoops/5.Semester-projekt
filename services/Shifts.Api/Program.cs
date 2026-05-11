@@ -43,12 +43,12 @@ app.Run();
 
 static string GetConnectionString()
 {
-    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING_SHIFT");
 
     if (string.IsNullOrWhiteSpace(connectionString))
     {
         throw new InvalidOperationException(
-            $"CONNECTION_STRING not found. Current directory: {Directory.GetCurrentDirectory()}");
+            $"CONNECTION_STRING_SHIFT not found. Current directory: {Directory.GetCurrentDirectory()}");
     }
 
     return connectionString;
