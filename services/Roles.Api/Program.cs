@@ -50,7 +50,7 @@ static string GetConnectionString()
     if (string.IsNullOrWhiteSpace(connectionString))
     {
         throw new InvalidOperationException(
-            $"CONNECTION_STRING not found. Current directory: {Directory.GetCurrentDirectory()}");
+            $"CONNECTION_STRING_ROLES not found. Current directory: {Directory.GetCurrentDirectory()}");
     }
 
     return connectionString;
