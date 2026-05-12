@@ -16,6 +16,9 @@ public class EmployeeRole
     [Column("role_Id")]
     public Guid RoleId { get; set; }
 
+    [ForeignKey("RoleId")]
+    public Role Role { get; set; }
+
     [Column("isPrimary")]
     public bool IsPrimary { get; set; }
 }

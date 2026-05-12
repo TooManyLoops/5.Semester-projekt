@@ -45,7 +45,7 @@ app.Run();
 
 static string GetConnectionString()
 {
-    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING_ROLES");
 
     if (string.IsNullOrWhiteSpace(connectionString))
     {

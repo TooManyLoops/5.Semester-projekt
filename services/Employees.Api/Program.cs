@@ -54,12 +54,12 @@ app.Run();
 
 static string GetConnectionString()
 {
-    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING_EMPLOYEE");
 
     if (string.IsNullOrWhiteSpace(connectionString))
     {
         throw new InvalidOperationException(
-            $"CONNECTION_STRING not found. Current directory: {Directory.GetCurrentDirectory()}"
+            $"CONNECTION_STRING_EMPLOYEE not found. Current directory: {Directory.GetCurrentDirectory()}"
         );
     }
 

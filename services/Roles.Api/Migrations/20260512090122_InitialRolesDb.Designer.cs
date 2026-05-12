@@ -12,8 +12,8 @@ using Timegrip.Roles.Api.Data;
 namespace Timegrip.Roles.Api.Migrations
 {
     [DbContext(typeof(RolesDbContext))]
-    [Migration("20260507121729_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260512090122_InitialRolesDb")]
+    partial class InitialRolesDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,8 @@ namespace Timegrip.Roles.Api.Migrations
 
                     b.HasKey("EmployeeRoleId");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("EmployeeRoles", "Role");
                 });
 
@@ -70,6 +72,17 @@ namespace Timegrip.Roles.Api.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles", "Role");
+                });
+
+            modelBuilder.Entity("Timegrip.Roles.Api.Models.EmployeeRole", b =>
+                {
+                    b.HasOne("Timegrip.Roles.Api.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

@@ -26,7 +26,7 @@ public class ShiftService(ShiftsDbContext context)
     {   
         var shift = new Shift
         {
-            ShiftId = request.ShiftId ?? Guid.NewGuid(),
+            ShiftId = Guid.NewGuid(),
             StartTime = request.StartTime,
             EndTime = request.EndTime,
         };
@@ -44,7 +44,7 @@ public class ShiftService(ShiftsDbContext context)
         {
             var shift = new Shift
             {
-                ShiftId = request.ShiftId ?? Guid.NewGuid(),
+                ShiftId = Guid.NewGuid(),
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
             };
