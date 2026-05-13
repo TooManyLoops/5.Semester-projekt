@@ -11,6 +11,10 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
+        if (request.StartTime !>= DateTime.Now && request.EndTime !> request.StartTime)
+        {
+            throw new ArgumentException("En eller flere datoer er ikke indtastet korrekt");
+        }
         if (request.ShiftRequirements is not null && request.ShiftRequirements.Any())
         {
             if (request.ShiftRequirements.Any(r =>
@@ -22,7 +26,7 @@ public class ShiftService(ShiftsDbContext context)
         return await CreateShift(request);
     }
 
-    public async Task<ShiftResponse> CreateShift(ShiftRequest request)
+    private async Task<ShiftResponse> CreateShift(ShiftRequest request)
     {   
         var shift = new Shift
         {
@@ -37,7 +41,7 @@ public class ShiftService(ShiftsDbContext context)
         return ToResponse(shift);
     }
 
-    public async Task<ShiftResponse> CreateShiftWithRequirements(ShiftRequest request)
+    private async Task<ShiftResponse> CreateShiftWithRequirements(ShiftRequest request)
     {
         await using var transaction = await context.Database.BeginTransactionAsync();
         try
@@ -85,6 +89,24 @@ public class ShiftService(ShiftsDbContext context)
             .Where(shift => shift.ShiftId == shiftId)
             .Select(shift => ToResponse(shift))
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
+    {
+        var shiftAssignments = await context.ShiftAssignments.AsNoTracking()
+            .Where(sa => sa.employeeRole_Id == employeeRoleId)    
+            .ToListAsync();
+
+        var shiftList = new List<ShiftResponse>?();
+        shiftList.ShiftAssignments = shiftAssignments;
+        foreach (ShiftAssignment sa in shiftAssignments)
+        {
+            var shift = await context.Shifts.AsNoTracking()
+                .Where(s => s.ShiftId == sa.ShiftId)
+                .FirstOrDefaultAsync();
+            shiftList.Add(ToResponse(shift))
+        }
+        return shiftList;
     }
 
     private static ShiftResponse ToResponse(Shift shift)
