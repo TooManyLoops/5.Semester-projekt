@@ -12,8 +12,8 @@ using Timegrip.Employees.Api.Data;
 namespace Timegrip.Employees.Api.Migrations
 {
     [DbContext(typeof(EmployeesDbContext))]
-    [Migration("20260512085825_InitialEmployeeDb")]
-    partial class InitialEmployeeDb
+    [Migration("20260513112817_InitialEmployeeCreate")]
+    partial class InitialEmployeeCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,6 +66,34 @@ namespace Timegrip.Employees.Api.Migrations
                     b.ToTable("Employees", "Employee");
                 });
 
+            modelBuilder.Entity("Timegrip.Employees.Api.Models.EmployeeRole", b =>
+                {
+                    b.Property<Guid>("EmployeeRoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("employeeRole_Id");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("employee_Id");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit")
+                        .HasColumnName("isPrimary");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("role_Id");
+
+                    b.HasKey("EmployeeRoleId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("EmployeeRoles", "Employee");
+                });
+
             modelBuilder.Entity("Timegrip.Employees.Api.Models.Employment", b =>
                 {
                     b.Property<Guid>("EmploymentId")
@@ -92,6 +120,47 @@ namespace Timegrip.Employees.Api.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("Employments", "Employee");
+                });
+
+            modelBuilder.Entity("Timegrip.Employees.Api.Models.Role", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("role_Id");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("role_name");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Roles", "Employee");
+                });
+
+            modelBuilder.Entity("Timegrip.Employees.Api.Models.EmployeeRole", b =>
+                {
+                    b.HasOne("Timegrip.Employees.Api.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Timegrip.Employees.Api.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Timegrip.Employees.Api.Models.Employment", b =>

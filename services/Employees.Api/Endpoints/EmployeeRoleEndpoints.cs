@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using Timegrip.Roles.Api.Requests;
-using Timegrip.Roles.Api.Services;
+﻿using System.ComponentModel.DataAnnotations;
+using Timegrip.Employees.Api.Requests;
+using Timegrip.Employees.Api.Services;
 
-namespace Timegrip.Roles.Api.Endpoints;
+namespace Timegrip.Employees.Api.Endpoints;
 
 public static class EmployeeRoleEndpoints
 {

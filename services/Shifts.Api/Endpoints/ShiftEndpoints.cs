@@ -41,9 +41,8 @@ public static class ShiftEndpoints
             return TypedResults.Problem("Der skete en uventet fejl");
         }
     }
+
     //Returns a list of all shifts in the system.
-    //This endpoint is useful for administrators or managers who need to view all scheduled shifts, regardless of employee assignment.
-    //It can be used to monitor overall shift coverage and identify any gaps in scheduling.
     private static async Task<IResult> GetShifts(ShiftService service)
     {
         var result = await service.GetShifts();
@@ -60,8 +59,6 @@ public static class ShiftEndpoints
     }
 
     //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
-    //This endpoint is useful for employees to view their own scheduled shifts, as well as for managers to check the shift assignments of their team members.
-    //It helps employees stay informed about their upcoming work schedule and allows managers to ensure that shifts are properly staffed.
     private static async Task<IResult> GetAllShiftsForEmployeeId(ShiftService service, Guid employeeRoleId)
     {
         if (employeeRoleId == Guid.Empty || employeeRoleId == null)

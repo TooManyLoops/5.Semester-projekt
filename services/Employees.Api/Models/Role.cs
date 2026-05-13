@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Timegrip.Roles.Api.Models;
+namespace Timegrip.Employees.Api.Models;
 
 [Table("Roles")]
 public class Role

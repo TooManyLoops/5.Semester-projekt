@@ -1,4 +1,4 @@
-namespace Timegrip.Roles.Api.Responses;
+namespace Timegrip.Employees.Api.Responses;
 
 public class EmployeeRoleResponse
 {

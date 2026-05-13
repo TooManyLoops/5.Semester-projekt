@@ -9,6 +9,8 @@ DotNetEnv.Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<EmployeeRoleService>();
 builder.Services.AddDbContext<EmployeesDbContext>(options =>
     options.UseSqlServer(
         GetConnectionString(),

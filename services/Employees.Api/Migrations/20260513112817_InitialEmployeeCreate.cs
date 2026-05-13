@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Timegrip.Employees.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialEmployeeDb : Migration
+    public partial class InitialEmployeeCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +33,20 @@ namespace Timegrip.Employees.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Roles",
+                schema: "Employee",
+                columns: table => new
+                {
+                    role_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    role_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.role_Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employments",
                 schema: "Employee",
                 columns: table => new
@@ -56,6 +70,47 @@ namespace Timegrip.Employees.Api.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "EmployeeRoles",
+                schema: "Employee",
+                columns: table => new
+                {
+                    employeeRole_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    employee_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    role_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    isPrimary = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeRoles", x => x.employeeRole_Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeRoles_Employees_employee_Id",
+                        column: x => x.employee_Id,
+                        principalSchema: "Employee",
+                        principalTable: "Employees",
+                        principalColumn: "employee_Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EmployeeRoles_Roles_role_Id",
+                        column: x => x.role_Id,
+                        principalSchema: "Employee",
+                        principalTable: "Roles",
+                        principalColumn: "role_Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeRoles_employee_Id",
+                schema: "Employee",
+                table: "EmployeeRoles",
+                column: "employee_Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeRoles_role_Id",
+                schema: "Employee",
+                table: "EmployeeRoles",
+                column: "role_Id");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Employments_EmployeeId",
                 schema: "Employee",
@@ -67,7 +122,15 @@ namespace Timegrip.Employees.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "EmployeeRoles",
+                schema: "Employee");
+
+            migrationBuilder.DropTable(
                 name: "Employments",
+                schema: "Employee");
+
+            migrationBuilder.DropTable(
+                name: "Roles",
                 schema: "Employee");
 
             migrationBuilder.DropTable(

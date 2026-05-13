@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Timegrip.Roles.Api.Requests;
+namespace Timegrip.Employees.Api.Requests;
 
 public class EmployeeRoleRequest
 {

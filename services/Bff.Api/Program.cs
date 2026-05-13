@@ -53,7 +53,7 @@ app.MapMethods(
         ProxyRequest(
             context,
             httpClientFactory,
-            GetServiceBaseUrl("ROLES_API_URL", "http://localhost:5002"),
+            GetServiceBaseUrl("EMPLOYEES_API_URL_API_URL", "http://localhost:5001"),
             "roles",
             path
         )
@@ -66,7 +66,7 @@ app.MapMethods(
         ProxyRequest(
             context,
             httpClientFactory,
-            GetServiceBaseUrl("ROLES_API_URL", "http://localhost:5002"),
+            GetServiceBaseUrl("EMPLOYEES_API_URL_API_URL", "http://localhost:5001"),
             "employee-roles",
             path
         )
@@ -79,7 +79,7 @@ app.MapMethods(
         ProxyRequest(
             context,
             httpClientFactory,
-            GetServiceBaseUrl("SHIFTS_API_URL", "http://localhost:5003"),
+            GetServiceBaseUrl("SHIFTS_API_URL", "http://localhost:5002"),
             "shifts",
             path
         )

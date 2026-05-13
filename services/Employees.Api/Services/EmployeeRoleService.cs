@@ -1,12 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using Timegrip.Roles.Api.Data;
-using Timegrip.Roles.Api.Models;
-using Timegrip.Roles.Api.Requests;
-using Timegrip.Roles.Api.Responses;
+﻿using Microsoft.EntityFrameworkCore;
+using Timegrip.Employees.Api.Data;
+using Timegrip.Employees.Api.Models;
+using Timegrip.Employees.Api.Requests;
+using Timegrip.Employees.Api.Responses;
 
-namespace Timegrip.Roles.Api.Services;
+namespace Timegrip.Employees.Api.Services;
 
-public class EmployeeRoleService(RolesDbContext context)
+public class EmployeeRoleService(EmployeesDbContext context)
 {
     public async Task<EmployeeRoleResponse> CreateEmployeeRole(EmployeeRoleRequest request)
     {

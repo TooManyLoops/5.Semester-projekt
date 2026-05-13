@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Timegrip.Roles.Api.Models;
+namespace Timegrip.Employees.Api.Models;
 
 [Table("EmployeeRoles")]
 public class EmployeeRole
@@ -12,6 +12,9 @@ public class EmployeeRole
 
     [Column("employee_Id")]
     public Guid EmployeeId { get; set; }
+
+    [ForeignKey("EmployeeId")]
+    public Employee Employee { get; set; }
 
     [Column("role_Id")]
     public Guid RoleId { get; set; }
