@@ -1,0 +1,10 @@
+.layout {
+    display: flex;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    background-color: #f3f4f6;
+    min-height: calc(100vh - 60px);
+}

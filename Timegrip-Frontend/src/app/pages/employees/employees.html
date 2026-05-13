@@ -1,0 +1,36 @@
+<h1>Add Employee</h1>
+
+<form (ngSubmit)="addEmployee()">
+    <label>First name:</label>
+    <input type="text" [(ngModel)]="employee.firstName" name="firstName">
+
+    <br><br>
+
+    <label>Last name:</label>
+    <input type="text" [(ngModel)]="employee.lastName" name="lastName">
+
+    <br><br>
+
+    <label>Email:</label>
+    <input type="text" [(ngModel)]="employee.email" name="email">
+
+    <br><br>
+
+    <label>PhoneNumber:</label>
+    <input type="text" [(ngModel)]="employee.phoneNumber" name="phoneNumber">
+
+    <label>Status:</label>
+    <select [(ngModel)]="employee.employeeStatus" name="employeeStatus">
+        <option [ngValue]="1">Active</option>
+        <option [ngValue]="2">Inactive</option>
+        <option [ngValue]="3">terminated</option>
+        <option [ngValue]="4">On_Leave</option>
+    </select>
+
+    <br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+<p>Test: {{ employee.firstName }} {{ employee.lastName }} {{ employee.email }} {{ employee.phoneNumber }} {{
+    employee.employeeStatus }}</p>

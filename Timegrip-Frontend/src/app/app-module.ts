@@ -6,20 +6,15 @@ import { App } from './app';
 import { HttpClientModule } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
+import { Header } from './header/header';
+import { Sidebar } from './sidebar/sidebar';
+import { Employees } from './pages/employees/employees';
+import { Shifts } from './pages/shifts/shifts';
 
 @NgModule({
-  declarations: [
-    App
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    HttpClientModule
-  ],
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-  ],
-  bootstrap: [App]
+  declarations: [App, Header, Sidebar, Employees, Shifts],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
+  providers: [provideBrowserGlobalErrorListeners()],
+  bootstrap: [App],
 })
-export class AppModule { }
+export class AppModule {}
