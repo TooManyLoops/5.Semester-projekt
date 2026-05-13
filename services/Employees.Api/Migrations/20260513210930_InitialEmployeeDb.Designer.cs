@@ -12,8 +12,8 @@ using Timegrip.Employees.Api.Data;
 namespace Timegrip.Employees.Api.Migrations
 {
     [DbContext(typeof(EmployeesDbContext))]
-    [Migration("20260513112817_InitialEmployeeCreate")]
-    partial class InitialEmployeeCreate
+    [Migration("20260513210930_InitialEmployeeDb")]
+    partial class InitialEmployeeDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
