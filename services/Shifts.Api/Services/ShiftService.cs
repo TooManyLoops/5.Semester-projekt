@@ -56,6 +56,8 @@ public class ShiftService(ShiftsDbContext context)
 
             foreach (var requirement in request.ShiftRequirements)
             {
+                //Potentially make check for RoleId to be an empty GUID,
+                //as its not checked for in endpoint validation
                 var shiftRequirement = new ShiftRequirement
                 {
                     ShiftId = shift.ShiftId,                    
@@ -109,6 +111,25 @@ public class ShiftService(ShiftsDbContext context)
         return shiftList;
     }
 
+    public async Task AssignShiftToEmployee(ShiftAssignmentRequest assignmentRequest)
+    {
+        var Shift = GetShift(assignmentRequest.ShiftId);
+        if (Shift == null)
+        {
+            throw new KeyNotFoundException($"Shift with ID {assignmentRequest.ShiftId} not found");
+        }
+
+        var shiftAssignment = new ShiftAssignment
+        {
+            ShiftAssignmentId = Guid.NewGuid(),
+            ShiftId = assignmentRequest.ShiftId,
+            EmployeeId = assignmentRequest.EmployeeId,
+            Status = assignmentRequest.AssignmentStatus,
+            AssignedAt = DateTime.UtcNow
+        };
+        context.ShiftAssignments.Add(shiftAssignment);
+        await context.SaveChangesAsync();        
+    }
     private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse
