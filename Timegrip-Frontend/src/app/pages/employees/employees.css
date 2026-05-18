@@ -1,0 +1,62 @@
+.page {
+    padding: 30px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.add-button {
+    background-color: #96768f;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background-color: #cca1c3;
+}
+
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.employee-table th,
+.employee-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.edit-button {
+    margin-right: 8px;
+    padding: 6px 10px;
+}
+
+.employee-table thead {
+    background-color: #4b5563;
+    color: white;
+}
+
+.employee-table tbody tr:nth-child(even) {
+    background-color: #f3f4f6;
+}
+
+.employee-table tbody tr:nth-child(odd) {
+    background-color: white;
+}
+
+.employee-table tbody tr:hover {
+    background-color: #e5e7eb;
+}

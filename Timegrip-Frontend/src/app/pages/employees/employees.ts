@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -7,36 +7,48 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './employees.html',
   styleUrl: './employees.css',
 })
-export class Employees {
-  employee = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    employeeStatus: 1
-  };
+export class Employees implements OnInit {
 
-  constructor(private http: HttpClient) { }
+  employees: any[] = [];
 
-  addEmployee() {
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
-    alert('addEmployee bliver kaldt');
-
-    this.http.post('http://localhost:5000/api/employees/', this.employee)
-      .subscribe(
-        {
-          next: response => {
-            alert('Employee oprettet');
-            console.log(response);
-          },
-          error: error => {
-            alert('Fejl ved oprettelse');
-            console.error(error);
-            console.log('STATUS:', error.status);
-            console.log('VALIDATION ERROR:', error.error);
-            console.log('DATA SENDT:', this.employee);
-          }
-
-        });
+  ngOnInit() {
+    this.loadEmployees();
   }
+
+  loadEmployees() {
+    this.http.get<any[]>('http://localhost:5000/api/employees/')
+      .subscribe({
+        next: data => {
+          this.employees = data;
+          this.cdr.detectChanges();
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+  }
+
+  getStatusText(status: number): string {
+
+    switch (status) {
+
+      case 1:
+        return 'Active';
+
+      case 2:
+        return 'Inactive';
+
+      case 3:
+        return 'Terminated';
+
+      case 4:
+        return 'On Leave';
+
+      default:
+        return 'Unknown';
+    }
+  }
+
 }

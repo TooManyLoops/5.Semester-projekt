@@ -1,36 +1,37 @@
-<h1>Add Employee</h1>
+<div class="page">
 
-<form (ngSubmit)="addEmployee()">
-    <label>First name:</label>
-    <input type="text" [(ngModel)]="employee.firstName" name="firstName">
+    <div class="page-header">
+        <h1>Medarbejdere</h1>
 
-    <br><br>
+        <button class="add-button" routerLink="/employees/create">
+            Tilføj ny medarbejdere
+        </button>
+    </div>
 
-    <label>Last name:</label>
-    <input type="text" [(ngModel)]="employee.lastName" name="lastName">
+    <table class="employee-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone number</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
-    <br><br>
+        <tbody>
+            <tr *ngFor="let emp of employees">
+                <td>{{ emp.firstName }} {{ emp.lastName }}</td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.phoneNumber }}</td>
+                <td>{{ getStatusText(emp.employeeStatus) }}</td>
+                <td>
+                    <button class="edit-button" [routerLink]="['/employees/edit', emp.employeeId]">
+                        Edit
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-    <label>Email:</label>
-    <input type="text" [(ngModel)]="employee.email" name="email">
-
-    <br><br>
-
-    <label>PhoneNumber:</label>
-    <input type="text" [(ngModel)]="employee.phoneNumber" name="phoneNumber">
-
-    <label>Status:</label>
-    <select [(ngModel)]="employee.employeeStatus" name="employeeStatus">
-        <option [ngValue]="1">Active</option>
-        <option [ngValue]="2">Inactive</option>
-        <option [ngValue]="3">terminated</option>
-        <option [ngValue]="4">On_Leave</option>
-    </select>
-
-    <br><br>
-
-    <button type="submit">Save</button>
-</form>
-
-<p>Test: {{ employee.firstName }} {{ employee.lastName }} {{ employee.email }} {{ employee.phoneNumber }} {{
-    employee.employeeStatus }}</p>
+</div>

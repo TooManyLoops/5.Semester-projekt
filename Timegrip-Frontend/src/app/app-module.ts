@@ -10,11 +10,13 @@ import { Header } from './header/header';
 import { Sidebar } from './sidebar/sidebar';
 import { Employees } from './pages/employees/employees';
 import { Shifts } from './pages/shifts/shifts';
+import { CreateEmployee } from './pages/create-employee/create-employee';
+import { EditEmployee } from './pages/edit-employee/edit-employee';
 
 @NgModule({
-  declarations: [App, Header, Sidebar, Employees, Shifts],
+  declarations: [App, Header, Sidebar, Employees, Shifts, CreateEmployee, EditEmployee],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })
-export class AppModule {}
+export class AppModule { }
