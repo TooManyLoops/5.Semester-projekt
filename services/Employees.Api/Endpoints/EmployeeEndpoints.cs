@@ -45,9 +45,9 @@ public static class EmployeeEndpoints
         return TypedResults.Ok(result);
     }
 
-    private static async Task<IResult> GetAllEmployees(EmployeeService service)
+    private static async Task<IResult> GetAllEmployees(EmployeeService service, int? pageNumber)
     {
-        var result = await service.GetAllEmployees();
+        var result = await service.GetAllEmployees(pageNumber);
         return TypedResults.Ok(result);
     }
 
