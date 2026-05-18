@@ -10,12 +10,13 @@ import { Header } from './header/header';
 import { Sidebar } from './sidebar/sidebar';
 import { Employees } from './pages/employees/employees';
 import { Shifts } from './pages/shifts/shifts';
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { CreateEmployee } from './pages/create-employee/create-employee';
 import { EditEmployee } from './pages/edit-employee/edit-employee';
 
 @NgModule({
   declarations: [App, Header, Sidebar, Employees, Shifts, CreateEmployee, EditEmployee],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, FullCalendarModule],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })

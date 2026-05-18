@@ -36,16 +36,12 @@ export class Employees implements OnInit {
 
       case 1:
         return 'Active';
-
       case 2:
         return 'Inactive';
-
       case 3:
         return 'Terminated';
-
       case 4:
         return 'On Leave';
-
       default:
         return 'Unknown';
     }

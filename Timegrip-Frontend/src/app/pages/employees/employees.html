@@ -11,9 +11,9 @@
     <table class="employee-table">
         <thead>
             <tr>
-                <th>Name</th>
+                <th>Navn</th>
                 <th>Email</th>
-                <th>Phone number</th>
+                <th>Telefon nummer</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -27,7 +27,7 @@
                 <td>{{ getStatusText(emp.employeeStatus) }}</td>
                 <td>
                     <button class="edit-button" [routerLink]="['/employees/edit', emp.employeeId]">
-                        Edit
+                        <i class="bi bi-pencil"></i>
                     </button>
                 </td>
             </tr>
