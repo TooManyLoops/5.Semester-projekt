@@ -99,14 +99,13 @@ public class ShiftService(ShiftsDbContext context)
             .Where(sa => sa.employeeRole_Id == employeeRoleId)    
             .ToListAsync();
 
-        var shiftList = new List<ShiftResponse>?();
-        shiftList.ShiftAssignments = shiftAssignments;
+        var shiftList = new List<ShiftResponse>();
         foreach (ShiftAssignment sa in shiftAssignments)
         {
             var shift = await context.Shifts.AsNoTracking()
                 .Where(s => s.ShiftId == sa.ShiftId)
                 .FirstOrDefaultAsync();
-            shiftList.Add(ToResponse(shift))
+            shiftList.Add(ToResponse(shift));
         }
         return shiftList;
     }

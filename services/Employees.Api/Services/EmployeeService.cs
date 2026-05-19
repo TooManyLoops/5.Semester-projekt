@@ -51,7 +51,7 @@ public class EmployeeService(EmployeesDbContext context)
         return Task.FromResult(statuses);
     }
 
-    public async Task<List<EmployeeResponse>> GetAllEmployees(PaginationRequest pagination)
+    public async Task<List<EmployeeResponse>> GetAllEmployees(PaginationRequest? pagination)
     {
         var query = context.Employees
             .AsNoTracking()
