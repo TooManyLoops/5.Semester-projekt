@@ -129,6 +129,7 @@ public class ShiftService(ShiftsDbContext context)
         };
         context.ShiftAssignments.Add(shiftAssignment);
         var result = await context.SaveChangesAsync();
+        return result > 0;
     }
     private static ShiftResponse ToResponse(Shift shift)
     {
@@ -138,10 +139,5 @@ public class ShiftService(ShiftsDbContext context)
             StartTime = shift.StartTime,
             EndTime = shift.EndTime,
         };
-    }
-
-    private static bool ValidateDbOutput(int result)
-    {
-        return result > 0;
     }
 }

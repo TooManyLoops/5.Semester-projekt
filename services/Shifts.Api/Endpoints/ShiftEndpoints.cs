@@ -66,10 +66,10 @@ public static class ShiftEndpoints
         {
             return TypedResults.BadRequest("Invalid employee role ID");
         }
-
         try
         {
             var result = await service.GetAllShiftsForEmployeeId(employeeRoleId);
+            return TypedResults.Ok(result);
         }
         catch (ArgumentException ex)
         {
