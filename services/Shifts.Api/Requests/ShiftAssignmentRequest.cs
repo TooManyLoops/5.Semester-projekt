@@ -11,7 +11,7 @@ public class ShiftAssignmentRequest
     public Guid ShiftId { get; set; }
 
     [Required]
-    public Guid EmployeeId { get; set; }
+    public Guid EmployeeRoleId { get; set; }
 
     [Required]
     public AssignmentStatus AssignmentStatus { get; set; }

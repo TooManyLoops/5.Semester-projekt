@@ -95,8 +95,9 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
     {
-        var shiftAssignments = await context.ShiftAssignments.AsNoTracking()
-            .Where(sa => sa.employeeRole_Id == employeeRoleId)    
+        var shiftAssignments = await context.ShiftAssignments
+            .AsNoTracking()
+            .Where(sa => sa.EmployeeRoleId == employeeRoleId)    
             .ToListAsync();
 
         var shiftList = new List<ShiftResponse>();
@@ -110,7 +111,7 @@ public class ShiftService(ShiftsDbContext context)
         return shiftList;
     }
 
-    public async Task AssignShiftToEmployee(ShiftAssignmentRequest assignmentRequest)
+    public async Task<bool> AssignShiftToEmployee(ShiftAssignmentRequest assignmentRequest)
     {
         var Shift = GetShift(assignmentRequest.ShiftId);
         if (Shift == null)
@@ -122,12 +123,12 @@ public class ShiftService(ShiftsDbContext context)
         {
             ShiftAssignmentId = Guid.NewGuid(),
             ShiftId = assignmentRequest.ShiftId,
-            EmployeeId = assignmentRequest.EmployeeId,
-            Status = assignmentRequest.AssignmentStatus,
+            EmployeeRoleId = assignmentRequest.EmployeeRoleId,
+            Status = (byte) assignmentRequest.AssignmentStatus,
             AssignedAt = DateTime.UtcNow
         };
         context.ShiftAssignments.Add(shiftAssignment);
-        await context.SaveChangesAsync();        
+        var result = await context.SaveChangesAsync();
     }
     private static ShiftResponse ToResponse(Shift shift)
     {
@@ -137,5 +138,10 @@ public class ShiftService(ShiftsDbContext context)
             StartTime = shift.StartTime,
             EndTime = shift.EndTime,
         };
+    }
+
+    private static bool ValidateDbOutput(int result)
+    {
+        return result > 0;
     }
 }
