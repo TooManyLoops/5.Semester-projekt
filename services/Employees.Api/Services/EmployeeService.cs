@@ -53,15 +53,15 @@ public class EmployeeService(EmployeesDbContext context)
 
     public async Task<List<EmployeeResponse>> GetAllEmployees(PaginationRequest? pagination)
     {
-        var query = context.Employees
+        IQueryable<Employee> query = context.Employees
             .AsNoTracking()
             .OrderBy(b => b.FirstName);
 
         if (pagination.PageNumber.HasValue && pagination.PageSize.HasValue)
         {
             query = query
-                .Skip((pagination.pageNumber.Value - 1) * pagination.pageSize.Value)
-                .Take(pagination.pageSize.Value);
+                .Skip((pagination.PageNumber.Value - 1) * pagination.PageSize.Value)
+                .Take(pagination.PageSize.Value);
         }
         
         return await query
