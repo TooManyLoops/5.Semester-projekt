@@ -56,6 +56,8 @@ public class ShiftService(ShiftsDbContext context)
 
             foreach (var requirement in request.ShiftRequirements)
             {
+                //Potentially make check for RoleId to be an empty GUID,
+                //as its not checked for in endpoint validation
                 var shiftRequirement = new ShiftRequirement
                 {
                     ShiftId = shift.ShiftId,                    
@@ -93,22 +95,42 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
     {
-        var shiftAssignments = await context.ShiftAssignments.AsNoTracking()
-            .Where(sa => sa.employeeRole_Id == employeeRoleId)    
+        var shiftAssignments = await context.ShiftAssignments
+            .AsNoTracking()
+            .Where(sa => sa.EmployeeRoleId == employeeRoleId)    
             .ToListAsync();
 
-        var shiftList = new List<ShiftResponse>?();
-        shiftList.ShiftAssignments = shiftAssignments;
+        var shiftList = new List<ShiftResponse>();
         foreach (ShiftAssignment sa in shiftAssignments)
         {
             var shift = await context.Shifts.AsNoTracking()
                 .Where(s => s.ShiftId == sa.ShiftId)
                 .FirstOrDefaultAsync();
-            shiftList.Add(ToResponse(shift))
+            shiftList.Add(ToResponse(shift));
         }
         return shiftList;
     }
 
+    public async Task<bool> AssignShiftToEmployee(ShiftAssignmentRequest assignmentRequest)
+    {
+        var Shift = GetShift(assignmentRequest.ShiftId);
+        if (Shift == null)
+        {
+            throw new KeyNotFoundException($"Shift with ID {assignmentRequest.ShiftId} not found");
+        }
+
+        var shiftAssignment = new ShiftAssignment
+        {
+            ShiftAssignmentId = Guid.NewGuid(),
+            ShiftId = assignmentRequest.ShiftId,
+            EmployeeRoleId = assignmentRequest.EmployeeRoleId,
+            Status = (byte) assignmentRequest.AssignmentStatus,
+            AssignedAt = DateTime.UtcNow
+        };
+        context.ShiftAssignments.Add(shiftAssignment);
+        var result = await context.SaveChangesAsync();
+        return result > 0;
+    }
     private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse

@@ -51,14 +51,24 @@ public class EmployeeService(EmployeesDbContext context)
         return Task.FromResult(statuses);
     }
 
-    public async Task<List<EmployeeResponse>> GetAllEmployees()
+    public async Task<List<EmployeeResponse>> GetAllEmployees(PaginationRequest? pagination)
     {
-        return await context
-            .Employees.AsNoTracking()
+        IQueryable<Employee> query = context.Employees
+            .AsNoTracking()
+            .OrderBy(b => b.FirstName);
+
+        if (pagination.PageNumber.HasValue && pagination.PageSize.HasValue)
+        {
+            query = query
+                .Skip((pagination.PageNumber.Value - 1) * pagination.PageSize.Value)
+                .Take(pagination.PageSize.Value);
+        }
+        
+        return await query
             .Select(employee => ToResponse(employee))
             .ToListAsync();
     }
-
+    
     public async Task<EmployeeResponse?> GetEmployee(Guid employeeId)
     {
         return await context

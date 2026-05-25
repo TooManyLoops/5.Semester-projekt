@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Timegrip.Shifts.Api.Models;
 using Timegrip.Shifts.Api.Requests;
 using Timegrip.Shifts.Api.Services;
 
@@ -13,7 +14,7 @@ public static class ShiftEndpoints
         shifts.MapPost("/", CreateShift).WithName("CreateShift");
         shifts.MapGet("/", GetShifts).WithName("GetShifts");
         shifts.MapGet("/{shiftId:guid}", GetShift).WithName("GetShift");
-        shifts.MapGet("/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
+        shifts.MapGet("/all/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
 
         return app;
     }
@@ -61,14 +62,14 @@ public static class ShiftEndpoints
     //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
     private static async Task<IResult> GetAllShiftsForEmployeeId(ShiftService service, Guid employeeRoleId)
     {
-        if (employeeRoleId == Guid.Empty || employeeRoleId == null)
+        if (employeeRoleId == Guid.Empty)
         {
             return TypedResults.BadRequest("Invalid employee role ID");
         }
-
         try
         {
             var result = await service.GetAllShiftsForEmployeeId(employeeRoleId);
+            return TypedResults.Ok(result);
         }
         catch (ArgumentException ex)
         {
@@ -79,6 +80,37 @@ public static class ShiftEndpoints
             return TypedResults.Problem("Der skete en uventet fejl");
         }
 
+    }
+
+    public static async Task<IResult> AssignShiftToEmployee(ShiftService service, ShiftAssignmentRequest assignmentRequest)
+    {
+        var validationResults = Validate(assignmentRequest);
+
+        if (validationResults.Count > 0)
+        {
+            return TypedResults.BadRequest(validationResults);
+        }
+        if (assignmentRequest.ShiftId == Guid.Empty || assignmentRequest.EmployeeRoleId == Guid.Empty)
+        {
+            return TypedResults.BadRequest("Invalid shift or employee ID");
+        }
+
+        try
+        {
+            await service.AssignShiftToEmployee(assignmentRequest);
+            return TypedResults.Ok();
+        }
+        catch (ArgumentException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return TypedResults.Problem("Der skete en uventet fejl");
+        }
+
+        //Check if shift exists for extra security
+        //Check if BLL layer makes sense to have a method for this, or if it should be done in the controller.
     }
 
     private static List<ValidationResult> Validate<T>(T model)
