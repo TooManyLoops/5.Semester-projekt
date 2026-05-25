@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="services/Bff.Api/Bff.Api.csproj" />
   <Project Path="services/Employees.Api/Employees.Api.csproj" />
-  <Project Path="services/Roles.Api/Roles.Api.csproj" />
   <Project Path="services/Shifts.Api/Shifts.Api.csproj" />
 </Solution>
