@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<EmployeeRoleService>();
+builder.Services.AddScoped<VerificationService>();
 builder.Services.AddDbContext<EmployeesDbContext>(options =>
     options.UseSqlServer(
         GetConnectionString(),
@@ -41,7 +42,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-ApplyMigrations<EmployeesDbContext>(app);
+//ApplyMigrations<EmployeesDbContext>(app);
 
 app.UseCors("AllowFrontend");
 
