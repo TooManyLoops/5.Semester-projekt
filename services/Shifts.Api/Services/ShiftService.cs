@@ -6,9 +6,9 @@ using Timegrip.Shifts.Api.Responses;
 
 namespace Timegrip.Shifts.Api.Services;
 
-public class ShiftService(ShiftsDbContext context)
+public class ShiftService(ShiftsDbContext context, VerificationService verificationService)
 {
-
+    
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
         if (request.StartTime !>= DateTime.Now && request.EndTime !> request.StartTime)
@@ -111,8 +111,14 @@ public class ShiftService(ShiftsDbContext context)
         return shiftList;
     }
 
-    public async Task<bool> AssignShiftToEmployee(ShiftAssignmentRequest assignmentRequest)
+    public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
     {
+        var validationResult = await verificationService.VerifyEmployeeRoleById(assignmentRequest.EmployeeRoleId);
+        if (validationResult is false)
+        {
+            throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
+        }
+        
         var Shift = GetShift(assignmentRequest.ShiftId);
         if (Shift == null)
         {
@@ -131,6 +137,7 @@ public class ShiftService(ShiftsDbContext context)
         var result = await context.SaveChangesAsync();
         return result > 0;
     }
+    
     private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse
