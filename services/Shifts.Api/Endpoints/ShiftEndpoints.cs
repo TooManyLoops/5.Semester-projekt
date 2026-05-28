@@ -15,13 +15,14 @@ public static class ShiftEndpoints
         shifts.MapGet("/", GetShifts).WithName("GetShifts");
         shifts.MapGet("/{shiftId:guid}", GetShift).WithName("GetShift");
         shifts.MapGet("/all/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
-        shifts.MapPost("/", AssignShiftToEmployeeRole).WithName("AssignShiftToEmployeeRole");
+        shifts.MapPost("/Assign/", AssignShiftToEmployeeRole).WithName("AssignShiftToEmployeeRole");
 
         return app;
     }
 
     private static async Task<IResult> CreateShift(ShiftService service, ShiftRequest request)
     {
+        Console.WriteLine($"ShiftRequirements count: {request.ShiftRequirements?.Count ?? 0}");
         var validationResults = Validate(request);
 
         if (validationResults.Count > 0)
