@@ -402,5 +402,7 @@ FodyWeavers.xsd
 
 *.env
 
-#Fjern Ide Filer
-.idea/
+
+*.tsbuildinfo
+.angular/
+dist/
