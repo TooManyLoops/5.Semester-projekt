@@ -401,3 +401,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 *.env
+
+#Fjern Ide Filer
+.idea/
