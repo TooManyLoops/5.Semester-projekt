@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Timegrip.Employees.Api.Data;
 using Timegrip.Employees.Api.Endpoints;
 using Timegrip.Employees.Api.Services;
+using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
 
@@ -49,9 +50,13 @@ app.UseCors("AllowFrontend");
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.MapEmployeeEndpoints();
+app.MapEmployeeRoleEndpoints();
+app.MapRoleEndpoints();
+
 
 app.Run();
 

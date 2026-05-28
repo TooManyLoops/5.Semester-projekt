@@ -11,7 +11,7 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
     
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
-        if (request.StartTime !>= DateTime.Now && request.EndTime !> request.StartTime)
+        if (!(request.StartTime >= DateTime.Now) || !(request.EndTime > request.StartTime))
         {
             throw new ArgumentException("En eller flere datoer er ikke indtastet korrekt");
         }
@@ -43,39 +43,43 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
 
     private async Task<ShiftResponse> CreateShiftWithRequirements(ShiftRequest request)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync();
-        try
+        var strategy = context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
         {
-            var shift = new Shift
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
             {
-                ShiftId = Guid.NewGuid(),
-                StartTime = request.StartTime,
-                EndTime = request.EndTime,
-            };
-            context.Shifts.Add(shift);
-
-            foreach (var requirement in request.ShiftRequirements)
-            {
-                //Potentially make check for RoleId to be an empty GUID,
-                //as its not checked for in endpoint validation
-                var shiftRequirement = new ShiftRequirement
+                var shift = new Shift
                 {
-                    ShiftId = shift.ShiftId,                    
-                    Amount = requirement.Amount,
-                    RoleId = requirement.RoleId,
+                    ShiftId = Guid.NewGuid(),
+                    StartTime = request.StartTime,
+                    EndTime = request.EndTime,
                 };
-                context.ShiftRequirements.Add(shiftRequirement);
-            }
+                context.Shifts.Add(shift);
 
-            await context.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return ToResponse(shift);
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }        
+                foreach (var requirement in request.ShiftRequirements)
+                {
+                    //Potentially make check for RoleId to be an empty GUID,
+                    //as its not checked for in endpoint validation
+                    var shiftRequirement = new ShiftRequirement
+                    {
+                        ShiftId = shift.ShiftId,
+                        Amount = requirement.Amount,
+                        RoleId = requirement.RoleId,
+                    };
+                    context.ShiftRequirements.Add(shiftRequirement);
+                }
+
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return ToResponse(shift);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 
     public async Task<List<ShiftResponse>> GetShifts()

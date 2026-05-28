@@ -5,6 +5,7 @@ using Timegrip.Shifts.Api.Endpoints;
 using Timegrip.Shifts.Api.Services;
 using Polly;
 using Polly.Retry;
+using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
 
@@ -51,6 +52,7 @@ app.UseCors("AllowFrontend");
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.MapShiftEndpoints();
