@@ -401,3 +401,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 *.env
+
+*.tsbuildinfo
+.angular/
+dist/
