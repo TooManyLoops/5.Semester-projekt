@@ -26,6 +26,18 @@
         </div>
 
         <div class="form-row">
+            <label>Rolle</label>
+
+            <select [(ngModel)]="selectedRoleId" name="selectedRoleId">
+                <option value="">Vælg rolle</option>
+
+                <option *ngFor="let role of roles" [value]="role.roleId">
+                    {{ role.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
             <label>Status</label>
 
             <select [(ngModel)]="employee.employeeStatus" name="employeeStatus">

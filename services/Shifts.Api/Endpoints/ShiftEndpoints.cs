@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Timegrip.Shifts.Api.Models;
 using Timegrip.Shifts.Api.Requests;
 using Timegrip.Shifts.Api.Services;
 
@@ -13,6 +14,8 @@ public static class ShiftEndpoints
         shifts.MapPost("/", CreateShift).WithName("CreateShift");
         shifts.MapGet("/", GetShifts).WithName("GetShifts");
         shifts.MapGet("/{shiftId:guid}", GetShift).WithName("GetShift");
+        shifts.MapGet("/all/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
+        shifts.MapPost("/", AssignShiftToEmployeeRole).WithName("AssignShiftToEmployeeRole");
 
         return app;
     }
@@ -41,6 +44,7 @@ public static class ShiftEndpoints
         }
     }
 
+    //Returns a list of all shifts in the system.
     private static async Task<IResult> GetShifts(ShiftService service)
     {
         var result = await service.GetShifts();
@@ -54,6 +58,56 @@ public static class ShiftEndpoints
         return result is null
             ? TypedResults.NotFound(new { Message = "Shift was not found.", ShiftId = shiftId })
             : TypedResults.Ok(result);
+    }
+
+    //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
+    private static async Task<IResult> GetAllShiftsForEmployeeId(ShiftService service, Guid employeeRoleId)
+    {
+        if (employeeRoleId == Guid.Empty)
+        {
+            return TypedResults.BadRequest("Invalid employee role ID");
+        }
+        try
+        {
+            var result = await service.GetAllShiftsForEmployeeId(employeeRoleId);
+            return TypedResults.Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return TypedResults.Problem("Der skete en uventet fejl");
+        }
+
+    }
+
+    private static async Task<IResult> AssignShiftToEmployeeRole(ShiftService service, ShiftAssignmentRequest assignmentRequest)
+    {
+        var validationResults = Validate(assignmentRequest);
+
+        if (validationResults.Count > 0)
+        {
+            return TypedResults.BadRequest(validationResults);
+        }
+        if (assignmentRequest.ShiftId == Guid.Empty || assignmentRequest.EmployeeRoleId == Guid.Empty)
+        {
+            return TypedResults.BadRequest("Invalid shift or employee ID");
+        }
+        try
+        {
+            await service.AssignShiftToEmployeeRole(assignmentRequest);
+            return TypedResults.Ok();
+        }
+        catch (ArgumentException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return TypedResults.Problem("Der skete en uventet fejl");
+        }
     }
 
     private static List<ValidationResult> Validate<T>(T model)

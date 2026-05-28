@@ -1,6 +1,6 @@
 <div class="page">
 
-    <h1>Redigere medarbejdere</h1>
+    <h1>Rediger medarbejder</h1>
 
     <form class="employee-form" (ngSubmit)="updateEmployee()">
 
@@ -40,5 +40,39 @@
         </div>
 
     </form>
+
+    <hr>
+
+    <h2>Roller</h2>
+
+    <div class="role-section">
+
+        <h3>Nuværende roller</h3>
+
+        <ul>
+            <li *ngFor="let employeeRole of employeeRoles">
+                {{ getRoleName(employeeRole.roleId) }}
+            </li>
+        </ul>
+
+        <div class="form-row">
+            <label>Tilføj rolle</label>
+
+            <select [(ngModel)]="selectedRoleId" name="selectedRoleId">
+                <option value="">Vælg rolle</option>
+
+                <option *ngFor="let role of roles" [value]="role.roleId">
+                    {{ role.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="button-row">
+            <button type="button" (click)="addRoleToEmployee()">
+                Tilføj rolle
+            </button>
+        </div>
+
+    </div>
 
 </div>

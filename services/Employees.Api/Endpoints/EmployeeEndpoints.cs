@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Timegrip.Employees.Api.Enums;
 using Timegrip.Employees.Api.Requests;
 using Timegrip.Employees.Api.Services;
 
@@ -15,7 +16,7 @@ public static class EmployeeEndpoints
         employees.MapGet("/", GetAllEmployees).WithName("GetEmployees");
         employees.MapGet("/{employeeId:guid}", GetEmployee).WithName("GetEmployee");
         employees.MapPut("/{employeeId:guid}", UpdateEmployee).WithName("UpdateEmployee");
-
+        
         return app;
     }
 
@@ -45,12 +46,15 @@ public static class EmployeeEndpoints
         return TypedResults.Ok(result);
     }
 
-    private static async Task<IResult> GetAllEmployees(EmployeeService service)
+    //Takes an optional pagination parameter, if not provided, it will return all employees.
+    private static async Task<IResult> GetAllEmployees(EmployeeService service, PaginationRequest? pagination)
     {
-        var result = await service.GetAllEmployees();
+        var result = await service.GetAllEmployees(pagination);
         return TypedResults.Ok(result);
     }
 
+    
+    
     private static async Task<IResult> GetEmployee(EmployeeService service, Guid employeeId)
     {
         var result = await service.GetEmployee(employeeId);
@@ -71,6 +75,8 @@ public static class EmployeeEndpoints
             ? TypedResults.NotFound(new { Message = "Employee was not found.", EmployeeId = employeeId })
             : TypedResults.Ok(result);
     }
+    
+    
 
     private static List<ValidationResult> Validate<T>(T model)
     {

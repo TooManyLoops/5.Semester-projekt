@@ -9,10 +9,34 @@
         Medarbejdere
     </button>
 
-    <button routerLink="/shifts" routerLinkActive="active">
-        <i class="bi bi-calendar3"></i>
-        Vagtplan
-    </button>
+    <div class="sidebar-item-with-menu">
+
+        <button routerLink="/shifts" routerLinkActive="active" class="main-sidebar-button">
+            <i class="bi bi-calendar3"></i>
+            Vagtplan
+        </button>
+
+        <button type="button" class="dots-button" (click)="toggleShiftMenu()">
+            ⋮
+        </button>
+
+    </div>
+
+    <div *ngIf="showShiftMenu" class="submenu">
+
+        <button routerLink="/shifts/open" routerLinkActive="active">
+            Ledige vagter
+        </button>
+
+        <button routerLink="/shifts/create" routerLinkActive="active">
+            Opret vagter
+        </button>
+
+        <button routerLink="/shifts/approvals" routerLinkActive="active">
+            Godkend vagter
+        </button>
+
+    </div>
 
     <button>
         <i class="bi bi-pencil-square"></i>

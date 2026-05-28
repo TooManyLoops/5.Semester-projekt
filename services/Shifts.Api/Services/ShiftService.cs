@@ -6,11 +6,15 @@ using Timegrip.Shifts.Api.Responses;
 
 namespace Timegrip.Shifts.Api.Services;
 
-public class ShiftService(ShiftsDbContext context)
+public class ShiftService(ShiftsDbContext context, VerificationService verificationService)
 {
-
+    
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
+        if (request.StartTime !>= DateTime.Now && request.EndTime !> request.StartTime)
+        {
+            throw new ArgumentException("En eller flere datoer er ikke indtastet korrekt");
+        }
         if (request.ShiftRequirements is not null && request.ShiftRequirements.Any())
         {
             if (request.ShiftRequirements.Any(r =>
@@ -22,11 +26,11 @@ public class ShiftService(ShiftsDbContext context)
         return await CreateShift(request);
     }
 
-    public async Task<ShiftResponse> CreateShift(ShiftRequest request)
+    private async Task<ShiftResponse> CreateShift(ShiftRequest request)
     {   
         var shift = new Shift
         {
-            ShiftId = request.ShiftId ?? Guid.NewGuid(),
+            ShiftId = Guid.NewGuid(),
             StartTime = request.StartTime,
             EndTime = request.EndTime,
         };
@@ -37,14 +41,14 @@ public class ShiftService(ShiftsDbContext context)
         return ToResponse(shift);
     }
 
-    public async Task<ShiftResponse> CreateShiftWithRequirements(ShiftRequest request)
+    private async Task<ShiftResponse> CreateShiftWithRequirements(ShiftRequest request)
     {
         await using var transaction = await context.Database.BeginTransactionAsync();
         try
         {
             var shift = new Shift
             {
-                ShiftId = request.ShiftId ?? Guid.NewGuid(),
+                ShiftId = Guid.NewGuid(),
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
             };
@@ -52,6 +56,8 @@ public class ShiftService(ShiftsDbContext context)
 
             foreach (var requirement in request.ShiftRequirements)
             {
+                //Potentially make check for RoleId to be an empty GUID,
+                //as its not checked for in endpoint validation
                 var shiftRequirement = new ShiftRequirement
                 {
                     ShiftId = shift.ShiftId,                    
@@ -87,6 +93,51 @@ public class ShiftService(ShiftsDbContext context)
             .FirstOrDefaultAsync();
     }
 
+    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
+    {
+        var shiftAssignments = await context.ShiftAssignments
+            .AsNoTracking()
+            .Where(sa => sa.EmployeeRoleId == employeeRoleId)    
+            .ToListAsync();
+
+        var shiftList = new List<ShiftResponse>();
+        foreach (ShiftAssignment sa in shiftAssignments)
+        {
+            var shift = await context.Shifts.AsNoTracking()
+                .Where(s => s.ShiftId == sa.ShiftId)
+                .FirstOrDefaultAsync();
+            shiftList.Add(ToResponse(shift));
+        }
+        return shiftList;
+    }
+
+    public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
+    {
+        var validationResult = await verificationService.VerifyEmployeeRoleById(assignmentRequest.EmployeeRoleId);
+        if (validationResult is false)
+        {
+            throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
+        }
+        
+        var Shift = GetShift(assignmentRequest.ShiftId);
+        if (Shift == null)
+        {
+            throw new KeyNotFoundException($"Shift with ID {assignmentRequest.ShiftId} not found");
+        }
+
+        var shiftAssignment = new ShiftAssignment
+        {
+            ShiftAssignmentId = Guid.NewGuid(),
+            ShiftId = assignmentRequest.ShiftId,
+            EmployeeRoleId = assignmentRequest.EmployeeRoleId,
+            Status = (byte) assignmentRequest.AssignmentStatus,
+            AssignedAt = DateTime.UtcNow
+        };
+        context.ShiftAssignments.Add(shiftAssignment);
+        var result = await context.SaveChangesAsync();
+        return result > 0;
+    }
+    
     private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse

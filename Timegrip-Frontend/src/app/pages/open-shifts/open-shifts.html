@@ -1,0 +1,46 @@
+<div class="page">
+
+    <h1>Ledige vagter</h1>
+
+    <table class="shift-table">
+
+        <thead>
+            <tr>
+                <th>Rolle</th>
+                <th>Dato</th>
+                <th>Tid</th>
+                <th>Handling</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr *ngFor="let shift of openShifts">
+
+                <td>
+                    Ledig vagt
+                </td>
+
+                <td>
+                    {{ formatDate(shift.startTime) }}
+                </td>
+
+                <td>
+                    {{ formatTime(shift.startTime) }}
+                    -
+                    {{ formatTime(shift.endTime) }}
+                </td>
+
+                <td>
+                    <button class="join-button">
+                        Tilmeld vagt
+                    </button>
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>

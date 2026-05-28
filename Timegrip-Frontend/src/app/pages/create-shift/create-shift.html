@@ -1,0 +1,68 @@
+<div class="page">
+
+    <h1>Opret vagt</h1>
+
+    <form class="shift-form" (ngSubmit)="addShift()">
+
+        <div class="form-row">
+            <label>Dato</label>
+            <input type="date" [(ngModel)]="shift.date" name="date" [min]="today">
+        </div>
+
+        <div class="form-row">
+            <label>Starttid</label>
+
+            <select [(ngModel)]="shift.startTime" name="startTime">
+                <option value="">Vælg starttid</option>
+
+                <option *ngFor="let time of times" [value]="time">
+                    {{ time }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>Sluttid</label>
+
+            <select [(ngModel)]="shift.endTime" name="endTime">
+                <option value="">Vælg sluttid</option>
+
+                <option *ngFor="let time of times" [value]="time">
+                    {{ time }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>Rolle</label>
+
+            <select [(ngModel)]="shift.roleId" name="roleId">
+                <option value="">Vælg rolle</option>
+
+                <option *ngFor="let role of roles" [value]="role.roleId">
+                    {{ role.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>Medarbejder</label>
+
+            <select [(ngModel)]="shift.employeeId" name="employeeId">
+                <option value="">Ingen medarbejder</option>
+
+                <option *ngFor="let employee of employees" [value]="employee.employeeId">
+                    {{ employee.firstName }} {{ employee.lastName }}
+                </option>
+            </select>
+        </div>
+
+        <div class="button-row">
+            <button type="submit">
+                Gem vagt
+            </button>
+        </div>
+
+    </form>
+
+</div>

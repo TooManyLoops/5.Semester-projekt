@@ -24,13 +24,11 @@ services:
       ASPNETCORE_URLS: http://+:8080
       FRONTEND_ORIGIN: "http://localhost:62892"
       EMPLOYEES_API_URL: "http://employees-api:8080"
-      ROLES_API_URL: "http://roles-api:8080"
       SHIFTS_API_URL: "http://shifts-api:8080"
     ports:
       - "5000:8080"
     depends_on:
       - employees-api
-      - roles-api
       - shifts-api
     networks:
       - backend
@@ -44,28 +42,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
-      CONNECTION_STRING: "Server=mssql,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;ConnectRetryCount=0;"
+      CONNECTION_STRING_EMPLOYEE: ${CONNECTION_STRING_EMPLOYEE}
       FRONTEND_ORIGIN: "http://localhost:62892"
     ports:
       - "5001:8080"
-    depends_on:
-      - mssql
-    networks:
-      - backend
-
-  roles-api:
-    build:
-      context: .
-      dockerfile: services/Roles.Api/Dockerfile
-    container_name: roles-api
-    restart: unless-stopped
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8080
-      CONNECTION_STRING: "Server=mssql,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;ConnectRetryCount=0;"
-      FRONTEND_ORIGIN: "http://localhost:62892"
-    ports:
-      - "5002:8080"
     depends_on:
       - mssql
     networks:
@@ -80,10 +60,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
-      CONNECTION_STRING: "Server=mssql,1433;Database=${DB_NAME};User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;ConnectRetryCount=0;"
+      CONNECTION_STRING_SHIFT: ${CONNECTION_STRING_SHIFT}
       FRONTEND_ORIGIN: "http://localhost:62892"
     ports:
-      - "5003:8080"
+      - "5002:8080"
     depends_on:
       - mssql
     networks:
