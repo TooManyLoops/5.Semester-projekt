@@ -45,9 +45,10 @@ public static class EmployeeEndpoints
         return TypedResults.Ok(result);
     }
 
-    private static async Task<IResult> GetAllEmployees(EmployeeService service)
+    //Takes an optional pagination parameter, if not provided, it will return all employees.
+    private static async Task<IResult> GetAllEmployees(EmployeeService service, PaginationRequest? pagination)
     {
-        var result = await service.GetAllEmployees();
+        var result = await service.GetAllEmployees(pagination);
         return TypedResults.Ok(result);
     }
 

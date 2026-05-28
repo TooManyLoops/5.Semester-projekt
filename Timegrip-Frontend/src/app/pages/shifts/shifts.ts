@@ -1,9 +1,5 @@
-import { Component } from '@angular/core';
-import { CalendarOptions } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import daLocale from '@fullcalendar/core/locales/da';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-shifts',
@@ -11,32 +7,76 @@ import daLocale from '@fullcalendar/core/locales/da';
   templateUrl: './shifts.html',
   styleUrl: './shifts.css'
 })
-export class Shifts {
+export class Shifts implements OnInit {
 
-  calendarOptions: CalendarOptions = {
-    plugins: [
-      dayGridPlugin,
-      timeGridPlugin,
-      interactionPlugin
-    ],
+  shifts: any[] = [];
 
-    locale: daLocale,
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) { }
 
-    initialView: 'timeGridWeek',
+  ngOnInit() {
+    this.loadShifts();
+  }
 
-    selectable: true,
+  loadShifts() {
+    this.http.get<any[]>('http://localhost:5003/shifts/')
+      .subscribe({
+        next: data => {
+          console.log('SHIFTS FRA DB:', data);
+          this.shifts = data;
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+  }
 
-    events: [
-      {
-        title: 'Khanh - 08:00-16:00',
-        start: '2026-05-18T08:00:00',
-        end: '2026-05-18T16:00:00'
-      }
-    ],
+  formatTime(dateTime: string): string {
+    return new Date(dateTime).toLocaleTimeString('da-DK', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 
-    dateClick: (info) => {
-      console.log('Klikket dato:', info.dateStr);
-      alert('Opret vagt på: ' + info.dateStr);
+  formatDate(dateTime: string): string {
+    return new Date(dateTime).toLocaleDateString('da-DK');
+  }
+
+  getShiftsForDay(dayIndex: number) {
+    return this.shifts.filter(shift => {
+      const date = new Date(shift.startTime);
+      return date.getDay() === dayIndex;
+    });
+  }
+
+  formatShiftTime(shift: any): string {
+    return `${this.formatTime(shift.startTime)} - ${this.formatTime(shift.endTime)}`;
+  }
+
+  employeeSchedule = [
+    {
+      employeeName: 'Khanh Do',
+      color: '#96768f',
+
+      monday: '08:00 - 16:00',
+      tuesday: '',
+      wednesday: '12:00 - 20:00',
+      thursday: '',
+      friday: ''
+    },
+
+    {
+      employeeName: 'Maria Jensen',
+      color: '#5b8c85',
+
+      monday: '',
+      tuesday: '10:00 - 18:00',
+      wednesday: '',
+      thursday: '',
+      friday: '08:00 - 14:00'
     }
-  };
+  ];
 }
+

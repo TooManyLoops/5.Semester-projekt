@@ -11,7 +11,7 @@ public class ShiftAssignment
 
     [Column("shift_Id")]
     public Guid ShiftId { get; set; }
-
+    
     [ForeignKey(nameof(ShiftId))]
     public Shift Shift { get; set; } = null!;
 

@@ -60,3 +60,50 @@
 .employee-table tbody tr:hover {
     background-color: #e5e7eb;
 }
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.filter-row label {
+    font-weight: bold;
+}
+
+.filter-row select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    background-color: #96768f;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background-color: #cca1c3;
+}
+
+.pagination button:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    font-weight: bold;
+}

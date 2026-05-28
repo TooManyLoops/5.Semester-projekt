@@ -32,3 +32,16 @@
     margin-left: 120px;
     margin-top: 24px;
 }
+
+.role-section button {
+    background-color: #96768f;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.role-section button:hover {
+    background-color: #cca1c3;
+}

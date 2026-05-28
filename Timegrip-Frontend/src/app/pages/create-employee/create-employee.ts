@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -8,7 +8,10 @@ import { Router } from '@angular/router';
   templateUrl: './create-employee.html',
   styleUrl: './create-employee.css'
 })
-export class CreateEmployee {
+export class CreateEmployee implements OnInit {
+
+  roles: any[] = [];
+  selectedRoleId = '';
 
   employee = {
     firstName: '',
@@ -23,14 +26,50 @@ export class CreateEmployee {
     private router: Router
   ) { }
 
-  addEmployee() {
-    this.http.post('http://localhost:5000/api/employees/', this.employee)
-      .subscribe({
-        next: response => {
-          alert('Employee oprettet');
-          console.log(response);
+  ngOnInit() {
+    this.loadRoles();
+  }
 
-          this.router.navigate(['/employees']);
+  loadRoles() {
+    this.http.get<any[]>('http://localhost:5000/api/roles/')
+      .subscribe({
+        next: data => {
+          this.roles = data;
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+  }
+
+  addEmployee() {
+    this.http.post<any>('http://localhost:5000/api/employees/', this.employee)
+      .subscribe({
+        next: createdEmployee => {
+
+          if (!this.selectedRoleId) {
+            alert('Medarbejder oprettet');
+            this.router.navigate(['/employees']);
+            return;
+          }
+
+          const employeeRoleRequest = {
+            employeeId: createdEmployee.employeeId,
+            roleId: this.selectedRoleId,
+            isPrimary: true
+          };
+
+          this.http.post('http://localhost:5000/employee-roles/', employeeRoleRequest)
+            .subscribe({
+              next: () => {
+                alert('Medarbejder og rolle oprettet');
+                this.router.navigate(['/employees']);
+              },
+              error: error => {
+                console.error(error);
+                alert('Medarbejder blev oprettet, men rolle fejlede');
+              }
+            });
         },
         error: error => {
           alert('Fejl ved oprettelse');

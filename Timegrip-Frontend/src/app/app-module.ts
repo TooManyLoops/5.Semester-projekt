@@ -13,11 +13,32 @@ import { Shifts } from './pages/shifts/shifts';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CreateEmployee } from './pages/create-employee/create-employee';
 import { EditEmployee } from './pages/edit-employee/edit-employee';
+import { CreateShift } from './pages/create-shift/create-shift';
+import { OpenShifts } from './pages/open-shifts/open-shifts';
+import { ShiftApprovals } from './pages/shift-approvals/shift-approvals';
+
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
-  declarations: [App, Header, Sidebar, Employees, Shifts, CreateEmployee, EditEmployee],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, FullCalendarModule],
+  declarations: [
+    App,
+    Header,
+    Sidebar,
+    Employees,
+    Shifts,
+    CreateEmployee,
+    EditEmployee,
+    CreateShift,
+    OpenShifts,
+    ShiftApprovals,
+  ],
+
+  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, FullCalendarModule,
+    MatDatepickerModule, MatNativeDateModule, MatInputModule],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })
+
 export class AppModule { }

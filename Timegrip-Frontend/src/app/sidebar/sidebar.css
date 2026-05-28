@@ -29,3 +29,38 @@
     color: white;
     font-weight: 600;
 }
+
+.sidebar-item-with-menu {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.main-sidebar-button {
+    flex: 1;
+}
+
+.dots-button {
+    background: transparent;
+    border: none;
+    color: #e5e7eb;
+    width: 40px;
+    cursor: pointer;
+    font-size: 18px;
+    text-align: center;
+}
+
+.dots-button:hover {
+    background-color: #cca1c3;
+}
+
+.submenu {
+    display: flex;
+    flex-direction: column;
+    margin-left: 16px;
+}
+
+.submenu button {
+    font-size: 14px;
+    padding: 14px 20px;
+}

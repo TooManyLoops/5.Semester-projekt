@@ -1,0 +1,42 @@
+.page {
+    padding: 30px;
+}
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.shift-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shift-table th {
+    background-color: #4b5563;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.shift-table td {
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    vertical-align: top;
+    min-height: 200px;
+}
+
+.employee-name {
+    font-weight: bold;
+}
+
+.shift-block {
+    background-color: #96768f;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+}

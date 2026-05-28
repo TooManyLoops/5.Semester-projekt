@@ -1,5 +1,55 @@
 <div class="page">
-    <h1>Vagtplan</h1>
 
-    <full-calendar [options]="calendarOptions"></full-calendar>
+    <h1>Aktuel vagtplan</h1>
+
+    <table class="shift-table">
+        <thead>
+            <tr>
+                <th>Medarbejder</th>
+                <th>Mandag</th>
+                <th>Tirsdag</th>
+                <th>Onsdag</th>
+                <th>Torsdag</th>
+                <th>Fredag</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let employee of employeeSchedule">
+                <td class="employee-name">
+                    {{ employee.employeeName }}
+                </td>
+
+                <td>
+                    <div *ngIf="employee.monday" class="shift-block" [style.background-color]="employee.color">
+                        {{ employee.monday }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="employee.tuesday" class="shift-block" [style.background-color]="employee.color">
+                        {{ employee.tuesday }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="employee.wednesday" class="shift-block" [style.background-color]="employee.color">
+                        {{ employee.wednesday }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="employee.thursday" class="shift-block" [style.background-color]="employee.color">
+                        {{ employee.thursday }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="employee.friday" class="shift-block" [style.background-color]="employee.color">
+                        {{ employee.friday }}
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
