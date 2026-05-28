@@ -406,3 +406,6 @@ FodyWeavers.xsd
 *.tsbuildinfo
 .angular/
 dist/
+
+#Fjern IDE filer
+.idea/
