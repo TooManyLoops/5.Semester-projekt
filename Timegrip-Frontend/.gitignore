@@ -31,6 +31,8 @@ yarn-error.log
 
 # Miscellaneous
 /.angular/cache
+/.angular
+*.tsbuildinfo
 .sass-cache/
 /connect.lock
 /coverage

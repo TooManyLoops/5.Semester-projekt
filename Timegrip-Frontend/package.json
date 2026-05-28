@@ -11,15 +11,23 @@
   "private": true,
   "packageManager": "npm@11.6.1",
   "dependencies": {
+    "@angular/cdk": "^21.2.13",
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
     "@angular/forms": "^21.2.0",
+    "@angular/material": "^21.2.13",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "@fullcalendar/angular": "^6.1.20",
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
+    "bootstrap-icons": "^1.13.1",
+    "jest-editor-support": "*",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "jest-editor-support": "*"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.7",

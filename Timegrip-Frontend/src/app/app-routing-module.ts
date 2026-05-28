@@ -1,7 +1,25 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+import { Employees } from './pages/employees/employees';
+import { Shifts } from './pages/shifts/shifts';
+import { CreateEmployee } from './pages/create-employee/create-employee';
+import { EditEmployee } from './pages/edit-employee/edit-employee';
+import { CreateShift } from './pages/create-shift/create-shift';
+import { OpenShifts } from './pages/open-shifts/open-shifts';
+import { ShiftApprovals } from './pages/shift-approvals/shift-approvals';
+
+const routes: Routes = [
+  { path: 'employees', component: Employees },
+  { path: 'employees/create', component: CreateEmployee },
+  { path: 'employees/edit/:id', component: EditEmployee },
+  { path: 'shifts', component: Shifts },
+  { path: 'shifts/create', component: CreateShift },
+  { path: 'shifts/open', component: OpenShifts },
+  { path: 'shifts/approvals', component: ShiftApprovals },
+
+  { path: '', redirectTo: 'employees', pathMatch: 'full' }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
