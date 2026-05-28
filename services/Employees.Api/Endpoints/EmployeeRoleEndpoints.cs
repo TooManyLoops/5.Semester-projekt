@@ -11,13 +11,9 @@ public static class EmployeeRoleEndpoints
         var employeeRoles = app.MapGroup("/employee-roles");
 
         employeeRoles.MapPost("/", CreateEmployeeRole).WithName("CreateEmployeeRole");
-        employeeRoles
-            .MapGet("/employee/{employeeId:guid}", GetEmployeeRoles)
-            .WithName("GetEmployeeRoles");
-
-        employeeRoles
-            .MapPatch("/{employeeRoleId:guid}", UpdateEmployeeRole)
-            .WithName("UpdateEmployeeRole");
+        employeeRoles.MapGet("/employee/{employeeId:guid}", GetEmployeeRoles).WithName("GetEmployeeRoles");
+        employeeRoles.MapPatch("/{employeeRoleId:guid}", UpdateEmployeeRole).WithName("UpdateEmployeeRole");
+        employeeRoles.MapGet("/employeeRole/{employeeRoleId:guid}", VerifyEmployeeRoleById).WithName("VerifyEmployeeStatus");
         return app;
     }
 
@@ -59,6 +55,21 @@ public static class EmployeeRoleEndpoints
                 new { Message = "Employee role was not found.", EmployeeRoleId = employeeRoleId }
             )
             : TypedResults.Ok(result);
+    }
+    
+    private static async Task<IResult> VerifyEmployeeRoleById(VerificationService service, Guid employeeRoleId)
+    {
+        var result = await service.VerifyEmployeeRoleById(employeeRoleId);
+
+        if (result is true)
+        {
+            return TypedResults.Ok();
+        }
+        else
+        {
+            return TypedResults.NotFound(new
+                { Message = "Employee was not found or is not active.", EmployeeRoleId = employeeRoleId });
+        }
     }
 
     private static List<ValidationResult> Validate<T>(T model)

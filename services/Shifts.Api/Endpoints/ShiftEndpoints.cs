@@ -15,6 +15,7 @@ public static class ShiftEndpoints
         shifts.MapGet("/", GetShifts).WithName("GetShifts");
         shifts.MapGet("/{shiftId:guid}", GetShift).WithName("GetShift");
         shifts.MapGet("/all/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
+        shifts.MapPost("/", AssignShiftToEmployeeRole).WithName("AssignShiftToEmployeeRole");
 
         return app;
     }
@@ -82,7 +83,7 @@ public static class ShiftEndpoints
 
     }
 
-    public static async Task<IResult> AssignShiftToEmployee(ShiftService service, ShiftAssignmentRequest assignmentRequest)
+    private static async Task<IResult> AssignShiftToEmployeeRole(ShiftService service, ShiftAssignmentRequest assignmentRequest)
     {
         var validationResults = Validate(assignmentRequest);
 
@@ -94,10 +95,9 @@ public static class ShiftEndpoints
         {
             return TypedResults.BadRequest("Invalid shift or employee ID");
         }
-
         try
         {
-            await service.AssignShiftToEmployee(assignmentRequest);
+            await service.AssignShiftToEmployeeRole(assignmentRequest);
             return TypedResults.Ok();
         }
         catch (ArgumentException ex)
@@ -108,9 +108,6 @@ public static class ShiftEndpoints
         {
             return TypedResults.Problem("Der skete en uventet fejl");
         }
-
-        //Check if shift exists for extra security
-        //Check if BLL layer makes sense to have a method for this, or if it should be done in the controller.
     }
 
     private static List<ValidationResult> Validate<T>(T model)

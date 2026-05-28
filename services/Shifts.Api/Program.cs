@@ -3,12 +3,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Timegrip.Shifts.Api.Data;
 using Timegrip.Shifts.Api.Endpoints;
 using Timegrip.Shifts.Api.Services;
+using Polly;
+using Polly.Retry;
 
 DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// Define a retry policy with exponential backoff
+builder.Services.AddSingleton<AsyncRetryPolicy>(Policy
+    .Handle<HttpRequestException>()
+    .WaitAndRetryAsync(
+        retryCount: 3,
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+        onRetry: (exception, retryCount) =>
+        {
+            Console.WriteLine($"Retrying request. Retry count: {retryCount}");
+        }));
+
 builder.Services.AddScoped<ShiftService>();
+builder.Services.AddHttpClient<VerificationService>();
+builder.Services.AddScoped<VerificationService>();
 builder.Services.AddDbContext<ShiftsDbContext>(options =>
     options.UseSqlServer(GetConnectionString(), sql =>
         sql.UseCompatibilityLevel(160)
@@ -28,7 +44,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-ApplyMigrations<ShiftsDbContext>(app);
+//ApplyMigrations<ShiftsDbContext>(app);
 
 app.UseCors("AllowFrontend");
 

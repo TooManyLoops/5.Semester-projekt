@@ -6,12 +6,12 @@ using Timegrip.Shifts.Api.Responses;
 
 namespace Timegrip.Shifts.Api.Services;
 
-public class ShiftService(ShiftsDbContext context)
+public class ShiftService(ShiftsDbContext context, VerificationService verificationService)
 {
-
+    
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
-        if (request.StartTime! >= DateTime.Now && request.EndTime! > request.StartTime)
+        if (request.StartTime !>= DateTime.Now && request.EndTime !> request.StartTime)
         {
             throw new ArgumentException("En eller flere datoer er ikke indtastet korrekt");
         }
@@ -27,7 +27,7 @@ public class ShiftService(ShiftsDbContext context)
     }
 
     private async Task<ShiftResponse> CreateShift(ShiftRequest request)
-    {
+    {   
         var shift = new Shift
         {
             ShiftId = Guid.NewGuid(),
@@ -60,7 +60,7 @@ public class ShiftService(ShiftsDbContext context)
                 //as its not checked for in endpoint validation
                 var shiftRequirement = new ShiftRequirement
                 {
-                    ShiftId = shift.ShiftId,
+                    ShiftId = shift.ShiftId,                    
                     Amount = requirement.Amount,
                     RoleId = requirement.RoleId,
                 };
@@ -75,7 +75,7 @@ public class ShiftService(ShiftsDbContext context)
         {
             await transaction.RollbackAsync();
             throw;
-        }
+        }        
     }
 
     public async Task<List<ShiftResponse>> GetShifts()
@@ -97,7 +97,7 @@ public class ShiftService(ShiftsDbContext context)
     {
         var shiftAssignments = await context.ShiftAssignments
             .AsNoTracking()
-            .Where(sa => sa.EmployeeRoleId == employeeRoleId)
+            .Where(sa => sa.EmployeeRoleId == employeeRoleId)    
             .ToListAsync();
 
         var shiftList = new List<ShiftResponse>();
@@ -111,10 +111,16 @@ public class ShiftService(ShiftsDbContext context)
         return shiftList;
     }
 
-    public async Task<bool> AssignShiftToEmployee(ShiftAssignmentRequest assignmentRequest)
+    public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
     {
-        var shift = GetShift(assignmentRequest.ShiftId);
-        if (shift == null)
+        var validationResult = await verificationService.VerifyEmployeeRoleById(assignmentRequest.EmployeeRoleId);
+        if (validationResult is false)
+        {
+            throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
+        }
+        
+        var Shift = GetShift(assignmentRequest.ShiftId);
+        if (Shift == null)
         {
             throw new KeyNotFoundException($"Shift with ID {assignmentRequest.ShiftId} not found");
         }
@@ -124,13 +130,14 @@ public class ShiftService(ShiftsDbContext context)
             ShiftAssignmentId = Guid.NewGuid(),
             ShiftId = assignmentRequest.ShiftId,
             EmployeeRoleId = assignmentRequest.EmployeeRoleId,
-            Status = (byte)assignmentRequest.AssignmentStatus,
+            Status = (byte) assignmentRequest.AssignmentStatus,
             AssignedAt = DateTime.UtcNow
         };
         context.ShiftAssignments.Add(shiftAssignment);
         var result = await context.SaveChangesAsync();
         return result > 0;
     }
+    
     private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse
