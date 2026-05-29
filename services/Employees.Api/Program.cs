@@ -31,10 +31,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins(
-                    Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                        ?? "http://localhost:62892"
-                )
+                .WithOrigins(GetFrontendOrigins())
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         }
@@ -72,6 +69,13 @@ static string GetConnectionString()
     }
 
     return connectionString;
+}
+
+static string[] GetFrontendOrigins()
+{
+    return (Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
+            ?? "http://localhost:62892;http://127.0.0.1:62892")
+        .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 }
 
 static void ApplyMigrations<TContext>(WebApplication app)
