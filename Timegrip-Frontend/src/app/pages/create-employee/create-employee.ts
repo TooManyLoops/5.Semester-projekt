@@ -59,7 +59,7 @@ export class CreateEmployee implements OnInit {
             isPrimary: true
           };
 
-          this.http.post('http://localhost:5000/employee-roles/', employeeRoleRequest)
+          this.http.post('http://localhost:5000/api/employee-roles/', employeeRoleRequest)
             .subscribe({
               next: () => {
                 alert('Medarbejder og rolle oprettet');

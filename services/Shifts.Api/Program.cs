@@ -45,7 +45,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//ApplyMigrations<ShiftsDbContext>(app);
+ApplyMigrations<ShiftsDbContext>(app);
 
 app.UseCors("AllowFrontend");
 

@@ -43,7 +43,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//ApplyMigrations<EmployeesDbContext>(app);
+ApplyMigrations<EmployeesDbContext>(app);
 
 app.UseCors("AllowFrontend");
 

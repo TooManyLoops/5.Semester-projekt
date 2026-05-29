@@ -18,7 +18,7 @@ export class OpenShifts implements OnInit {
   }
 
   loadOpenShifts() {
-    this.http.get<any[]>('http://localhost:5003/shifts/')
+    this.http.get<any[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
           console.log('LEDIGE VAGTER:', data);

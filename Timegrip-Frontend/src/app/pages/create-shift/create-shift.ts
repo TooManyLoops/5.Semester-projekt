@@ -83,7 +83,7 @@ export class CreateShift implements OnInit {
 
     console.log('REQUEST SENDT:', request);
 
-    this.http.post('http://localhost:5003/shifts/', request)
+    this.http.post('http://localhost:5000/api/shifts/', request)
       .subscribe({
         next: response => {
           alert('Vagt oprettet');

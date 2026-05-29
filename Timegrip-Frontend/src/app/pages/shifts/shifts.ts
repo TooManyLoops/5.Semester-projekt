@@ -21,7 +21,7 @@ export class Shifts implements OnInit {
   }
 
   loadShifts() {
-    this.http.get<any[]>('http://localhost:5003/shifts/')
+    this.http.get<any[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
           console.log('SHIFTS FRA DB:', data);
