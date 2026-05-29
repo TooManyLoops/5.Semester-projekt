@@ -99,6 +99,7 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
 
     public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
     {
+        //fix så den tager Shifts ud og ikke shift assignments først.
         var shiftAssignments = await context.ShiftAssignments
             .AsNoTracking()
             .Where(sa => sa.EmployeeRoleId == employeeRoleId)    
@@ -123,8 +124,8 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
             throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
         }
         
-        var Shift = GetShift(assignmentRequest.ShiftId);
-        if (Shift == null)
+        var shift = await GetShift(assignmentRequest.ShiftId);
+        if (shift is null)
         {
             throw new KeyNotFoundException($"Shift with ID {assignmentRequest.ShiftId} not found");
         }
