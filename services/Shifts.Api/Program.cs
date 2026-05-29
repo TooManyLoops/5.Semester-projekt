@@ -84,5 +84,51 @@ static void ApplyMigrations<TContext>(WebApplication app)
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<TContext>();
+    EnsureInitialMigrationHistoryForLegacySchema(
+        context,
+        "Shift",
+        "Shifts",
+        "20260511180347_InitialCreate"
+    );
     context.Database.Migrate();
+}
+
+static void EnsureInitialMigrationHistoryForLegacySchema(
+    DbContext context,
+    string schema,
+    string existingTable,
+    string migrationId
+)
+{
+    if (!context.Database.CanConnect())
+    {
+        return;
+    }
+
+    var repairSql = $"""
+        IF SCHEMA_ID(N'{schema}') IS NOT NULL
+        AND OBJECT_ID(N'[{schema}].[{existingTable}]', N'U') IS NOT NULL
+        BEGIN
+            IF OBJECT_ID(N'[{schema}].[__EFMigrationsHistory]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [{schema}].[__EFMigrationsHistory] (
+                    [MigrationId] nvarchar(150) NOT NULL,
+                    [ProductVersion] nvarchar(32) NOT NULL,
+                    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+                );
+            END;
+
+            IF NOT EXISTS (
+                SELECT 1
+                FROM [{schema}].[__EFMigrationsHistory]
+                WHERE [MigrationId] = N'{migrationId}'
+            )
+            BEGIN
+                INSERT INTO [{schema}].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+                VALUES (N'{migrationId}', N'10.0.7');
+            END;
+        END;
+        """;
+
+    context.Database.ExecuteSqlRaw(repairSql);
 }
