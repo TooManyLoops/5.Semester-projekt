@@ -39,6 +39,19 @@ services:
     networks:
       - backend
 
+  frontend:
+    build:
+      context: ./Timegrip-Frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "62892:80"
+    depends_on:
+      - bff-api
+    networks:
+      - backend
+
   employees-api:
     build:
       context: .
