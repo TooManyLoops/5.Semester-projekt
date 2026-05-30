@@ -97,7 +97,7 @@ public class ShiftService(ShiftsDbContext context)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeRoleId(List<Guid> employeeRoleIds)
+    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeRoleIds(List<Guid> employeeRoleIds)
     {
         var shiftIds = await context.ShiftAssignments
             .Where(sa => employeeRoleIds.Contains(sa.EmployeeRoleId))
