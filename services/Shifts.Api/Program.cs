@@ -24,8 +24,6 @@ builder.Services.AddSingleton<AsyncRetryPolicy>(Policy
         }));
 
 builder.Services.AddScoped<ShiftService>();
-builder.Services.AddHttpClient<VerificationService>();
-builder.Services.AddScoped<VerificationService>();
 builder.Services.AddDbContext<ShiftsDbContext>(options =>
     options.UseSqlServer(GetConnectionString(), sql =>
         sql.UseCompatibilityLevel(160)
