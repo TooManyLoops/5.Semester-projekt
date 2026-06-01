@@ -193,8 +193,4 @@ export class OpenShifts implements OnInit {
   formatDate(dateTime: string): string {
     return new Date(dateTime).toLocaleDateString('da-DK');
   }
-
-  testClick(shift: any) {
-    alert('Klik virker: ' + shift.shiftId);
-  }
 }

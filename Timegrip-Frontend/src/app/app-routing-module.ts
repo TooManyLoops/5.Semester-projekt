@@ -8,7 +8,6 @@ import { EditEmployee } from './pages/edit-employee/edit-employee';
 import { CreateShift } from './pages/create-shift/create-shift';
 import { OpenShifts } from './pages/open-shifts/open-shifts';
 import { ShiftApprovals } from './pages/shift-approvals/shift-approvals';
-import { AssignShift } from './pages/assign-shift/assign-shift';
 
 const routes: Routes = [
   { path: 'employees', component: Employees },
@@ -19,7 +18,6 @@ const routes: Routes = [
   { path: 'shifts/open', component: OpenShifts },
   { path: 'shifts/approvals', component: ShiftApprovals },
 
-  { path: 'assign-shift/:id', component: AssignShift },
   { path: '', redirectTo: 'employees', pathMatch: 'full' }
 ];
 
