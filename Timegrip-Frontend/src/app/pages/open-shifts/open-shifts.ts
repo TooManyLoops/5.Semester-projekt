@@ -53,7 +53,8 @@ export class OpenShifts implements OnInit {
   }
 
   getRoleName(shift: any): string {
-    const roleId = shift.shiftRequirements?.[0]?.roleId;
+
+    const roleId = shift.roleId;
 
     if (!roleId) {
       return 'Ingen rolle';

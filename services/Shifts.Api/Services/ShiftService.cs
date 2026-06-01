@@ -84,16 +84,38 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
 
     public async Task<List<ShiftResponse>> GetShifts()
     {
-        return await context.Shifts.AsNoTracking()
-            .Select(shift => ToResponse(shift))
+        return await context.Shifts
+            .AsNoTracking()
+            .Select(shift => new ShiftResponse
+            {
+                ShiftId = shift.ShiftId,
+                StartTime = shift.StartTime,
+                EndTime = shift.EndTime,
+
+                RoleId = context.ShiftRequirements
+                    .Where(requirement => requirement.ShiftId == shift.ShiftId)
+                    .Select(requirement => (Guid?)requirement.RoleId)
+                    .FirstOrDefault()
+            })
             .ToListAsync();
     }
 
     public async Task<ShiftResponse?> GetShift(Guid shiftId)
     {
-        return await context.Shifts.AsNoTracking()
+        return await context.Shifts
+            .AsNoTracking()
             .Where(shift => shift.ShiftId == shiftId)
-            .Select(shift => ToResponse(shift))
+            .Select(shift => new ShiftResponse
+            {
+                ShiftId = shift.ShiftId,
+                StartTime = shift.StartTime,
+                EndTime = shift.EndTime,
+
+                RoleId = context.ShiftRequirements
+                    .Where(requirement => requirement.ShiftId == shift.ShiftId)
+                    .Select(requirement => (Guid?)requirement.RoleId)
+                    .FirstOrDefault()
+            })
             .FirstOrDefaultAsync();
     }
 
