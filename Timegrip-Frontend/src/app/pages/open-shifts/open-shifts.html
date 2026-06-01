@@ -17,13 +17,9 @@
 
             <tr *ngFor="let shift of openShifts">
 
-                <td>
-                    Ledig vagt
-                </td>
+                <td>{{ shift.roleName }}</td>
 
-                <td>
-                    {{ formatDate(shift.startTime) }}
-                </td>
+                <td>{{ formatDate(shift.startTime) }}</td>
 
                 <td>
                     {{ formatTime(shift.startTime) }}

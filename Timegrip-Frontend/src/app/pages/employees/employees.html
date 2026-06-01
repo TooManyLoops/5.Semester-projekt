@@ -39,7 +39,7 @@
                 <td>{{ emp.firstName }} {{ emp.lastName }}</td>
                 <td>{{ emp.email }}</td>
                 <td>{{ emp.phoneNumber }}</td>
-                <td>{{ emp.rolesText || 'Ingen rolle' }}</td>
+                <td>{{ emp.rolesText }}</td>
                 <td>{{ getStatusText(emp.employeeStatus) }}</td>
                 <td>
                     <button class="edit-button" [routerLink]="['/employees/edit', emp.employeeId]">

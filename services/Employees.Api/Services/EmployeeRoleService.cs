@@ -29,7 +29,19 @@ public class EmployeeRoleService(EmployeesDbContext context)
         return await context
             .EmployeeRoles.AsNoTracking()
             .Where(employeeRole => employeeRole.EmployeeId == employeeId)
-            .Select(employeeRole => ToResponse(employeeRole))
+             .Join(
+            context.Roles,
+            employeeRole => employeeRole.RoleId,
+            role => role.RoleId,
+            (employeeRole, role) => new EmployeeRoleResponse
+            {
+                EmployeeRoleId = employeeRole.EmployeeRoleId,
+                EmployeeId = employeeRole.EmployeeId,
+                RoleId = employeeRole.RoleId,
+                RoleName = role.Name,
+                IsPrimary = employeeRole.IsPrimary
+            }
+        )
             .ToListAsync();
     }
 
@@ -61,6 +73,7 @@ public class EmployeeRoleService(EmployeesDbContext context)
             EmployeeRoleId = employeeRole.EmployeeRoleId,
             EmployeeId = employeeRole.EmployeeId,
             RoleId = employeeRole.RoleId,
+            RoleName = null,
             IsPrimary = employeeRole.IsPrimary,
         };
     }

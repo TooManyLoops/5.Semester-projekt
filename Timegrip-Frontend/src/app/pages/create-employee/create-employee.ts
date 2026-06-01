@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -23,7 +23,8 @@ export class CreateEmployee implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -35,6 +36,7 @@ export class CreateEmployee implements OnInit {
       .subscribe({
         next: data => {
           this.roles = data;
+          this.cdr.detectChanges();
         },
         error: error => {
           console.error(error);

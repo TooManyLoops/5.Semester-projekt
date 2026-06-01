@@ -17,14 +17,14 @@ public class VerificationService
         _retryPolicy = retryPolicy;
         _logger = logger;
     }
-    
+
     public async Task<bool> VerifyEmployeeRoleById(Guid employeeRoleId)
     {
         try
         {
             await _retryPolicy.ExecuteAsync(async () =>
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:8080/api/employee-roles/employeeRole/{employeeRoleId}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"http://employees-api:8080/api/employee-roles/employeeRole/{employeeRoleId}");
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();

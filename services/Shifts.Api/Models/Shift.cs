@@ -15,4 +15,7 @@ public class Shift
 
     [Column("endTime")]
     public DateTime EndTime { get; set; }
+
+    public List<ShiftRequirement> ShiftRequirements { get; set; } = [];
+    public List<ShiftAssignment> ShiftAssignments { get; set; } = [];
 }

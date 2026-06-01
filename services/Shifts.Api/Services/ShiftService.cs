@@ -8,7 +8,7 @@ namespace Timegrip.Shifts.Api.Services;
 
 public class ShiftService(ShiftsDbContext context, VerificationService verificationService)
 {
-    
+
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
         if (!(request.StartTime >= DateTime.Now) || !(request.EndTime > request.StartTime))
@@ -27,7 +27,7 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
     }
 
     private async Task<ShiftResponse> CreateShift(ShiftRequest request)
-    {   
+    {
         var shift = new Shift
         {
             ShiftId = Guid.NewGuid(),
@@ -102,7 +102,7 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
         //fix så den tager Shifts ud og ikke shift assignments først.
         var shiftAssignments = await context.ShiftAssignments
             .AsNoTracking()
-            .Where(sa => sa.EmployeeRoleId == employeeRoleId)    
+            .Where(sa => sa.EmployeeRoleId == employeeRoleId)
             .ToListAsync();
 
         var shiftList = new List<ShiftResponse>();
@@ -123,7 +123,7 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
         {
             throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
         }
-        
+
         var shift = await GetShift(assignmentRequest.ShiftId);
         if (shift is null)
         {
@@ -135,14 +135,14 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
             ShiftAssignmentId = Guid.NewGuid(),
             ShiftId = assignmentRequest.ShiftId,
             EmployeeRoleId = assignmentRequest.EmployeeRoleId,
-            Status = (byte) assignmentRequest.AssignmentStatus,
+            Status = (byte)assignmentRequest.AssignmentStatus,
             AssignedAt = DateTime.UtcNow
         };
         context.ShiftAssignments.Add(shiftAssignment);
         var result = await context.SaveChangesAsync();
         return result > 0;
     }
-    
+
     private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse
