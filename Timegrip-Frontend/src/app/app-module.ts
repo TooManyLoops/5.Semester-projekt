@@ -20,6 +20,7 @@ import { ShiftApprovals } from './pages/shift-approvals/shift-approvals';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { AssignShift } from './pages/assign-shift/assign-shift';
 
 @NgModule({
   declarations: [
@@ -33,12 +34,20 @@ import { MatInputModule } from '@angular/material/input';
     CreateShift,
     OpenShifts,
     ShiftApprovals,
+    AssignShift,
   ],
 
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, FullCalendarModule,
-    MatDatepickerModule, MatNativeDateModule, MatInputModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    FullCalendarModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+  ],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })
-
-export class AppModule { }
+export class AppModule {}
