@@ -24,7 +24,7 @@ public class VerificationService
         {
             await _retryPolicy.ExecuteAsync(async () =>
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"http://employees-api:8080/api/employee-roles/employeeRole/{employeeRoleId}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"http://employees-api:8080/employee-roles/employeeRole/{employeeRoleId}");
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();

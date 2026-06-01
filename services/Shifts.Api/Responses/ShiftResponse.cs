@@ -8,4 +8,6 @@ public class ShiftResponse
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public Guid? RoleId { get; set; }
+    public bool IsAssigned { get; set; }
+    public Guid? EmployeeRoleId { get; set; }
 }

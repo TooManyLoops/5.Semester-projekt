@@ -36,9 +36,7 @@ export class OpenShifts implements OnInit {
       .subscribe({
         next: data => {
           this.openShifts = data
-            .filter(shift =>
-              !shift.shiftAssignments || shift.shiftAssignments.length === 0
-            )
+            .filter(shift => !shift.isAssigned)
             .map(shift => ({
               ...shift,
               roleName: this.getRoleName(shift)

@@ -95,7 +95,15 @@ public class ShiftService(ShiftsDbContext context, VerificationService verificat
                 RoleId = context.ShiftRequirements
                     .Where(requirement => requirement.ShiftId == shift.ShiftId)
                     .Select(requirement => (Guid?)requirement.RoleId)
-                    .FirstOrDefault()
+                    .FirstOrDefault(),
+
+                EmployeeRoleId = context.ShiftAssignments
+                    .Where(assignment => assignment.ShiftId == shift.ShiftId)
+                    .Select(assignment => (Guid?)assignment.EmployeeRoleId)
+                    .FirstOrDefault(),
+
+                IsAssigned = context.ShiftAssignments
+                    .Any(assignment => assignment.ShiftId == shift.ShiftId)
             })
             .ToListAsync();
     }

@@ -10,6 +10,8 @@ import { HttpClient } from '@angular/common/http';
 export class Shifts implements OnInit {
 
   shifts: any[] = [];
+  employees: any[] = [];
+  employeeRoles: any[] = [];
 
   constructor(
     private http: HttpClient,
@@ -17,20 +19,72 @@ export class Shifts implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.loadShifts();
+    console.log('SHIFTS COMPONENT LOADED');
+    this.loadEmployeesAndShifts();
   }
 
   loadShifts() {
     this.http.get<any[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
-          console.log('SHIFTS FRA DB:', data);
-          this.shifts = data;
+          this.shifts = data.filter(shift => shift.isAssigned === true);
+
+          this.employeeSchedule = [
+            {
+              employeeName: this.getEmployeeNameFromEmployeeRoleId(this.shifts[0]?.employeeRoleId),
+              color: '#96768f',
+
+              monday: this.getShiftTextForDay(1),
+              tuesday: this.getShiftTextForDay(2),
+              wednesday: this.getShiftTextForDay(3),
+              thursday: this.getShiftTextForDay(4),
+              friday: this.getShiftTextForDay(5)
+            }
+          ];
+
+          this.cdr.detectChanges();
         },
         error: error => {
           console.error(error);
         }
       });
+  }
+
+  loadEmployeesAndShifts() {
+    this.http.get<any[]>('http://localhost:5000/api/employees/')
+      .subscribe({
+        next: employees => {
+          console.log('EMPLOYEES:', employees);
+
+          this.employees = employees;
+          this.loadEmployeeRoles();
+
+          setTimeout(() => {
+            this.loadShifts();
+          }, 500);
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+  }
+
+  loadEmployeeRoles() {
+    this.employeeRoles = [];
+
+    this.employees.forEach(employee => {
+      this.http.get<any[]>(
+        `http://localhost:5000/api/employee-roles/employee/${employee.employeeId}`
+      )
+        .subscribe({
+          next: roles => {
+            this.employeeRoles.push(...roles);
+          },
+          error: error => {
+            console.error(error);
+          }
+        });
+    });
   }
 
   formatTime(dateTime: string): string {
@@ -55,28 +109,37 @@ export class Shifts implements OnInit {
     return `${this.formatTime(shift.startTime)} - ${this.formatTime(shift.endTime)}`;
   }
 
-  employeeSchedule = [
-    {
-      employeeName: 'Khanh Do',
-      color: '#96768f',
+  getShiftTextForDay(dayIndex: number): string {
+    const shiftsForDay = this.shifts.filter(shift => {
+      const date = new Date(shift.startTime);
+      return date.getDay() === dayIndex;
+    });
 
-      monday: '08:00 - 16:00',
-      tuesday: '',
-      wednesday: '12:00 - 20:00',
-      thursday: '',
-      friday: ''
-    },
+    return shiftsForDay
+      .map(shift => this.formatShiftTime(shift))
+      .join(', ');
+  }
 
-    {
-      employeeName: 'Maria Jensen',
-      color: '#5b8c85',
+  getEmployeeNameFromEmployeeRoleId(employeeRoleId: string): string {
+    const employeeRole = this.employeeRoles.find(er =>
+      er.employeeRoleId === employeeRoleId
+    );
 
-      monday: '',
-      tuesday: '10:00 - 18:00',
-      wednesday: '',
-      thursday: '',
-      friday: '08:00 - 14:00'
+    if (!employeeRole) {
+      return 'Ukendt medarbejder';
     }
-  ];
+
+    const employee = this.employees.find(emp =>
+      emp.employeeId === employeeRole.employeeId
+    );
+
+    if (!employee) {
+      return 'Ukendt medarbejder';
+    }
+
+    return `${employee.firstName} ${employee.lastName}`;
+  }
+
+  employeeSchedule: any[] = [];
 }
 

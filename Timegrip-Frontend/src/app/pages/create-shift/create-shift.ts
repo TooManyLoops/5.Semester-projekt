@@ -85,11 +85,62 @@ export class CreateShift implements OnInit {
 
     this.http.post('http://localhost:5000/api/shifts/', request)
       .subscribe({
-        next: response => {
-          alert('Vagt oprettet');
-          console.log(response);
-          this.router.navigate(['/shifts']);
+        next: createdShift => {
+          if (!this.shift.employeeId) {
+            alert('Vagt oprettet som ledig vagt');
+            this.router.navigate(['/shifts/open']);
+            return;
+          }
+
+          this.http.get<any[]>(
+            `http://localhost:5000/api/employee-roles/employee/${this.shift.employeeId}`
+          )
+            .subscribe({
+              next: employeeRoles => {
+                const matchingEmployeeRole = employeeRoles.find(er =>
+                  er.roleId === this.shift.roleId
+                );
+
+                if (!matchingEmployeeRole) {
+                  alert('Medarbejderen har ikke den valgte rolle');
+                  return;
+                }
+
+                console.log('MATCHING EMPLOYEE ROLE:', matchingEmployeeRole);
+
+                const assignmentRequest = {
+                  shiftId: (createdShift as any).shiftId,
+                  employeeRoleId: matchingEmployeeRole.employeeRoleId,
+                  assignmentStatus: 1
+                };
+
+                console.log('ASSIGN REQUEST:', assignmentRequest);
+
+                this.http.post('http://localhost:5000/api/shifts/Assign', assignmentRequest)
+                  .subscribe({
+                    next: () => {
+                      alert('Vagt oprettet og tildelt medarbejder');
+                      this.router.navigate(['/shifts']);
+                    },
+
+                    error: error => {
+                      console.error(error);
+
+                      alert(
+                        'Assign fejlede\n' +
+                        'Status: ' + error.status + '\n' +
+                        'Body: ' + JSON.stringify(error.error)
+                      );
+                    }
+                  });
+              },
+              error: error => {
+                console.error(error);
+                alert('Kunne ikke hente medarbejderens roller');
+              }
+            });
         },
+
         error: error => {
           console.error(error);
           console.log('ERROR STATUS:', error.status);
