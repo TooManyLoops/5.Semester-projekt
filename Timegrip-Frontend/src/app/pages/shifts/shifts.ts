@@ -19,7 +19,6 @@ export class Shifts implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('SHIFTS COMPONENT LOADED');
     this.loadEmployeesAndShifts();
   }
 
@@ -29,18 +28,7 @@ export class Shifts implements OnInit {
         next: data => {
           this.shifts = data.filter(shift => shift.isAssigned === true);
 
-          this.employeeSchedule = [
-            {
-              employeeName: this.getEmployeeNameFromEmployeeRoleId(this.shifts[0]?.employeeRoleId),
-              color: '#96768f',
-
-              monday: this.getShiftTextForDay(1),
-              tuesday: this.getShiftTextForDay(2),
-              wednesday: this.getShiftTextForDay(3),
-              thursday: this.getShiftTextForDay(4),
-              friday: this.getShiftTextForDay(5)
-            }
-          ];
+          this.buildEmployeeSchedule();
 
           this.cdr.detectChanges();
         },
@@ -54,7 +42,6 @@ export class Shifts implements OnInit {
     this.http.get<any[]>('http://localhost:5000/api/employees/')
       .subscribe({
         next: employees => {
-          console.log('EMPLOYEES:', employees);
 
           this.employees = employees;
           this.loadEmployeeRoles();
@@ -94,17 +81,6 @@ export class Shifts implements OnInit {
     });
   }
 
-  formatDate(dateTime: string): string {
-    return new Date(dateTime).toLocaleDateString('da-DK');
-  }
-
-  getShiftsForDay(dayIndex: number) {
-    return this.shifts.filter(shift => {
-      const date = new Date(shift.startTime);
-      return date.getDay() === dayIndex;
-    });
-  }
-
   formatShiftTime(shift: any): string {
     return `${this.formatTime(shift.startTime)} - ${this.formatTime(shift.endTime)}`;
   }
@@ -118,6 +94,79 @@ export class Shifts implements OnInit {
     return shiftsForDay
       .map(shift => this.formatShiftTime(shift))
       .join(', ');
+  }
+
+  buildEmployeeSchedule() {
+    const groupedByEmployee: any = {};
+
+    this.shifts.forEach(shift => {
+      const employeeName = this.getEmployeeNameFromEmployeeRoleId(shift.employeeRoleId);
+
+      if (!groupedByEmployee[employeeName]) {
+        groupedByEmployee[employeeName] = {
+          employeeName: employeeName,
+          color: this.getEmployeeColor(employeeName),
+          monday: '',
+          tuesday: '',
+          wednesday: '',
+          thursday: '',
+          friday: ''
+        };
+      }
+
+      const day = new Date(shift.startTime).getDay();
+      const shiftText = this.formatShiftTime(shift);
+
+      if (day === 1) {
+        groupedByEmployee[employeeName].monday += groupedByEmployee[employeeName].monday
+          ? ', ' + shiftText
+          : shiftText;
+      }
+
+      if (day === 2) {
+        groupedByEmployee[employeeName].tuesday += groupedByEmployee[employeeName].tuesday
+          ? ', ' + shiftText
+          : shiftText;
+      }
+
+      if (day === 3) {
+        groupedByEmployee[employeeName].wednesday += groupedByEmployee[employeeName].wednesday
+          ? ', ' + shiftText
+          : shiftText;
+      }
+
+      if (day === 4) {
+        groupedByEmployee[employeeName].thursday += groupedByEmployee[employeeName].thursday
+          ? ', ' + shiftText
+          : shiftText;
+      }
+
+      if (day === 5) {
+        groupedByEmployee[employeeName].friday += groupedByEmployee[employeeName].friday
+          ? ', ' + shiftText
+          : shiftText;
+      }
+    });
+
+    this.employeeSchedule = Object.values(groupedByEmployee);
+  }
+
+  getEmployeeColor(employeeName: string): string {
+    const colors = [
+      '#96768f',
+      '#5b8c85',
+      '#c98b5f',
+      '#6f83b8',
+      '#9b6f9f'
+    ];
+
+    let sum = 0;
+
+    for (let i = 0; i < employeeName.length; i++) {
+      sum += employeeName.charCodeAt(i);
+    }
+
+    return colors[sum % colors.length];
   }
 
   getEmployeeNameFromEmployeeRoleId(employeeRoleId: string): string {
