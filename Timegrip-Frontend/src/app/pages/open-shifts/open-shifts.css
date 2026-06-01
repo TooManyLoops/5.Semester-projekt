@@ -60,3 +60,35 @@
 .join-button:hover {
     background-color: #cca1c3;
 }
+
+.assign-box {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.form-row label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-row input,
+.form-row select {
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+}
+
+.button-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}

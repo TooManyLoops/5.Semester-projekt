@@ -2,6 +2,39 @@
 
     <h1>Ledige vagter</h1>
 
+    <div *ngIf="selectedShift" class="assign-box">
+
+        <h2>Tilmeld ledig vagt</h2>
+
+        <div class="form-row">
+            <label>Rolle</label>
+            <input type="text" [value]="selectedShift.roleName" readonly>
+        </div>
+
+        <div class="form-row">
+            <label>Medarbejder</label>
+
+            <select [(ngModel)]="selectedEmployeeId" name="selectedEmployeeId">
+                <option value="">Vælg medarbejder</option>
+
+                <option *ngFor="let employee of employees" [value]="employee.employeeId">
+                    {{ employee.firstName }} {{ employee.lastName }}
+                </option>
+            </select>
+        </div>
+
+        <div class="button-row">
+            <button class="join-button" type="button" (click)="confirmJoinShift()">
+                Bekræft tilmelding
+            </button>
+
+            <button class="cancel-button" type="button" (click)="selectedShift = null">
+                Annuller
+            </button>
+        </div>
+
+    </div>
+
     <table class="shift-table">
 
         <thead>
@@ -28,7 +61,7 @@
                 </td>
 
                 <td>
-                    <button class="join-button">
+                    <button class="join-button" (click)="selectedShift = shift">
                         Tilmeld vagt
                     </button>
                 </td>
