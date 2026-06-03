@@ -13,6 +13,8 @@ export class Shifts implements OnInit {
   employees: any[] = [];
   employeeRoles: any[] = [];
   roles: any[] = [];
+  employeeSchedule: any[] = [];
+  currentWeekStart: Date = this.getMonday(new Date());
 
   constructor(
     private http: HttpClient,
@@ -24,11 +26,74 @@ export class Shifts implements OnInit {
     this.loadEmployeesAndShifts();
   }
 
+  openShiftRow: any = {
+    employeeName: 'Ledige vagter',
+    monday: null,
+    tuesday: null,
+    wednesday: null,
+    thursday: null,
+    friday: null
+  };
+
+  getMonday(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+  }
+
+  getWeekNumber(date: Date): number {
+
+    const d = new Date(date);
+
+    d.setHours(0, 0, 0, 0);
+
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+
+    const yearStart = new Date(d.getFullYear(), 0, 1);
+
+    return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  }
+
+  getWeekText(): string {
+
+    const weekNumber = this.getWeekNumber(this.currentWeekStart);
+
+    const startDate = new Date(this.currentWeekStart);
+
+    const endDate = new Date(this.currentWeekStart);
+    endDate.setDate(endDate.getDate() + 6);
+
+    const startText = startDate.toLocaleDateString('da-DK');
+    const endText = endDate.toLocaleDateString('da-DK');
+
+    return `Uge ${weekNumber} (${startText} - ${endText})`;
+  }
+
+  goToPreviousWeek() {
+    this.currentWeekStart.setDate(this.currentWeekStart.getDate() - 7);
+    this.buildEmployeeSchedule();
+  }
+
+  goToNextWeek() {
+    this.currentWeekStart.setDate(this.currentWeekStart.getDate() + 7);
+    this.buildEmployeeSchedule();
+  }
+
+  isShiftInCurrentWeek(shift: any): boolean {
+    const shiftDate = new Date(shift.startTime);
+
+    const weekEnd = new Date(this.currentWeekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    return shiftDate >= this.currentWeekStart && shiftDate < weekEnd;
+  }
+
   loadShifts() {
     this.http.get<any[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
-          this.shifts = data.filter(shift => shift.isAssigned === true);
+          this.shifts = data;
 
           this.buildEmployeeSchedule();
 
@@ -109,59 +174,114 @@ export class Shifts implements OnInit {
   buildEmployeeSchedule() {
     const groupedByEmployee: any = {};
 
-    this.shifts.forEach(shift => {
-      const employeeName = this.getEmployeeNameFromEmployeeRoleId(shift.employeeRoleId);
+    this.openShiftRow = {
+      employeeName: 'Ledige vagter',
+      monday: null,
+      tuesday: null,
+      wednesday: null,
+      thursday: null,
+      friday: null
+    };
 
-      if (!groupedByEmployee[employeeName]) {
-        groupedByEmployee[employeeName] = {
-          employeeName: employeeName,
-          monday: null,
-          tuesday: null,
-          wednesday: null,
-          thursday: null,
-          friday: null
-        };
-      }
+    this.shifts
+      .filter(shift => this.isShiftInCurrentWeek(shift))
+      .forEach(shift => {
 
-      const day = new Date(shift.startTime).getDay();
-      const shiftText = this.formatShiftTime(shift);
+        if (!shift.isAssigned) {
 
-      if (day === 1) {
-        groupedByEmployee[employeeName].monday = {
-          text: shiftText,
-          color: this.getRoleColor(shift.roleId)
-        };
-      }
+          const day = new Date(shift.startTime).getDay();
+          const shiftText = this.formatShiftTime(shift);
 
-      if (day === 2) {
-        groupedByEmployee[employeeName].tuesday = {
-          text: shiftText,
-          color: this.getRoleColor(shift.roleId)
-        };
-      }
+          if (day === 1) {
+            this.openShiftRow.monday = {
+              text: shiftText,
+              color: '#d9d9d9'
+            };
+          }
 
-      if (day === 3) {
-        groupedByEmployee[employeeName].wednesday = {
-          text: shiftText,
-          color: this.getRoleColor(shift.roleId)
-        };
-      }
+          if (day === 2) {
+            this.openShiftRow.tuesday = {
+              text: shiftText,
+              color: '#d9d9d9'
+            };
+          }
 
-      if (day === 4) {
-        groupedByEmployee[employeeName].thursday = {
-          text: shiftText,
-          color: this.getRoleColor(shift.roleId)
-        };
-      }
+          if (day === 3) {
+            this.openShiftRow.wednesday = {
+              text: shiftText,
+              color: '#d9d9d9'
+            };
+          }
 
-      if (day === 5) {
-        groupedByEmployee[employeeName].friday = {
-          text: shiftText,
-          color: this.getRoleColor(shift.roleId)
-        };
-      }
+          if (day === 4) {
+            this.openShiftRow.thursday = {
+              text: shiftText,
+              color: '#d9d9d9'
+            };
+          }
 
-    });
+          if (day === 5) {
+            this.openShiftRow.friday = {
+              text: shiftText,
+              color: '#d9d9d9'
+            };
+          }
+
+          return;
+        }
+
+        const employeeName = this.getEmployeeNameFromEmployeeRoleId(shift.employeeRoleId);
+
+        if (!groupedByEmployee[employeeName]) {
+          groupedByEmployee[employeeName] = {
+            employeeName: employeeName,
+            monday: null,
+            tuesday: null,
+            wednesday: null,
+            thursday: null,
+            friday: null
+          };
+        }
+
+        const day = new Date(shift.startTime).getDay();
+        const shiftText = this.formatShiftTime(shift);
+
+        if (day === 1) {
+          groupedByEmployee[employeeName].monday = {
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId)
+          };
+        }
+
+        if (day === 2) {
+          groupedByEmployee[employeeName].tuesday = {
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId)
+          };
+        }
+
+        if (day === 3) {
+          groupedByEmployee[employeeName].wednesday = {
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId)
+          };
+        }
+
+        if (day === 4) {
+          groupedByEmployee[employeeName].thursday = {
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId)
+          };
+        }
+
+        if (day === 5) {
+          groupedByEmployee[employeeName].friday = {
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId)
+          };
+        }
+
+      });
 
     this.employeeSchedule = Object.values(groupedByEmployee);
   }
@@ -208,6 +328,5 @@ export class Shifts implements OnInit {
     return `${employee.firstName} ${employee.lastName}`;
   }
 
-  employeeSchedule: any[] = [];
 }
 

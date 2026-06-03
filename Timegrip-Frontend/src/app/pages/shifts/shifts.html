@@ -2,6 +2,22 @@
 
     <h1>Aktuel vagtplan</h1>
 
+    <div class="week-navigation">
+
+        <button (click)="goToPreviousWeek()">
+            ← Forrige uge
+        </button>
+
+        <span>
+            {{ getWeekText() }}
+        </span>
+
+        <button (click)="goToNextWeek()">
+            Næste uge →
+        </button>
+
+    </div>
+
     <table class="shift-table">
         <thead>
             <tr>
@@ -15,6 +31,48 @@
         </thead>
 
         <tbody>
+
+            <tr class="open-shifts-row">
+                <td class="employee-name">
+                    {{ openShiftRow.employeeName }}
+                </td>
+
+                <td>
+                    <div *ngIf="openShiftRow.monday" class="shift-block"
+                        [style.background-color]="openShiftRow.monday.color">
+                        {{ openShiftRow.monday.text }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="openShiftRow.tuesday" class="shift-block"
+                        [style.background-color]="openShiftRow.tuesday.color">
+                        {{ openShiftRow.tuesday.text }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="openShiftRow.wednesday" class="shift-block"
+                        [style.background-color]="openShiftRow.wednesday.color">
+                        {{ openShiftRow.wednesday.text }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="openShiftRow.thursday" class="shift-block"
+                        [style.background-color]="openShiftRow.thursday.color">
+                        {{ openShiftRow.thursday.text }}
+                    </div>
+                </td>
+
+                <td>
+                    <div *ngIf="openShiftRow.friday" class="shift-block"
+                        [style.background-color]="openShiftRow.friday.color">
+                        {{ openShiftRow.friday.text }}
+                    </div>
+                </td>
+            </tr>
+
             <tr *ngFor="let employee of employeeSchedule">
                 <td class="employee-name">
                     {{ employee.employeeName }}
@@ -52,6 +110,7 @@
                     </div>
                 </td>
             </tr>
+
         </tbody>
     </table>
 
