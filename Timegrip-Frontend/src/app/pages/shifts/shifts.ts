@@ -12,6 +12,7 @@ export class Shifts implements OnInit {
   shifts: any[] = [];
   employees: any[] = [];
   employeeRoles: any[] = [];
+  roles: any[] = [];
 
   constructor(
     private http: HttpClient,
@@ -19,6 +20,7 @@ export class Shifts implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.loadRoles();
     this.loadEmployeesAndShifts();
   }
 
@@ -74,6 +76,14 @@ export class Shifts implements OnInit {
     });
   }
 
+  loadRoles() {
+    this.http.get<any[]>('http://localhost:5000/api/roles/')
+      .subscribe({
+        next: data => this.roles = data,
+        error: error => console.error(error)
+      });
+  }
+
   formatTime(dateTime: string): string {
     return new Date(dateTime).toLocaleTimeString('da-DK', {
       hour: '2-digit',
@@ -105,12 +115,11 @@ export class Shifts implements OnInit {
       if (!groupedByEmployee[employeeName]) {
         groupedByEmployee[employeeName] = {
           employeeName: employeeName,
-          color: this.getEmployeeColor(employeeName),
-          monday: '',
-          tuesday: '',
-          wednesday: '',
-          thursday: '',
-          friday: ''
+          monday: null,
+          tuesday: null,
+          wednesday: null,
+          thursday: null,
+          friday: null
         };
       }
 
@@ -118,55 +127,65 @@ export class Shifts implements OnInit {
       const shiftText = this.formatShiftTime(shift);
 
       if (day === 1) {
-        groupedByEmployee[employeeName].monday += groupedByEmployee[employeeName].monday
-          ? ', ' + shiftText
-          : shiftText;
+        groupedByEmployee[employeeName].monday = {
+          text: shiftText,
+          color: this.getRoleColor(shift.roleId)
+        };
       }
 
       if (day === 2) {
-        groupedByEmployee[employeeName].tuesday += groupedByEmployee[employeeName].tuesday
-          ? ', ' + shiftText
-          : shiftText;
+        groupedByEmployee[employeeName].tuesday = {
+          text: shiftText,
+          color: this.getRoleColor(shift.roleId)
+        };
       }
 
       if (day === 3) {
-        groupedByEmployee[employeeName].wednesday += groupedByEmployee[employeeName].wednesday
-          ? ', ' + shiftText
-          : shiftText;
+        groupedByEmployee[employeeName].wednesday = {
+          text: shiftText,
+          color: this.getRoleColor(shift.roleId)
+        };
       }
 
       if (day === 4) {
-        groupedByEmployee[employeeName].thursday += groupedByEmployee[employeeName].thursday
-          ? ', ' + shiftText
-          : shiftText;
+        groupedByEmployee[employeeName].thursday = {
+          text: shiftText,
+          color: this.getRoleColor(shift.roleId)
+        };
       }
 
       if (day === 5) {
-        groupedByEmployee[employeeName].friday += groupedByEmployee[employeeName].friday
-          ? ', ' + shiftText
-          : shiftText;
+        groupedByEmployee[employeeName].friday = {
+          text: shiftText,
+          color: this.getRoleColor(shift.roleId)
+        };
       }
+
     });
 
     this.employeeSchedule = Object.values(groupedByEmployee);
   }
 
-  getEmployeeColor(employeeName: string): string {
-    const colors = [
-      '#96768f',
-      '#5b8c85',
-      '#c98b5f',
-      '#6f83b8',
-      '#9b6f9f'
-    ];
+  getRoleColor(roleId: string): string {
+    const role = this.roles.find(r => r.roleId === roleId);
 
-    let sum = 0;
-
-    for (let i = 0; i < employeeName.length; i++) {
-      sum += employeeName.charCodeAt(i);
+    if (!role) {
+      return '#cccccc';
     }
 
-    return colors[sum % colors.length];
+    switch (role.name) {
+      case 'Kok':
+        return '#96768f';
+
+      case 'Tjener':
+        return '#5b8c85';
+
+      case 'Opvasker':
+        return '#c98b5f';
+
+      default:
+        return '#6f83b8';
+    }
   }
 
   getEmployeeNameFromEmployeeRoleId(employeeRoleId: string): string {

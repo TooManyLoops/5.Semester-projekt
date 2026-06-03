@@ -21,35 +21,38 @@
                 </td>
 
                 <td>
-                    <div *ngIf="employee.monday" class="shift-block" [style.background-color]="employee.color">
-                        {{ employee.monday }}
+                    <div *ngIf="employee.monday" class="shift-block" [style.background-color]="employee.monday.color">
+                        {{ employee.monday.text }}
                     </div>
                 </td>
 
                 <td>
-                    <div *ngIf="employee.tuesday" class="shift-block" [style.background-color]="employee.color">
-                        {{ employee.tuesday }}
+                    <div *ngIf="employee.tuesday" class="shift-block" [style.background-color]="employee.tuesday.color">
+                        {{ employee.tuesday.text }}
                     </div>
                 </td>
 
                 <td>
-                    <div *ngIf="employee.wednesday" class="shift-block" [style.background-color]="employee.color">
-                        {{ employee.wednesday }}
+                    <div *ngIf="employee.wednesday" class="shift-block"
+                        [style.background-color]="employee.wednesday.color">
+                        {{ employee.wednesday.text }}
                     </div>
                 </td>
 
                 <td>
-                    <div *ngIf="employee.thursday" class="shift-block" [style.background-color]="employee.color">
-                        {{ employee.thursday }}
+                    <div *ngIf="employee.thursday" class="shift-block"
+                        [style.background-color]="employee.thursday.color">
+                        {{ employee.thursday.text }}
                     </div>
                 </td>
 
                 <td>
-                    <div *ngIf="employee.friday" class="shift-block" [style.background-color]="employee.color">
-                        {{ employee.friday }}
+                    <div *ngIf="employee.friday" class="shift-block" [style.background-color]="employee.friday.color">
+                        {{ employee.friday.text }}
                     </div>
                 </td>
             </tr>
         </tbody>
     </table>
+
 </div>

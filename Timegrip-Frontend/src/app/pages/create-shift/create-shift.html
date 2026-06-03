@@ -36,7 +36,7 @@
         <div class="form-row">
             <label>Rolle</label>
 
-            <select [(ngModel)]="shift.roleId" name="roleId">
+            <select [(ngModel)]="shift.roleId" name="roleId" (ngModelChange)="filterEmployeesByRole()">
                 <option value="">Vælg rolle</option>
 
                 <option *ngFor="let role of roles" [value]="role.roleId">
@@ -51,7 +51,7 @@
             <select [(ngModel)]="shift.employeeId" name="employeeId">
                 <option value="">Ingen medarbejder</option>
 
-                <option *ngFor="let employee of employees" [value]="employee.employeeId">
+                <option *ngFor="let employee of filteredEmployees" [value]="employee.employeeId">
                     {{ employee.firstName }} {{ employee.lastName }}
                 </option>
             </select>

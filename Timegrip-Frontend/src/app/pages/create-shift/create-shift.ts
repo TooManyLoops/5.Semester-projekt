@@ -12,9 +12,10 @@ export class CreateShift implements OnInit {
 
   roles: any[] = [];
   employees: any[] = [];
-
   times: string[] = [];
   today = '';
+  employeeRoles: any[] = [];
+  filteredEmployees: any[] = [];
 
   shift = {
     date: '',
@@ -64,9 +65,41 @@ export class CreateShift implements OnInit {
   loadEmployees() {
     this.http.get<any[]>('http://localhost:5000/api/employees/')
       .subscribe({
-        next: data => this.employees = data,
+        next: data => {
+          this.employees = data;
+          this.filteredEmployees = data;
+
+          this.employees.forEach(employee => {
+            this.http.get<any[]>(
+              `http://localhost:5000/api/employee-roles/employee/${employee.employeeId}`
+            )
+              .subscribe({
+                next: roles => {
+                  this.employeeRoles.push(...roles);
+                },
+                error: error => console.error(error)
+              });
+          });
+        },
         error: error => console.error(error)
       });
+  }
+
+  filterEmployeesByRole() {
+    if (!this.shift.roleId) {
+      this.filteredEmployees = this.employees;
+      return;
+    }
+
+    const employeeIdsWithRole = this.employeeRoles
+      .filter(er => er.roleId === this.shift.roleId)
+      .map(er => er.employeeId);
+
+    this.filteredEmployees = this.employees.filter(employee =>
+      employeeIdsWithRole.includes(employee.employeeId)
+    );
+
+    this.shift.employeeId = '';
   }
 
   addShift() {
