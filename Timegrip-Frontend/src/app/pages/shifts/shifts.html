@@ -18,7 +18,7 @@
 
         <div class="schedule-actions-center">
 
-            <button>I dag</button>
+            <button type="button" (click)="goToToday()">I dag</button>
 
             <button (click)="goToPreviousWeek()">←</button>
 
@@ -26,12 +26,18 @@
 
             <button (click)="goToNextWeek()">→</button>
 
-            <select>
-                <option>Juni</option>
+            <select [(ngModel)]="selectedMonth" name="selectedMonth" (change)="goToSelectedMonth()">
+
+                <option *ngFor="let month of months" [ngValue]="month.value">
+                    {{ month.name }}
+                </option>
             </select>
 
-            <select>
-                <option>Uge 23</option>
+            <select [(ngModel)]="selectedWeek" name="selectedWeek" (change)="goToSelectedWeek()">
+
+                <option *ngFor="let week of weeks" [ngValue]="week">
+                    Uge {{ week }}
+                </option>
             </select>
 
         </div>
