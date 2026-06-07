@@ -16,6 +16,11 @@ export class Shifts implements OnInit {
   employeeSchedule: any[] = [];
   currentWeekStart: Date = this.getMonday(new Date());
   selectedEmployeeId = '';
+  selectedEmployeeForShift = '';
+  showAllShifts = false;
+  selectedDayShifts: any[] = [];
+  selectedDayName = '';
+
 
   selectedMonth = new Date().getMonth();
   selectedWeek = this.getWeekNumber(new Date());
@@ -71,9 +76,13 @@ export class Shifts implements OnInit {
 
   getMonday(date: Date): Date {
     const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
+
+    d.setDate(diff);
+    return d;
   }
 
   getWeekNumber(date: Date): number {
@@ -227,11 +236,11 @@ export class Shifts implements OnInit {
 
     this.openShiftRow = {
       employeeName: 'Ledige vagter',
-      monday: null,
-      tuesday: null,
-      wednesday: null,
-      thursday: null,
-      friday: null
+      monday: [],
+      tuesday: [],
+      wednesday: [],
+      thursday: [],
+      friday: []
     };
 
     this.shifts
@@ -244,43 +253,53 @@ export class Shifts implements OnInit {
           const shiftText = this.formatShiftTime(shift);
 
           if (day === 1) {
-            this.openShiftRow.monday = {
+            this.openShiftRow.monday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
               text: shiftText,
               color: '#d9d9d9',
               role: this.getRoleName(shift.roleId)
-            };
+            });
           }
 
           if (day === 2) {
-            this.openShiftRow.tuesday = {
+            this.openShiftRow.tuesday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
               text: shiftText,
               color: '#d9d9d9',
               role: this.getRoleName(shift.roleId)
-            };
+            });
           }
 
           if (day === 3) {
-            this.openShiftRow.wednesday = {
+            this.openShiftRow.wednesday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
               text: shiftText,
               color: '#d9d9d9',
               role: this.getRoleName(shift.roleId)
-            };
+            });
           }
 
           if (day === 4) {
-            this.openShiftRow.thursday = {
+            this.openShiftRow.thursday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
               text: shiftText,
               color: '#d9d9d9',
               role: this.getRoleName(shift.roleId)
-            };
+            });
           }
 
           if (day === 5) {
-            this.openShiftRow.friday = {
+            this.openShiftRow.friday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
               text: shiftText,
               color: '#d9d9d9',
               role: this.getRoleName(shift.roleId)
-            };
+            });
           }
 
           return;
@@ -306,11 +325,11 @@ export class Shifts implements OnInit {
         if (!groupedByEmployee[employeeName]) {
           groupedByEmployee[employeeName] = {
             employeeName: employeeName,
-            monday: null,
-            tuesday: null,
-            wednesday: null,
-            thursday: null,
-            friday: null
+            monday: [],
+            tuesday: [],
+            wednesday: [],
+            thursday: [],
+            friday: []
           };
         }
 
@@ -409,6 +428,154 @@ export class Shifts implements OnInit {
     }
 
     return `${employee.firstName} ${employee.lastName}`;
+  }
+
+  selectedOpenShift: any = null;
+
+  selectOpenShift(shift: any) {
+    this.selectedOpenShift = shift;
+    this.selectedEmployeeForShift = '';
+
+    console.log('Valgt ledig vagt:', shift);
+  }
+
+  assignSelectedShift() {
+
+    this.http.get<any[]>(
+      `http://localhost:5000/api/employee-roles/employee/${this.selectedEmployeeForShift}`
+    )
+      .subscribe({
+
+        next: employeeRoles => {
+
+          const matchingEmployeeRole = employeeRoles.find(er =>
+            er.roleId === this.selectedOpenShift.roleId
+          );
+
+          if (!matchingEmployeeRole) {
+            alert('Medarbejderen har ikke den nødvendige rolle');
+            return;
+          }
+
+          const hasConflict = this.shifts.some(shift => {
+            if (!shift.isAssigned) {
+              return false;
+            }
+
+            const existingEmployeeRole = this.employeeRoles.find(er =>
+              er.employeeRoleId === shift.employeeRoleId
+            );
+
+            if (!existingEmployeeRole) {
+              return false;
+            }
+
+            if (
+              existingEmployeeRole.employeeId?.toLowerCase() !==
+              this.selectedEmployeeForShift?.toLowerCase()
+            ) {
+              return false;
+            }
+
+            const existingStart = new Date(shift.startTime);
+            const existingEnd = new Date(shift.endTime);
+
+            const newShift = this.shifts.find(s =>
+              s.shiftId === this.selectedOpenShift.shiftId
+            );
+
+            if (!newShift) {
+              return false;
+            }
+
+            const newStart = new Date(newShift.startTime);
+            const newEnd = new Date(newShift.endTime);
+
+            const overlaps =
+              newStart < existingEnd &&
+              newEnd > existingStart;
+
+            console.log('Samme medarbejder:', existingEmployeeRole.employeeId, this.selectedEmployeeForShift);
+            console.log('Eksisterende:', existingStart, existingEnd);
+            console.log('Ny:', newStart, newEnd);
+            console.log('Overlap:', overlaps);
+
+            return overlaps;
+          });
+
+          if (hasConflict) {
+            alert('Medarbejderen har allerede en vagt i dette tidsrum');
+            return;
+          }
+
+          const assignmentRequest = {
+            shiftId: this.selectedOpenShift.shiftId,
+            employeeRoleId: matchingEmployeeRole.employeeRoleId,
+            assignmentStatus: 1
+          };
+
+          this.http.post(
+            'http://localhost:5000/api/shifts/Assign',
+            assignmentRequest
+          )
+            .subscribe({
+              next: () => {
+                alert('Vagt tildelt');
+
+                this.selectedOpenShift = null;
+                this.selectedEmployeeForShift = '';
+
+                this.loadShifts();
+              },
+              error: error => {
+                console.error(error);
+                alert('Kunne ikke tildele vagten');
+              }
+            });
+
+        },
+
+        error: error => {
+          console.error(error);
+        }
+
+      });
+
+  }
+
+  getEmployeesForSelectedOpenShift(): any[] {
+    if (!this.selectedOpenShift) {
+      return [];
+    }
+
+    const employeeIdsWithRole = this.employeeRoles
+      .filter(er => er.roleId === this.selectedOpenShift.roleId)
+      .map(er => er.employeeId);
+
+    return this.employees.filter(employee =>
+      employeeIdsWithRole.includes(employee.employeeId)
+    );
+  }
+
+  getDayHeader(dayOffset: number): string {
+    const date = new Date(this.currentWeekStart);
+    date.setDate(date.getDate() + dayOffset);
+
+    const dayNames = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag'];
+    const dateText = date.toLocaleDateString('da-DK', {
+      day: 'numeric',
+      month: 'numeric'
+    });
+
+    return `${dayNames[dayOffset]} ${dateText}`;
+  }
+
+  showMoreShifts(shifts: any[], dayName: string) {
+
+    this.selectedDayShifts = shifts;
+    this.selectedDayName = dayName;
+    this.showAllShifts = true;
+
   }
 
 }
