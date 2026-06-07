@@ -15,6 +15,7 @@ export class Shifts implements OnInit {
   roles: any[] = [];
   employeeSchedule: any[] = [];
   currentWeekStart: Date = this.getMonday(new Date());
+  selectedEmployeeId = '';
 
   selectedMonth = new Date().getMonth();
   selectedWeek = this.getWeekNumber(new Date());
@@ -282,6 +283,21 @@ export class Shifts implements OnInit {
             };
           }
 
+          return;
+        }
+
+        const employeeRole = this.employeeRoles.find(er =>
+          er.employeeRoleId === shift.employeeRoleId
+        );
+
+        if (!employeeRole) {
+          return;
+        }
+
+        if (
+          this.selectedEmployeeId &&
+          employeeRole.employeeId !== this.selectedEmployeeId
+        ) {
           return;
         }
 
