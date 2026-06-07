@@ -2,19 +2,43 @@
 
     <h1>Aktuel vagtplan</h1>
 
-    <div class="week-navigation">
+    <div class="schedule-topbar">
 
-        <button (click)="goToPreviousWeek()">
-            ← Forrige uge
-        </button>
+        <div class="schedule-actions-left">
 
-        <span>
-            {{ getWeekText() }}
-        </span>
+            <select>
+                <option>Alle medarbejdere</option>
+            </select>
 
-        <button (click)="goToNextWeek()">
-            Næste uge →
-        </button>
+        </div>
+
+        <div class="schedule-actions-center">
+
+            <button>I dag</button>
+
+            <button (click)="goToPreviousWeek()">←</button>
+
+            <span>{{ getWeekText() }}</span>
+
+            <button (click)="goToNextWeek()">→</button>
+
+            <select>
+                <option>Juni</option>
+            </select>
+
+            <select>
+                <option>Uge 23</option>
+            </select>
+
+        </div>
+
+        <div class="schedule-actions-right">
+
+            <button class="create-button">
+                + Opret vagt
+            </button>
+
+        </div>
 
     </div>
 
@@ -40,35 +64,75 @@
                 <td>
                     <div *ngIf="openShiftRow.monday" class="shift-block"
                         [style.background-color]="openShiftRow.monday.color">
-                        {{ openShiftRow.monday.text }}
+
+                        <div class="shift-time">
+                            {{ openShiftRow.monday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ openShiftRow.monday.role }}
+                        </div>
+
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="openShiftRow.tuesday" class="shift-block"
                         [style.background-color]="openShiftRow.tuesday.color">
-                        {{ openShiftRow.tuesday.text }}
+
+                        <div class="shift-time">
+                            {{ openShiftRow.tuesday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ openShiftRow.tuesday.role }}
+                        </div>
+
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="openShiftRow.wednesday" class="shift-block"
                         [style.background-color]="openShiftRow.wednesday.color">
-                        {{ openShiftRow.wednesday.text }}
+
+                        <div class="shift-time">
+                            {{ openShiftRow.wednesday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ openShiftRow.wednesday.role }}
+                        </div>
+
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="openShiftRow.thursday" class="shift-block"
                         [style.background-color]="openShiftRow.thursday.color">
-                        {{ openShiftRow.thursday.text }}
+
+                        <div class="shift-time">
+                            {{ openShiftRow.thursday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ openShiftRow.thursday.role }}
+                        </div>
+
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="openShiftRow.friday" class="shift-block"
                         [style.background-color]="openShiftRow.friday.color">
-                        {{ openShiftRow.friday.text }}
+
+                        <div class="shift-time">
+                            {{ openShiftRow.friday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ openShiftRow.friday.role }}
+                        </div>
+
                     </div>
                 </td>
             </tr>
@@ -80,38 +144,98 @@
 
                 <td>
                     <div *ngIf="employee.monday" class="shift-block" [style.background-color]="employee.monday.color">
-                        {{ employee.monday.text }}
+
+                        <div class="shift-time">
+                            {{ employee.monday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ employee.monday.role }}
+                        </div>
+
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="employee.tuesday" class="shift-block" [style.background-color]="employee.tuesday.color">
-                        {{ employee.tuesday.text }}
+
+                        <div class="shift-time">
+                            {{ employee.tuesday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ employee.tuesday.role }}
+                        </div>
+
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="employee.wednesday" class="shift-block"
                         [style.background-color]="employee.wednesday.color">
-                        {{ employee.wednesday.text }}
+                        <div class="shift-time">
+                            {{ employee.wednesday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ employee.wednesday.role }}
+                        </div>
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="employee.thursday" class="shift-block"
                         [style.background-color]="employee.thursday.color">
-                        {{ employee.thursday.text }}
+                        <div class="shift-time">
+                            {{ employee.thursday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ employee.thursday.role }}
+                        </div>
                     </div>
                 </td>
 
                 <td>
                     <div *ngIf="employee.friday" class="shift-block" [style.background-color]="employee.friday.color">
-                        {{ employee.friday.text }}
+                        <div class="shift-time">
+                            {{ employee.friday.text }}
+                        </div>
+
+                        <div class="shift-role">
+                            {{ employee.friday.role }}
+                        </div>
                     </div>
                 </td>
             </tr>
 
         </tbody>
     </table>
+
+    <div class="color-legend">
+        <h3>Farveforklaring</h3>
+
+        <div class="legend-items">
+            <div class="legend-item">
+                <span class="legend-color kok"></span>
+                <span>Kok</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color tjener"></span>
+                <span>Tjener</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color opvasker"></span>
+                <span>Opvasker</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color ledig"></span>
+                <span>Ledige vagter</span>
+            </div>
+        </div>
+    </div>
 
 </div>

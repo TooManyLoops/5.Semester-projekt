@@ -16,6 +16,26 @@ export class Shifts implements OnInit {
   employeeSchedule: any[] = [];
   currentWeekStart: Date = this.getMonday(new Date());
 
+  selectedMonth = new Date().getMonth();
+  selectedWeek = this.getWeekNumber(new Date());
+
+  months = [
+    { name: 'Januar', value: 0 },
+    { name: 'Februar', value: 1 },
+    { name: 'Marts', value: 2 },
+    { name: 'April', value: 3 },
+    { name: 'Maj', value: 4 },
+    { name: 'Juni', value: 5 },
+    { name: 'Juli', value: 6 },
+    { name: 'August', value: 7 },
+    { name: 'September', value: 8 },
+    { name: 'Oktober', value: 9 },
+    { name: 'November', value: 10 },
+    { name: 'December', value: 11 }
+  ];
+
+  weeks = Array.from({ length: 53 }, (_, i) => i + 1);
+
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef
@@ -34,6 +54,19 @@ export class Shifts implements OnInit {
     thursday: null,
     friday: null
   };
+
+  goToSelectedWeek() {
+    const year = new Date().getFullYear();
+
+    const firstDayOfYear = new Date(year, 0, 1);
+    const daysToAdd = (this.selectedWeek - 1) * 7;
+
+    const targetDate = new Date(firstDayOfYear);
+    targetDate.setDate(firstDayOfYear.getDate() + daysToAdd);
+
+    this.currentWeekStart = this.getMonday(targetDate);
+    this.buildEmployeeSchedule();
+  }
 
   getMonday(date: Date): Date {
     const d = new Date(date);
@@ -77,6 +110,23 @@ export class Shifts implements OnInit {
 
   goToNextWeek() {
     this.currentWeekStart.setDate(this.currentWeekStart.getDate() + 7);
+    this.buildEmployeeSchedule();
+  }
+
+  goToToday() {
+    this.currentWeekStart = this.getMonday(new Date());
+    this.selectedWeek = this.getWeekNumber(this.currentWeekStart);
+    this.selectedMonth = this.currentWeekStart.getMonth();
+    this.buildEmployeeSchedule();
+  }
+
+  goToSelectedMonth() {
+    const year = new Date().getFullYear();
+    const date = new Date(year, this.selectedMonth, 1);
+
+    this.currentWeekStart = this.getMonday(date);
+    this.selectedWeek = this.getWeekNumber(this.currentWeekStart);
+
     this.buildEmployeeSchedule();
   }
 
@@ -195,35 +245,40 @@ export class Shifts implements OnInit {
           if (day === 1) {
             this.openShiftRow.monday = {
               text: shiftText,
-              color: '#d9d9d9'
+              color: '#d9d9d9',
+              role: this.getRoleName(shift.roleId)
             };
           }
 
           if (day === 2) {
             this.openShiftRow.tuesday = {
               text: shiftText,
-              color: '#d9d9d9'
+              color: '#d9d9d9',
+              role: this.getRoleName(shift.roleId)
             };
           }
 
           if (day === 3) {
             this.openShiftRow.wednesday = {
               text: shiftText,
-              color: '#d9d9d9'
+              color: '#d9d9d9',
+              role: this.getRoleName(shift.roleId)
             };
           }
 
           if (day === 4) {
             this.openShiftRow.thursday = {
               text: shiftText,
-              color: '#d9d9d9'
+              color: '#d9d9d9',
+              role: this.getRoleName(shift.roleId)
             };
           }
 
           if (day === 5) {
             this.openShiftRow.friday = {
               text: shiftText,
-              color: '#d9d9d9'
+              color: '#d9d9d9',
+              role: this.getRoleName(shift.roleId)
             };
           }
 
@@ -249,35 +304,40 @@ export class Shifts implements OnInit {
         if (day === 1) {
           groupedByEmployee[employeeName].monday = {
             text: shiftText,
-            color: this.getRoleColor(shift.roleId)
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
           };
         }
 
         if (day === 2) {
           groupedByEmployee[employeeName].tuesday = {
             text: shiftText,
-            color: this.getRoleColor(shift.roleId)
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
           };
         }
 
         if (day === 3) {
           groupedByEmployee[employeeName].wednesday = {
             text: shiftText,
-            color: this.getRoleColor(shift.roleId)
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
           };
         }
 
         if (day === 4) {
           groupedByEmployee[employeeName].thursday = {
             text: shiftText,
-            color: this.getRoleColor(shift.roleId)
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
           };
         }
 
         if (day === 5) {
           groupedByEmployee[employeeName].friday = {
             text: shiftText,
-            color: this.getRoleColor(shift.roleId)
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
           };
         }
 
@@ -295,17 +355,24 @@ export class Shifts implements OnInit {
 
     switch (role.name) {
       case 'Kok':
-        return '#96768f';
+        return '#dfe8f6';
 
       case 'Tjener':
-        return '#5b8c85';
+        return '#eadcf5';
 
       case 'Opvasker':
-        return '#c98b5f';
+        return '#f8efd4';
 
       default:
         return '#6f83b8';
     }
+  }
+
+  getRoleName(roleId: string): string {
+
+    const role = this.roles.find(r => r.roleId === roleId);
+
+    return role ? role.name : '';
   }
 
   getEmployeeNameFromEmployeeRoleId(employeeRoleId: string): string {
