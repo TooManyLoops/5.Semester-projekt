@@ -20,6 +20,7 @@ export class Shifts implements OnInit {
   showAllShifts = false;
   selectedDayShifts: any[] = [];
   selectedDayName = '';
+  isAssigningShift = false;
 
 
   selectedMonth = new Date().getMonth();
@@ -337,43 +338,43 @@ export class Shifts implements OnInit {
         const shiftText = this.formatShiftTime(shift);
 
         if (day === 1) {
-          groupedByEmployee[employeeName].monday = {
+          groupedByEmployee[employeeName].monday.push({
             text: shiftText,
             color: this.getRoleColor(shift.roleId),
             role: this.getRoleName(shift.roleId)
-          };
+          });
         }
 
         if (day === 2) {
-          groupedByEmployee[employeeName].tuesday = {
+          groupedByEmployee[employeeName].tuesday.push({
             text: shiftText,
             color: this.getRoleColor(shift.roleId),
             role: this.getRoleName(shift.roleId)
-          };
+          });
         }
 
         if (day === 3) {
-          groupedByEmployee[employeeName].wednesday = {
+          groupedByEmployee[employeeName].wednesday.push({
             text: shiftText,
             color: this.getRoleColor(shift.roleId),
             role: this.getRoleName(shift.roleId)
-          };
+          });
         }
 
         if (day === 4) {
-          groupedByEmployee[employeeName].thursday = {
+          groupedByEmployee[employeeName].thursday.push({
             text: shiftText,
             color: this.getRoleColor(shift.roleId),
             role: this.getRoleName(shift.roleId)
-          };
+          });
         }
 
         if (day === 5) {
-          groupedByEmployee[employeeName].friday = {
+          groupedByEmployee[employeeName].friday.push({
             text: shiftText,
             color: this.getRoleColor(shift.roleId),
             role: this.getRoleName(shift.roleId)
-          };
+          });
         }
 
       });
@@ -435,6 +436,10 @@ export class Shifts implements OnInit {
   selectOpenShift(shift: any) {
     this.selectedOpenShift = shift;
     this.selectedEmployeeForShift = '';
+
+    this.showAllShifts = false;
+    this.selectedDayShifts = [];
+    this.selectedDayName = '';
 
     console.log('Valgt ledig vagt:', shift);
   }
@@ -520,12 +525,16 @@ export class Shifts implements OnInit {
           )
             .subscribe({
               next: () => {
-                alert('Vagt tildelt');
 
                 this.selectedOpenShift = null;
                 this.selectedEmployeeForShift = '';
 
                 this.loadShifts();
+
+                setTimeout(() => {
+                  this.cdr.detectChanges();
+                }, 100);
+
               },
               error: error => {
                 console.error(error);

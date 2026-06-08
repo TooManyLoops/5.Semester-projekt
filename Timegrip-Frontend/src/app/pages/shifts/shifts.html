@@ -262,69 +262,88 @@
                 </td>
 
                 <td>
-                    <div *ngIf="employee.monday" class="shift-block" [style.background-color]="employee.monday.color">
+
+                    <div *ngFor="let shift of employee.monday" class="shift-block"
+                        [style.background-color]="shift.color">
 
                         <div class="shift-time">
-                            {{ employee.monday.text }}
+                            {{ shift.text }}
                         </div>
 
                         <div class="shift-role">
-                            {{ employee.monday.role }}
+                            {{ shift.role }}
                         </div>
 
                     </div>
+
                 </td>
 
                 <td>
-                    <div *ngIf="employee.tuesday" class="shift-block" [style.background-color]="employee.tuesday.color">
+
+                    <div *ngFor="let shift of employee.tuesday" class="shift-block"
+                        [style.background-color]="shift.color">
 
                         <div class="shift-time">
-                            {{ employee.tuesday.text }}
+                            {{ shift.text }}
                         </div>
 
                         <div class="shift-role">
-                            {{ employee.tuesday.role }}
+                            {{ shift.role }}
                         </div>
 
                     </div>
+
                 </td>
 
                 <td>
-                    <div *ngIf="employee.wednesday" class="shift-block"
-                        [style.background-color]="employee.wednesday.color">
+
+                    <div *ngFor="let shift of employee.wednesday" class="shift-block"
+                        [style.background-color]="shift.color">
+
                         <div class="shift-time">
-                            {{ employee.wednesday.text }}
+                            {{ shift.text }}
                         </div>
 
                         <div class="shift-role">
-                            {{ employee.wednesday.role }}
+                            {{ shift.role }}
                         </div>
+
                     </div>
+
                 </td>
 
                 <td>
-                    <div *ngIf="employee.thursday" class="shift-block"
-                        [style.background-color]="employee.thursday.color">
+
+                    <div *ngFor="let shift of employee.thursday" class="shift-block"
+                        [style.background-color]="shift.color">
+
                         <div class="shift-time">
-                            {{ employee.thursday.text }}
+                            {{ shift.text }}
                         </div>
 
                         <div class="shift-role">
-                            {{ employee.thursday.role }}
+                            {{ shift.role }}
                         </div>
+
                     </div>
+
                 </td>
 
                 <td>
-                    <div *ngIf="employee.friday" class="shift-block" [style.background-color]="employee.friday.color">
+
+                    <div *ngFor="let shift of employee.friday" class="shift-block"
+                        [style.background-color]="shift.color">
+
                         <div class="shift-time">
-                            {{ employee.friday.text }}
+                            {{ shift.text }}
                         </div>
 
                         <div class="shift-role">
-                            {{ employee.friday.role }}
+                            {{ shift.role }}
                         </div>
+
                     </div>
+
                 </td>
             </tr>
 

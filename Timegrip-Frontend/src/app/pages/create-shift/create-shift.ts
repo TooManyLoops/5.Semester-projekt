@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -11,11 +11,12 @@ import { Router } from '@angular/router';
 export class CreateShift implements OnInit {
 
   roles: any[] = [];
+  roleRequirements: any[] = [];
+  filteredEmployees: any[] = [];
   employees: any[] = [];
   times: string[] = [];
   today = '';
   employeeRoles: any[] = [];
-  filteredEmployees: any[] = [];
 
   shift = {
     date: '',
@@ -27,6 +28,7 @@ export class CreateShift implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private cdr: ChangeDetectorRef,
     private router: Router
   ) {
     this.generateTimes();
@@ -57,7 +59,17 @@ export class CreateShift implements OnInit {
   loadRoles() {
     this.http.get<any[]>('http://localhost:5000/api/roles/')
       .subscribe({
-        next: data => this.roles = data,
+        next: data => {
+          this.roles = data;
+
+          this.roleRequirements = this.roles.map(role => ({
+            roleId: role.roleId,
+            roleName: role.name,
+            count: 0
+          }));
+
+          this.cdr.detectChanges();
+        },
         error: error => console.error(error)
       });
   }
@@ -103,84 +115,41 @@ export class CreateShift implements OnInit {
   }
 
   addShift() {
-    const request = {
-      startTime: `${this.shift.date}T${this.shift.startTime}:00`,
-      endTime: `${this.shift.date}T${this.shift.endTime}:00`,
-      shiftRequirements: [
-        {
-          roleId: this.shift.roleId,
-          amount: 1
-        }
-      ]
-    };
+    const selectedRoles = this.roleRequirements.filter(role => role.count > 0);
 
-    console.log('REQUEST SENDT:', request);
+    if (selectedRoles.length === 0) {
+      alert('Vælg mindst én rolle');
+      return;
+    }
 
-    this.http.post('http://localhost:5000/api/shifts/', request)
-      .subscribe({
-        next: createdShift => {
-          if (!this.shift.employeeId) {
-            alert('Vagt oprettet som ledig vagt');
-            this.router.navigate(['/shifts/open']);
-            return;
-          }
+    selectedRoles.forEach(role => {
+      for (let i = 0; i < role.count; i++) {
 
-          this.http.get<any[]>(
-            `http://localhost:5000/api/employee-roles/employee/${this.shift.employeeId}`
-          )
-            .subscribe({
-              next: employeeRoles => {
-                const matchingEmployeeRole = employeeRoles.find(er =>
-                  er.roleId === this.shift.roleId
-                );
+        const request = {
+          startTime: `${this.shift.date}T${this.shift.startTime}:00`,
+          endTime: `${this.shift.date}T${this.shift.endTime}:00`,
+          shiftRequirements: [
+            {
+              roleId: role.roleId,
+              amount: 1
+            }
+          ]
+        };
 
-                if (!matchingEmployeeRole) {
-                  alert('Medarbejderen har ikke den valgte rolle');
-                  return;
-                }
+        this.http.post('http://localhost:5000/api/shifts/', request)
+          .subscribe({
+            next: response => {
+              console.log('Vagt oprettet:', response);
+            },
+            error: error => {
+              console.error(error);
+              alert('Fejl ved oprettelse af vagt');
+            }
+          });
+      }
+    });
 
-                console.log('MATCHING EMPLOYEE ROLE:', matchingEmployeeRole);
-
-                const assignmentRequest = {
-                  shiftId: (createdShift as any).shiftId,
-                  employeeRoleId: matchingEmployeeRole.employeeRoleId,
-                  assignmentStatus: 1
-                };
-
-                console.log('ASSIGN REQUEST:', assignmentRequest);
-
-                this.http.post('http://localhost:5000/api/shifts/Assign', assignmentRequest)
-                  .subscribe({
-                    next: () => {
-                      alert('Vagt oprettet og tildelt medarbejder');
-                      this.router.navigate(['/shifts']);
-                    },
-
-                    error: error => {
-                      console.error(error);
-
-                      alert(
-                        'Assign fejlede\n' +
-                        'Status: ' + error.status + '\n' +
-                        'Body: ' + JSON.stringify(error.error)
-                      );
-                    }
-                  });
-              },
-              error: error => {
-                console.error(error);
-                alert('Kunne ikke hente medarbejderens roller');
-              }
-            });
-        },
-
-        error: error => {
-          console.error(error);
-          console.log('ERROR STATUS:', error.status);
-          console.log('ERROR BODY:', error.error);
-          console.log('DATA SENDT:', request);
-          alert('Fejl ved oprettelse af vagt');
-        }
-      });
+    alert('Vagter oprettet');
+    this.router.navigate(['/shifts']);
   }
 }
