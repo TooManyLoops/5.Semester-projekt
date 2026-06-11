@@ -10,6 +10,6 @@ public class VerificationService(EmployeesDbContext context)
 {
     public async Task<bool> VerifyEmployeeRoleById(Guid employeeRoleId)
     {
-        return context.EmployeeRoles.Any(e => e.EmployeeRoleId == employeeRoleId);
+        return await context.EmployeeRoles.AnyAsync(e => e.EmployeeRoleId == employeeRoleId);
     }
 }
