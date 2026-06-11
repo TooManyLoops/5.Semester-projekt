@@ -263,7 +263,7 @@
 
                 <td>
 
-                    <div *ngFor="let shift of employee.monday" class="shift-block"
+                    <div *ngFor="let shift of employee.monday.slice(0,1)" class="shift-block"
                         [style.background-color]="shift.color">
 
                         <div class="shift-time">
@@ -276,11 +276,18 @@
 
                     </div>
 
+                    <div *ngIf="employee.monday.length > 1" class="more-shifts"
+                        (click)="showMoreShifts(employee.monday, 'Mandag')">
+
+                        +{{ employee.monday.length - 1 }} flere...
+
+                    </div>
+
                 </td>
 
                 <td>
 
-                    <div *ngFor="let shift of employee.tuesday" class="shift-block"
+                    <div *ngFor="let shift of employee.tuesday.slice(0,1)" class="shift-block"
                         [style.background-color]="shift.color">
 
                         <div class="shift-time">
@@ -293,11 +300,18 @@
 
                     </div>
 
+                    <div *ngIf="employee.tuesday.length > 1" class="more-shifts"
+                        (click)="showMoreShifts(employee.tuesday, 'Tirsdag')">
+
+                        +{{ employee.tuesday.length - 1 }} flere...
+
+                    </div>
+
                 </td>
 
                 <td>
 
-                    <div *ngFor="let shift of employee.wednesday" class="shift-block"
+                    <div *ngFor="let shift of employee.wednesday.slice(0,1)" class="shift-block"
                         [style.background-color]="shift.color">
 
                         <div class="shift-time">
@@ -310,11 +324,18 @@
 
                     </div>
 
+                    <div *ngIf="employee.wednesday.length > 1" class="more-shifts"
+                        (click)="showMoreShifts(employee.wednesday, 'Onsdag')">
+
+                        +{{ employee.wednesday.length - 1 }} flere...
+
+                    </div>
+
                 </td>
 
                 <td>
 
-                    <div *ngFor="let shift of employee.thursday" class="shift-block"
+                    <div *ngFor="let shift of employee.thursday.slice(0,1)" class="shift-block"
                         [style.background-color]="shift.color">
 
                         <div class="shift-time">
@@ -327,11 +348,18 @@
 
                     </div>
 
+                    <div *ngIf="employee.thursday.length > 1" class="more-shifts"
+                        (click)="showMoreShifts(employee.thursday, 'Torsdag')">
+
+                        +{{ employee.thursday.length - 1 }} flere...
+
+                    </div>
+
                 </td>
 
                 <td>
 
-                    <div *ngFor="let shift of employee.friday" class="shift-block"
+                    <div *ngFor="let shift of employee.friday.slice(0,1)" class="shift-block"
                         [style.background-color]="shift.color">
 
                         <div class="shift-time">
@@ -341,6 +369,13 @@
                         <div class="shift-role">
                             {{ shift.role }}
                         </div>
+
+                    </div>
+
+                    <div *ngIf="employee.friday.length > 1" class="more-shifts"
+                        (click)="showMoreShifts(employee.friday, 'Fredag')">
+
+                        +{{ employee.friday.length - 1 }} flere...
 
                     </div>
 

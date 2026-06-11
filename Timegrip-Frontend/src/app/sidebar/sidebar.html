@@ -4,7 +4,8 @@
         Dashboard
     </button>
 
-    <button routerLink="/employees" routerLinkActive="active">
+    <button *ngIf="userRole === 'leader'" routerLink="/employees" routerLinkActive="active">
+
         <i class="bi bi-people"></i>
         Medarbejdere
     </button>
@@ -22,7 +23,7 @@
 
     </div>
 
-    <div *ngIf="showShiftMenu" class="submenu">
+    <div *ngIf="showShiftMenu && userRole === 'leader'" class="submenu">
 
         <button routerLink="/shifts/create" routerLinkActive="active">
             Opret vagter
@@ -57,6 +58,11 @@
     <button>
         <i class="bi bi-gear"></i>
         Indstillinger
+    </button>
+
+    <button (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+        Log ud
     </button>
 
 </nav>
