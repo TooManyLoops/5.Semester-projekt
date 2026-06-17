@@ -1,8 +1,5 @@
-using System.Net;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
-using Polly;
 using Testcontainers.MsSql;
 using Timegrip.Shifts.Api.Data;
 using Timegrip.Shifts.Api.Enums;
@@ -27,9 +24,8 @@ public sealed class ShiftAssignmentIntegrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AssignShiftToEmployeeRole_WhenShiftExistsAndEmployeeRoleIsVerified_ShouldPersistAssignment()
+    public async Task AssignShiftToEmployeeRole_WhenShiftExists_ShouldPersistAssignment()
     {
-        // Arrange
         await using var context = CreateContext();
         await context.Database.MigrateAsync();
 
@@ -42,7 +38,7 @@ public sealed class ShiftAssignmentIntegrationTests : IAsyncLifetime
         context.Shifts.Add(shift);
         await context.SaveChangesAsync();
 
-        var service = CreateService(context, HttpStatusCode.OK);
+        var service = new ShiftService(context);
         var request = new ShiftAssignmentRequest
         {
             ShiftId = shift.ShiftId,
@@ -50,10 +46,8 @@ public sealed class ShiftAssignmentIntegrationTests : IAsyncLifetime
             AssignmentStatus = AssignmentStatus.Confirmed,
         };
 
-        // Act
         var assigned = await service.AssignShiftToEmployeeRole(request);
 
-        // Assert
         assigned.Should().BeTrue();
         context.ShiftAssignments.Should().ContainSingle(assignment =>
             assignment.ShiftId == shift.ShiftId &&
@@ -61,13 +55,12 @@ public sealed class ShiftAssignmentIntegrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AssignShiftToEmployeeRole_WhenShiftDoesNotExist_ShouldFailBecauseDatabaseRejectsForeignKey()
+    public async Task AssignShiftToEmployeeRole_WhenShiftDoesNotExist_ShouldThrowNotFound()
     {
-        // Arrange
         await using var context = CreateContext();
         await context.Database.MigrateAsync();
 
-        var service = CreateService(context, HttpStatusCode.OK);
+        var service = new ShiftService(context);
         var request = new ShiftAssignmentRequest
         {
             ShiftId = Guid.NewGuid(),
@@ -75,11 +68,9 @@ public sealed class ShiftAssignmentIntegrationTests : IAsyncLifetime
             AssignmentStatus = AssignmentStatus.Confirmed,
         };
 
-        // Act
         var act = () => service.AssignShiftToEmployeeRole(request);
 
-        // Assert
-        await act.Should().ThrowAsync<DbUpdateException>();
+        await act.Should().ThrowAsync<KeyNotFoundException>();
     }
 
     private ShiftsDbContext CreateContext()
@@ -89,30 +80,5 @@ public sealed class ShiftAssignmentIntegrationTests : IAsyncLifetime
             .Options;
 
         return new ShiftsDbContext(options);
-    }
-
-    private static ShiftService CreateService(ShiftsDbContext context, HttpStatusCode verificationStatusCode)
-    {
-        var httpClient = new HttpClient(new StubHttpMessageHandler(verificationStatusCode));
-        var retryPolicy = Policy.Handle<HttpRequestException>().RetryAsync(0);
-        var verificationService = new VerificationService(
-            httpClient,
-            retryPolicy,
-            NullLogger<VerificationService>.Instance);
-
-        return new ShiftService(context, verificationService);
-    }
-
-    private sealed class StubHttpMessageHandler(HttpStatusCode statusCode) : HttpMessageHandler
-    {
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            return Task.FromResult(new HttpResponseMessage(statusCode)
-            {
-                Content = new StringContent("{}"),
-            });
-        }
     }
 }

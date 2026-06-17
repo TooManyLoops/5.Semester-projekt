@@ -4,7 +4,8 @@ This folder contains the first split of the old scheduling module into three bou
 
 ## Services
 
-- `Bff.Api` is the frontend-facing backend-for-frontend that routes `/api/*` requests to the internal services.
+- `Bff.Api` is the frontend-facing aggregated API gateway. It keeps the existing `/api/*` proxy routes for CRUD compatibility and adds `/api/aggregate/*` endpoints that compose data from multiple internal services into frontend-specific read models.
+- `Bff.Api` caches the role catalog from `Employees.Api` in memory for 30 minutes and invalidates it after successful role writes through the gateway. Employee-role assignments are not cached.
 - `Employees.Api` owns employees, employments, and employee statuses.
 - `Employees.Api` also owns roles and employee-role assignments.
 - `Shifts.Api` owns shifts, shift assignments, and shift requirements.

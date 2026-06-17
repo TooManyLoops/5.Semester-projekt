@@ -57,7 +57,7 @@ public class ShiftService(ShiftsDbContext context)
                 };
                 context.Shifts.Add(shift);
 
-                foreach (var requirement in request.ShiftRequirements)
+                foreach (var requirement in request.ShiftRequirements ?? [])
                 {
                     //Potentially make check for RoleId to be an empty GUID,
                     //as its not checked for in endpoint validation
@@ -74,7 +74,7 @@ public class ShiftService(ShiftsDbContext context)
                 await transaction.CommitAsync();
                 return ToResponse(shift);
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
                 throw;
