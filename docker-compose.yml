@@ -19,11 +19,11 @@ services:
     networks:
       - backend
 
-  bff-api:
+  gateway-api:
     build:
       context: .
-      dockerfile: services/Bff.Api/Dockerfile
-    container_name: bff-api
+      dockerfile: services/Gateway.Api/Dockerfile
+    container_name: gateway-api
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Development
@@ -48,7 +48,7 @@ services:
     ports:
       - "62892:80"
     depends_on:
-      - bff-api
+      - gateway-api
     networks:
       - backend
 
