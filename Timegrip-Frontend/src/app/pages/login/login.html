@@ -1,15 +1,27 @@
-<div class="login-container">
+<div class="login-page">
 
-    <h1>TimeGrip</h1>
+    <div class="login-card">
 
-    <h2>Vælg rolle</h2>
+        <h1>Login</h1>
 
-    <button (click)="loginAsLeader()">
-        Leder
-    </button>
+        <p>Vælg hvordan du vil fortsætte</p>
 
-    <button (click)="loginAsEmployee()">
-        Medarbejder
-    </button>
+        <div class="login-buttons">
+
+            <button class="leader-button" (click)="loginAsLeader()">
+
+                Leder
+
+            </button>
+
+            <button class="employee-button" (click)="loginAsEmployee()">
+
+                Medarbejder
+
+            </button>
+
+        </div>
+
+    </div>
 
 </div>

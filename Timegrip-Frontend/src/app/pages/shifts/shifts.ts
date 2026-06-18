@@ -59,7 +59,9 @@ export class Shifts implements OnInit {
     tuesday: null,
     wednesday: null,
     thursday: null,
-    friday: null
+    friday: null,
+    saturday: null,
+    sunday: null
   };
 
   goToSelectedWeek() {
@@ -241,7 +243,9 @@ export class Shifts implements OnInit {
       tuesday: [],
       wednesday: [],
       thursday: [],
-      friday: []
+      friday: [],
+      saturday: [],
+      sunday: []
     };
 
     this.shifts
@@ -258,7 +262,7 @@ export class Shifts implements OnInit {
               shiftId: shift.shiftId,
               roleId: shift.roleId,
               text: shiftText,
-              color: '#d9d9d9',
+              color: this.getRoleColor(shift.roleId),
               role: this.getRoleName(shift.roleId)
             });
           }
@@ -268,7 +272,7 @@ export class Shifts implements OnInit {
               shiftId: shift.shiftId,
               roleId: shift.roleId,
               text: shiftText,
-              color: '#d9d9d9',
+              color: this.getRoleColor(shift.roleId),
               role: this.getRoleName(shift.roleId)
             });
           }
@@ -278,7 +282,7 @@ export class Shifts implements OnInit {
               shiftId: shift.shiftId,
               roleId: shift.roleId,
               text: shiftText,
-              color: '#d9d9d9',
+              color: this.getRoleColor(shift.roleId),
               role: this.getRoleName(shift.roleId)
             });
           }
@@ -288,7 +292,7 @@ export class Shifts implements OnInit {
               shiftId: shift.shiftId,
               roleId: shift.roleId,
               text: shiftText,
-              color: '#d9d9d9',
+              color: this.getRoleColor(shift.roleId),
               role: this.getRoleName(shift.roleId)
             });
           }
@@ -298,7 +302,27 @@ export class Shifts implements OnInit {
               shiftId: shift.shiftId,
               roleId: shift.roleId,
               text: shiftText,
-              color: '#d9d9d9',
+              color: this.getRoleColor(shift.roleId),
+              role: this.getRoleName(shift.roleId)
+            });
+          }
+
+          if (day === 6) {
+            this.openShiftRow.saturday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
+              text: shiftText,
+              color: this.getRoleColor(shift.roleId),
+              role: this.getRoleName(shift.roleId)
+            });
+          }
+
+          if (day === 7) {
+            this.openShiftRow.sunday.push({
+              shiftId: shift.shiftId,
+              roleId: shift.roleId,
+              text: shiftText,
+              color: this.getRoleColor(shift.roleId),
               role: this.getRoleName(shift.roleId)
             });
           }
@@ -330,7 +354,9 @@ export class Shifts implements OnInit {
             tuesday: [],
             wednesday: [],
             thursday: [],
-            friday: []
+            friday: [],
+            saturday: [],
+            sunday: []
           };
         }
 
@@ -371,6 +397,22 @@ export class Shifts implements OnInit {
 
         if (day === 5) {
           groupedByEmployee[employeeName].friday.push({
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
+          });
+        }
+
+        if (day === 6) {
+          groupedByEmployee[employeeName].saturday.push({
+            text: shiftText,
+            color: this.getRoleColor(shift.roleId),
+            role: this.getRoleName(shift.roleId)
+          });
+        }
+
+        if (day === 0) {
+          groupedByEmployee[employeeName].sunday.push({
             text: shiftText,
             color: this.getRoleColor(shift.roleId),
             role: this.getRoleName(shift.roleId)
@@ -570,7 +612,7 @@ export class Shifts implements OnInit {
     const date = new Date(this.currentWeekStart);
     date.setDate(date.getDate() + dayOffset);
 
-    const dayNames = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag'];
+    const dayNames = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
     const dateText = date.toLocaleDateString('da-DK', {
       day: 'numeric',
       month: 'numeric'
