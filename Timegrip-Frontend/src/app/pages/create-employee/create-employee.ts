@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Employee, EmployeeForm, Role } from '../../model';
 
 @Component({
   selector: 'app-create-employee',
@@ -10,14 +11,14 @@ import { Router } from '@angular/router';
 })
 export class CreateEmployee implements OnInit {
 
-  roles: any[] = [];
+  roles: Role[] = [];
   selectedRoleId = '';
   validationErrors = {
     email: '',
     phoneNumber: ''
   };
 
-  employee = {
+  employee: EmployeeForm = {
     firstName: '',
     lastName: '',
     email: '',
@@ -36,7 +37,7 @@ export class CreateEmployee implements OnInit {
   }
 
   loadRoles() {
-    this.http.get<any[]>('http://localhost:5000/api/roles/')
+    this.http.get<Role[]>('http://localhost:5000/api/roles/')
       .subscribe({
         next: data => {
           this.roles = data;
@@ -53,7 +54,7 @@ export class CreateEmployee implements OnInit {
       return;
     }
 
-    this.http.post<any>('http://localhost:5000/api/employees/', this.employee)
+    this.http.post<Employee>('http://localhost:5000/api/employees/', this.employee)
       .subscribe({
         next: createdEmployee => {
 

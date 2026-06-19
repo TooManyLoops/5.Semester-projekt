@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { EmployeeForm, EmployeeRole, Role } from '../../model';
 
 @Component({
   selector: 'app-edit-employee',
@@ -12,7 +13,7 @@ export class EditEmployee implements OnInit {
 
   employeeId: string | null = null;
 
-  employee = {
+  employee: EmployeeForm = {
     firstName: '',
     lastName: '',
     email: '',
@@ -20,8 +21,8 @@ export class EditEmployee implements OnInit {
     employeeStatus: 1
   };
 
-  roles: any[] = [];
-  employeeRoles: any[] = [];
+  roles: Role[] = [];
+  employeeRoles: EmployeeRole[] = [];
   selectedRoleId = '';
 
   constructor(
@@ -40,7 +41,7 @@ export class EditEmployee implements OnInit {
   }
 
   loadEmployee() {
-    this.http.get<any>(`http://localhost:5000/api/employees/${this.employeeId}`)
+    this.http.get<EmployeeForm>(`http://localhost:5000/api/employees/${this.employeeId}`)
       .subscribe({
         next: data => {
           this.employee = data;
@@ -53,7 +54,7 @@ export class EditEmployee implements OnInit {
   }
 
   loadRoles() {
-    this.http.get<any[]>('http://localhost:5000/api/roles/')
+    this.http.get<Role[]>('http://localhost:5000/api/roles/')
       .subscribe({
         next: data => {
           this.roles = data;
@@ -66,7 +67,7 @@ export class EditEmployee implements OnInit {
   }
 
   loadEmployeeRoles() {
-    this.http.get<any[]>(
+    this.http.get<EmployeeRole[]>(
       `http://localhost:5000/api/employee-roles/employee/${this.employeeId}`
     )
       .subscribe({

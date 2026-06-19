@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Employee } from '../../model';
 
 @Component({
   selector: 'app-employees',
@@ -9,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class Employees implements OnInit {
 
-  employees: any[] = [];
+  employees: Employee[] = [];
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
@@ -18,7 +19,7 @@ export class Employees implements OnInit {
   }
 
   loadEmployees() {
-    this.http.get<any[]>('http://localhost:5000/api/aggregate/employees')
+    this.http.get<Employee[]>('http://localhost:5000/api/aggregate/employees')
       .subscribe({
         next: data => {
           this.employees = data;
@@ -110,7 +111,7 @@ export class Employees implements OnInit {
       .slice(0, 8);
   }
 
-  getEmployeeFullName(employee: any): string {
+  getEmployeeFullName(employee: Employee): string {
     return `${employee.firstName ?? ''} ${employee.lastName ?? ''}`.trim();
   }
 
@@ -119,7 +120,7 @@ export class Employees implements OnInit {
     this.showEmployeeSuggestions = this.employeeSearch.trim().length > 0;
   }
 
-  selectEmployeeSuggestion(employee: any) {
+  selectEmployeeSuggestion(employee: Employee) {
     this.employeeSearch = this.getEmployeeFullName(employee);
     this.showEmployeeSuggestions = false;
     this.currentPage = 1;
