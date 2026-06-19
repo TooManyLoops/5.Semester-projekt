@@ -10,4 +10,6 @@ public class ShiftResponse
     public Guid? RoleId { get; set; }
     public bool IsAssigned { get; set; }
     public Guid? EmployeeRoleId { get; set; }
+    public List<ShiftRequirement>? ShiftRequirements { get; set; }
+    public List<ShiftAssignment>? ShiftAssignments { get; set; }
 }

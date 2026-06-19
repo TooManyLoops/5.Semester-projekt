@@ -51,6 +51,7 @@ builder.Services
 // Aggregation services compose frontend-specific read models from downstream service data.
 builder.Services.AddScoped<EmployeeAggregationService>();
 builder.Services.AddScoped<ShiftAggregationService>();
+builder.Services.AddScoped<ShiftImportService>();
 builder.Services.AddScoped<RoleCatalogService>();
 builder.Services.AddScoped<ProxyService>();
 

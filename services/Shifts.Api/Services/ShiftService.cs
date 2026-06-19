@@ -11,7 +11,7 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
-        if (!(request.StartTime >= DateTime.Now) || !(request.EndTime > request.StartTime))
+        if ((!request.AllowPast && request.StartTime < DateTime.Now) || request.EndTime <= request.StartTime)
         {
             throw new ArgumentException("En eller flere datoer er ikke indtastet korrekt");
         }
@@ -84,28 +84,27 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<List<ShiftResponse>> GetShifts()
     {
-        return await context.Shifts
+        var shifts = await context.Shifts
             .AsNoTracking()
-            .Select(shift => new ShiftResponse
-            {
-                ShiftId = shift.ShiftId,
-                StartTime = shift.StartTime,
-                EndTime = shift.EndTime,
-
-                RoleId = context.ShiftRequirements
-                    .Where(requirement => requirement.ShiftId == shift.ShiftId)
-                    .Select(requirement => (Guid?)requirement.RoleId)
-                    .FirstOrDefault(),
-
-                EmployeeRoleId = context.ShiftAssignments
-                    .Where(assignment => assignment.ShiftId == shift.ShiftId)
-                    .Select(assignment => (Guid?)assignment.EmployeeRoleId)
-                    .FirstOrDefault(),
-
-                IsAssigned = context.ShiftAssignments
-                    .Any(assignment => assignment.ShiftId == shift.ShiftId)
-            })
             .ToListAsync();
+
+        var shiftIds = shifts.Select(shift => shift.ShiftId).ToList();
+
+        var assignments = await context.ShiftAssignments
+            .AsNoTracking()
+            .Where(assignment => shiftIds.Contains(assignment.ShiftId))
+            .ToListAsync();
+
+        var requirements = await context.ShiftRequirements
+            .AsNoTracking()
+            .Where(requirement => shiftIds.Contains(requirement.ShiftId))
+            .ToListAsync();
+
+        return shifts.Select(shift => ToResponse(
+            shift,
+            assignments.Where(assignment => assignment.ShiftId == shift.ShiftId).ToList(),
+            requirements.Where(requirement => requirement.ShiftId == shift.ShiftId).ToList()
+        )).ToList();
     }
 
     public async Task<ShiftResponse?> GetShift(Guid shiftId)
@@ -157,12 +156,6 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
     {
-        var validationResult = await verificationService.VerifyEmployeeRoleById(assignmentRequest.EmployeeRoleId);
-        if (validationResult is false)
-        {
-            throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
-        }
-
         var shift = await GetShift(assignmentRequest.ShiftId);
         if (shift is null)
         {
@@ -189,6 +182,9 @@ public class ShiftService(ShiftsDbContext context)
             ShiftId = shift.ShiftId,
             StartTime = shift.StartTime,
             EndTime = shift.EndTime,
+            RoleId = sr?.Select(requirement => (Guid?)requirement.RoleId).FirstOrDefault(),
+            EmployeeRoleId = sa?.Select(assignment => (Guid?)assignment.EmployeeRoleId).FirstOrDefault(),
+            IsAssigned = sa?.Any() is true,
             ShiftAssignments = sa,
             ShiftRequirements = sr
         };

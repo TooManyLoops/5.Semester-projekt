@@ -49,9 +49,38 @@
 
         <div class="schedule-actions-right">
 
+            <label *ngIf="loggedInRole === 'leader'" class="import-button">
+                {{ isImportingShifts ? 'Importerer...' : 'Upload Excel' }}
+                <input type="file" accept=".xlsx" [disabled]="isImportingShifts" (click)="clearShiftImportInput($event)" (change)="importShifts($event)">
+            </label>
+
             <button *ngIf="loggedInRole === 'leader'" class="create-button" type="button" routerLink="/shifts/create">
                 + Opret vagt
             </button>
+
+        </div>
+
+    </div>
+
+    <div *ngIf="showPastImportPrompt" class="shift-modal">
+
+        <div class="shift-modal-content import-confirm-modal">
+
+            <h3>Historiske vagter</h3>
+
+            <p>
+                Der er {{ pastImportCount }} vagter før dags dato i filen. Vil du også tilføje dem?
+            </p>
+
+            <div class="import-confirm-actions">
+                <button type="button" (click)="importPastShifts(true)">
+                    Ja
+                </button>
+
+                <button type="button" class="secondary-button" (click)="importPastShifts(false)">
+                    Nej
+                </button>
+            </div>
 
         </div>
 

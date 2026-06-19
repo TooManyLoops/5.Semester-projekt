@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, finalize, timeout } from 'rxjs/operators';
 
 @Component({
   selector: 'app-shifts',
@@ -23,6 +23,11 @@ export class Shifts implements OnInit {
   selectedDayShifts: any[] = [];
   selectedDayName = '';
   isAssigningShift = false;
+  isImportingShifts = false;
+  showPastImportPrompt = false;
+  pastImportCount = 0;
+  pendingImportFile: File | null = null;
+  pendingImportInput: HTMLInputElement | null = null;
   loggedInRole = localStorage.getItem('role');
   loggedInEmployeeId = localStorage.getItem('employeeId');
   isMySchedulePage = false;
@@ -633,6 +638,115 @@ export class Shifts implements OnInit {
 
     this.assignSelectedShift();
 
+  }
+
+  importShifts(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    this.isImportingShifts = true;
+    this.uploadShiftImport(file, input, false, false);
+  }
+
+  clearShiftImportInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    input.value = '';
+  }
+
+  importPastShifts(includePast: boolean) {
+    if (!this.pendingImportFile || !this.pendingImportInput) {
+      this.closePastImportPrompt();
+      return;
+    }
+
+    const file = this.pendingImportFile;
+    const input = this.pendingImportInput;
+    this.closePastImportPrompt(false);
+    this.isImportingShifts = true;
+    this.uploadShiftImport(file, input, includePast, !includePast);
+  }
+
+  private closePastImportPrompt(clearInput = true) {
+    if (clearInput && this.pendingImportInput) {
+      this.pendingImportInput.value = '';
+    }
+
+    this.showPastImportPrompt = false;
+    this.pastImportCount = 0;
+    this.pendingImportFile = null;
+    this.pendingImportInput = null;
+    this.isImportingShifts = false;
+  }
+
+  private uploadShiftImport(
+    file: File,
+    input: HTMLInputElement,
+    includePast: boolean,
+    excludePast: boolean
+  ) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http.post<any>(
+      `http://localhost:5000/api/aggregate/imports/shifts?includePast=${includePast}&excludePast=${excludePast}`,
+      formData
+    )
+      .pipe(
+        timeout(120000),
+        finalize(() => {
+          this.isImportingShifts = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: result => {
+          if (result.requiresPastConfirmation) {
+            this.pendingImportFile = file;
+            this.pendingImportInput = input;
+            this.pastImportCount = result.pastShiftRows;
+            this.showPastImportPrompt = true;
+            return;
+          }
+
+          const skippedText = result.skippedRows
+            ? `\n${result.skippedRows} rækker sprunget over.`
+            : '';
+          const pastText = result.pastShiftRows
+            ? `\n${result.pastShiftRows} vagter var før dags dato.`
+            : '';
+          const dateText = result.firstShiftDate && result.lastShiftDate
+            ? `\nPeriode: ${new Date(result.firstShiftDate).toLocaleDateString('da-DK')} - ${new Date(result.lastShiftDate).toLocaleDateString('da-DK')}`
+            : '';
+
+          if (result.firstShiftDate) {
+            const firstImportedDate = new Date(result.firstShiftDate);
+            this.currentWeekStart = this.getMonday(firstImportedDate);
+            this.selectedWeek = this.getWeekNumber(firstImportedDate);
+            this.selectedMonth = firstImportedDate.getMonth();
+          }
+
+          alert(`Import færdig: ${result.createdShifts} vagter oprettet.${skippedText}${pastText}${dateText}`);
+          input.value = '';
+          this.loadEmployeesAndShifts();
+        },
+        error: error => {
+          const response = error.error;
+          const message = response?.title || response?.message || response?.detail || '';
+          const unknownRoles = response?.unknownRoles?.length
+            ? `Ukendte roller: ${response.unknownRoles.join(', ')}`
+            : '';
+          const rowErrors = response?.errors?.length
+            ? response.errors.map((item: any) => `Række ${item.rowNumber}: ${item.message}`).join('\n')
+            : '';
+
+          alert(['Kunne ikke importere Excel-filen.', message, unknownRoles, rowErrors].filter(Boolean).join('\n'));
+          input.value = '';
+        }
+      });
   }
 
   private normalizeShift(shift: any): any[] {

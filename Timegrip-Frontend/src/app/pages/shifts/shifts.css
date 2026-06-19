@@ -28,6 +28,9 @@
 
 .schedule-actions-right {
     justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .schedule-topbar button,
@@ -40,11 +43,25 @@
     font-size: 14px;
 }
 
-.schedule-actions-right button {
+.schedule-actions-right button,
+.import-button {
     background-color: #96768f;
     color: white;
     border: none;
     font-weight: 600;
+}
+
+.import-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.import-button input {
+    display: none;
 }
 
 .shift-table {
@@ -286,4 +303,15 @@
 
 .shift-modal-content button:hover {
     opacity: 0.9;
+}
+
+.import-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.import-confirm-actions .secondary-button {
+    background-color: #e5e7eb;
+    color: #111827;
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using Timegrip.Shifts.Api.Models;
 using Timegrip.Shifts.Api.Requests;
 using Timegrip.Shifts.Api.Services;
@@ -62,15 +63,18 @@ public static class ShiftEndpoints
     }
 
     //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
-    private static async Task<IResult> GetAllShiftsForEmployeeRoleIds(ShiftService service, List<Guid> employeeRoleIds)
+    private static async Task<IResult> GetAllShiftsForEmployeeRoleIds(
+        ShiftService service,
+        [FromQuery] Guid[] employeeRoleIds
+    )
     {
-        if (employeeRoleIds.Count is 0)
+        if (employeeRoleIds.Length is 0)
         {
             return TypedResults.BadRequest("Missing Employee Role IDs");
         }
         try
         {
-            var result = await service.GetAllShiftsForEmployeeRoleIds(employeeRoleIds);
+            var result = await service.GetAllShiftsForEmployeeRoleIds(employeeRoleIds.ToList());
             return TypedResults.Ok(result);
         }
         catch (ArgumentException ex)

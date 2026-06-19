@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Timegrip.Gateway.Api.Downstream.Models;
+using Timegrip.Gateway.Api.Downstream.Requests;
 using Timegrip.Gateway.Api.Aggregation.Requests;
 
 namespace Timegrip.Gateway.Api.Downstream;
@@ -12,6 +13,18 @@ public sealed class ShiftsApiClient(HttpClient httpClient)
     // These methods wrap Shifts.Api endpoints behind a small gateway-specific client.
     public Task<List<ShiftDto>> GetShifts(CancellationToken cancellationToken) =>
         Send<List<ShiftDto>>(HttpMethod.Get, "shifts/", cancellationToken);
+
+    public Task<ShiftDto> CreateShift(
+        CreateShiftDownstreamRequest request,
+        CancellationToken cancellationToken
+    ) =>
+        Send<ShiftDto>(
+            new HttpRequestMessage(HttpMethod.Post, "shifts/")
+            {
+                Content = JsonContent.Create(request, options: DownstreamJson.Options),
+            },
+            cancellationToken
+        );
 
     public async Task AssignShift(
         Guid shiftId,
@@ -46,6 +59,28 @@ public sealed class ShiftsApiClient(HttpClient httpClient)
     {
         // Deserialize successful downstream JSON into gateway-owned DTOs.
         using var request = new HttpRequestMessage(method, requestUri);
+        using var response = await Send(request, cancellationToken);
+        await EnsureSuccess(response, cancellationToken);
+
+        var result = await response.Content.ReadFromJsonAsync<T>(
+            DownstreamJson.Options,
+            cancellationToken
+        );
+
+        return result
+            ?? throw new DownstreamApiException(
+                ServiceName,
+                HttpStatusCode.BadGateway,
+                "Downstream response body was empty."
+            );
+    }
+
+    private async Task<T> Send<T>(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken
+    )
+    {
+        // Used by write operations where the request has a JSON body.
         using var response = await Send(request, cancellationToken);
         await EnsureSuccess(response, cancellationToken);
 
