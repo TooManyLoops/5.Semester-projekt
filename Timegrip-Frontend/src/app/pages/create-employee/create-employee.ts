@@ -12,6 +12,10 @@ export class CreateEmployee implements OnInit {
 
   roles: any[] = [];
   selectedRoleId = '';
+  validationErrors = {
+    email: '',
+    phoneNumber: ''
+  };
 
   employee = {
     firstName: '',
@@ -45,6 +49,10 @@ export class CreateEmployee implements OnInit {
   }
 
   addEmployee() {
+    if (!this.validateEmployee()) {
+      return;
+    }
+
     this.http.post<any>('http://localhost:5000/api/employees/', this.employee)
       .subscribe({
         next: createdEmployee => {
@@ -78,5 +86,31 @@ export class CreateEmployee implements OnInit {
           console.error(error);
         }
       });
+  }
+
+  validateEmployee(): boolean {
+    this.validationErrors = {
+      email: '',
+      phoneNumber: ''
+    };
+
+    const email = this.employee.email.trim();
+    const phoneNumber = this.employee.phoneNumber.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneNumberPattern = /^\d{8}$/;
+
+    if (!emailPattern.test(email)) {
+      this.validationErrors.email = 'Email er ugyldig';
+    }
+
+    if (!phoneNumberPattern.test(phoneNumber)) {
+      this.validationErrors.phoneNumber = 'Telefonnummer skal være præcis 8 cifre';
+    }
+
+    return !this.validationErrors.email && !this.validationErrors.phoneNumber;
+  }
+
+  clearValidationError(field: 'email' | 'phoneNumber') {
+    this.validationErrors[field] = '';
   }
 }

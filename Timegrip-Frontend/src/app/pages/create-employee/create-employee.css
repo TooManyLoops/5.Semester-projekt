@@ -15,6 +15,23 @@
     padding: 8px;
 }
 
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-row input.invalid {
+    border: 1px solid #dc2626;
+    outline-color: #dc2626;
+}
+
+.error-message {
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 .employee-form button {
     background-color: #96768f;
     color: white;

@@ -18,34 +18,11 @@ export class Employees implements OnInit {
   }
 
   loadEmployees() {
-    this.http.get<any[]>('http://localhost:5000/api/employees/')
+    this.http.get<any[]>('http://localhost:5000/api/aggregate/employees')
       .subscribe({
         next: data => {
-
-          this.employees = data.map(emp => ({
-            ...emp,
-            rolesText: ''
-          }));
-
-          this.employees.forEach(emp => {
-            this.http.get<any[]>(
-              `http://localhost:5000/api/employee-roles/employee/${emp.employeeId}`
-            )
-              .subscribe({
-                next: roles => {
-                  emp.rolesText = roles
-                    .map(role => role.roleName)
-                    .join(', ');
-
-                  this.cdr.detectChanges();
-                },
-                error: error => {
-                  console.error(error);
-                }
-              });
-
-          });
-
+          this.employees = data;
+          this.cdr.detectChanges();
         },
         error: error => {
           console.error(error);
@@ -72,21 +49,22 @@ export class Employees implements OnInit {
 
   currentPage = 1;
   pageSize = 10;
-  selectedLetter = '';
+  employeeSearch = '';
+  showEmployeeSuggestions = false;
 
-  letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ'.split('');
 
   get filteredEmployees() {
     let result = [...this.employees];
+    const search = this.employeeSearch.trim().toLowerCase();
 
-    if (this.selectedLetter) {
+    if (search) {
       result = result.filter(emp =>
-        emp.firstName?.toUpperCase().startsWith(this.selectedLetter)
+        this.getEmployeeFullName(emp).toLowerCase().startsWith(search)
       );
     }
 
     return result.sort((a, b) =>
-      a.firstName.localeCompare(b.firstName)
+      this.getEmployeeFullName(a).localeCompare(this.getEmployeeFullName(b))
     );
   }
 
@@ -119,8 +97,39 @@ export class Employees implements OnInit {
     this.currentPage = this.totalPages;
   }
 
-  onLetterChange() {
+  get employeeSuggestions() {
+    const search = this.employeeSearch.trim().toLowerCase();
+
+    if (!search) {
+      return [];
+    }
+
+    return this.employees
+      .filter(emp => this.getEmployeeFullName(emp).toLowerCase().startsWith(search))
+      .sort((a, b) => this.getEmployeeFullName(a).localeCompare(this.getEmployeeFullName(b)))
+      .slice(0, 8);
+  }
+
+  getEmployeeFullName(employee: any): string {
+    return `${employee.firstName ?? ''} ${employee.lastName ?? ''}`.trim();
+  }
+
+  onEmployeeSearchChange() {
     this.currentPage = 1;
+    this.showEmployeeSuggestions = this.employeeSearch.trim().length > 0;
+  }
+
+  selectEmployeeSuggestion(employee: any) {
+    this.employeeSearch = this.getEmployeeFullName(employee);
+    this.showEmployeeSuggestions = false;
+    this.currentPage = 1;
+  }
+
+  hideEmployeeSuggestions() {
+    setTimeout(() => {
+      this.showEmployeeSuggestions = false;
+      this.cdr.detectChanges();
+    }, 150);
   }
 
 }
