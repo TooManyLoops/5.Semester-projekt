@@ -23,18 +23,21 @@
 
     </div>
 
-    <div *ngIf="showShiftMenu && userRole === 'leader'" class="submenu">
+    <div *ngIf="showShiftMenu" class="submenu">
 
-        <button routerLink="/shifts/create" routerLinkActive="active">
+        <button *ngIf="userRole === 'employee'" routerLink="/my-shifts" routerLinkActive="active">
+            Min vagtplan
+        </button>
+
+        <button *ngIf="userRole === 'leader'" routerLink="/shifts/create" routerLinkActive="active">
             Opret vagter
         </button>
 
-        <button routerLink="/shifts/approvals" routerLinkActive="active">
+        <button *ngIf="userRole === 'leader'" routerLink="/shifts/approvals" routerLinkActive="active">
             Godkend vagter
         </button>
 
     </div>
-
     <button>
         <i class="bi bi-pencil-square"></i>
         Registreringer

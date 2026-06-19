@@ -18,6 +18,7 @@ const routes: Routes = [
   { path: 'shifts', component: Shifts },
   { path: 'shifts/create', component: CreateShift },
   { path: 'shifts/approvals', component: ShiftApprovals },
+  { path: 'my-shifts', component: Shifts },
 
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

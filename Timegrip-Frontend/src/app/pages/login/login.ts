@@ -14,12 +14,19 @@ export class Login {
   loginAsLeader() {
 
     localStorage.setItem('role', 'leader');
+    localStorage.removeItem('employeeId');
     this.router.navigate(['/shifts']);
   }
 
   loginAsEmployee() {
 
     localStorage.setItem('role', 'employee');
+
+    localStorage.setItem(
+      'employeeId',
+      '03328d8a-195c-49e5-8045-5ac71b7d7729'
+    );
+
     this.router.navigate(['/shifts']);
   }
 }

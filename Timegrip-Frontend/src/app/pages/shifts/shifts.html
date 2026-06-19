@@ -1,17 +1,22 @@
 <div class="page">
 
-    <h1>Vagtplan</h1>
+    <h1>{{ isMySchedulePage ? 'Min vagtplan' : 'Vagtplan' }}</h1>
 
     <div class="schedule-topbar">
 
-        <div class="schedule-actions-left">
+        <div class="schedule-actions-left" [style.visibility]="loggedInRole === 'leader' ? 'visible' : 'hidden'">
 
             <select [(ngModel)]="selectedEmployeeId" name="selectedEmployeeId" (change)="buildEmployeeSchedule()">
+
                 <option value="">Alle medarbejdere</option>
 
                 <option *ngFor="let employee of employees" [value]="employee.employeeId">
-                    {{ employee.firstName }} {{ employee.lastName }}
+
+                    {{ employee.firstName }}
+                    {{ employee.lastName }}
+
                 </option>
+
             </select>
 
         </div>
@@ -44,7 +49,7 @@
 
         <div class="schedule-actions-right">
 
-            <button class="create-button" type="button" routerLink="/shifts/create">
+            <button *ngIf="loggedInRole === 'leader'" class="create-button" type="button" routerLink="/shifts/create">
                 + Opret vagt
             </button>
 
@@ -52,7 +57,7 @@
 
     </div>
 
-    <div *ngIf="selectedOpenShift" class="assign-panel">
+    <div *ngIf="selectedOpenShift && loggedInRole === 'leader'" class="assign-panel">
 
         <h3>Tildel ledig vagt</h3>
 
@@ -85,6 +90,37 @@
         </button>
 
     </div>
+
+    <div *ngIf="selectedOpenShift && loggedInRole === 'employee'" class="shift-modal">
+
+        <div class="shift-modal-content">
+
+            <h3>Ledig vagt</h3>
+
+            <div class="shift-block" [style.background-color]="selectedOpenShift.color">
+
+                <div class="shift-time">
+                    {{ selectedOpenShift.text }}
+                </div>
+
+                <div class="shift-role">
+                    {{ selectedOpenShift.role }}
+                </div>
+
+            </div>
+
+            <button type="button" (click)="signUpForShift()">
+                Tilmeld vagt
+            </button>
+
+            <button type="button" (click)="selectedOpenShift = null">
+                Luk
+            </button>
+
+        </div>
+
+    </div>
+
 
     <div *ngIf="showAllShifts" class="shift-modal">
 
@@ -133,7 +169,7 @@
 
         <tbody>
 
-            <tr class="open-shifts-row">
+            <tr class="open-shifts-row" *ngIf="!isMySchedulePage">
                 <td class="employee-name">
                     {{ openShiftRow.employeeName }}
                 </td>
@@ -502,10 +538,6 @@
                 <span>Opvasker</span>
             </div>
 
-            <div class="legend-item">
-                <span class="legend-color ledig"></span>
-                <span>Ledige vagter</span>
-            </div>
         </div>
     </div>
 

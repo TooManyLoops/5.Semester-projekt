@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-shifts',
@@ -21,6 +23,9 @@ export class Shifts implements OnInit {
   selectedDayShifts: any[] = [];
   selectedDayName = '';
   isAssigningShift = false;
+  loggedInRole = localStorage.getItem('role');
+  loggedInEmployeeId = localStorage.getItem('employeeId');
+  isMySchedulePage = false;
 
 
   selectedMonth = new Date().getMonth();
@@ -45,10 +50,24 @@ export class Shifts implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) { }
 
   ngOnInit() {
+    this.isMySchedulePage = this.router.url === '/my-shifts';
+
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.isMySchedulePage = this.router.url === '/my-shifts';
+
+        if (this.shifts.length > 0) {
+          this.buildEmployeeSchedule();
+          this.cdr.detectChanges();
+        }
+      });
+
     this.loadRoles();
     this.loadEmployeesAndShifts();
   }
@@ -157,9 +176,7 @@ export class Shifts implements OnInit {
       .subscribe({
         next: data => {
           this.shifts = data;
-
           this.buildEmployeeSchedule();
-
           this.cdr.detectChanges();
         },
         error: error => {
@@ -172,13 +189,8 @@ export class Shifts implements OnInit {
     this.http.get<any[]>('http://localhost:5000/api/employees/')
       .subscribe({
         next: employees => {
-
           this.employees = employees;
           this.loadEmployeeRoles();
-
-          setTimeout(() => {
-            this.loadShifts();
-          }, 500);
         },
         error: error => {
           console.error(error);
@@ -189,6 +201,8 @@ export class Shifts implements OnInit {
   loadEmployeeRoles() {
     this.employeeRoles = [];
 
+    let completedRequests = 0;
+
     this.employees.forEach(employee => {
       this.http.get<any[]>(
         `http://localhost:5000/api/employee-roles/employee/${employee.employeeId}`
@@ -196,14 +210,25 @@ export class Shifts implements OnInit {
         .subscribe({
           next: roles => {
             this.employeeRoles.push(...roles);
+
+            completedRequests++;
+
+            if (completedRequests === this.employees.length) {
+              this.loadShifts();
+            }
           },
           error: error => {
             console.error(error);
+
+            completedRequests++;
+
+            if (completedRequests === this.employees.length) {
+              this.loadShifts();
+            }
           }
         });
     });
   }
-
   loadRoles() {
     this.http.get<any[]>('http://localhost:5000/api/roles/')
       .subscribe({
@@ -253,6 +278,27 @@ export class Shifts implements OnInit {
       .forEach(shift => {
 
         if (!shift.isAssigned) {
+          if (this.isMySchedulePage) {
+            return;
+          }
+
+          if (this.loggedInRole === 'employee') {
+
+            const employeeHasRole = this.employeeRoles.some(er =>
+
+              er.employeeId === this.loggedInEmployeeId &&
+
+              er.roleId === shift.roleId
+
+            );
+
+            if (!employeeHasRole) {
+
+              return;
+
+            }
+
+          }
 
           const day = new Date(shift.startTime).getDay();
           const shiftText = this.formatShiftTime(shift);
@@ -317,7 +363,7 @@ export class Shifts implements OnInit {
             });
           }
 
-          if (day === 7) {
+          if (day === 0) {
             this.openShiftRow.sunday.push({
               shiftId: shift.shiftId,
               roleId: shift.roleId,
@@ -341,6 +387,13 @@ export class Shifts implements OnInit {
         if (
           this.selectedEmployeeId &&
           employeeRole.employeeId !== this.selectedEmployeeId
+        ) {
+          return;
+        }
+
+        if (
+          this.isMySchedulePage &&
+          employeeRole.employeeId !== this.loggedInEmployeeId
         ) {
           return;
         }
@@ -626,6 +679,14 @@ export class Shifts implements OnInit {
     this.selectedDayShifts = shifts;
     this.selectedDayName = dayName;
     this.showAllShifts = true;
+
+  }
+
+  signUpForShift() {
+
+    this.selectedEmployeeForShift = this.loggedInEmployeeId || '';
+
+    this.assignSelectedShift();
 
   }
 
