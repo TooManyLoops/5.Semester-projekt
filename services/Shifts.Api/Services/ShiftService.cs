@@ -6,7 +6,7 @@ using Timegrip.Shifts.Api.Responses;
 
 namespace Timegrip.Shifts.Api.Services;
 
-public class ShiftService(ShiftsDbContext context)
+public class ShiftService(ShiftsDbContext context, VerificationService verificationService)
 {
 
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
@@ -57,7 +57,7 @@ public class ShiftService(ShiftsDbContext context)
                 };
                 context.Shifts.Add(shift);
 
-                foreach (var requirement in request.ShiftRequirements ?? [])
+                foreach (var requirement in request.ShiftRequirements)
                 {
                     //Potentially make check for RoleId to be an empty GUID,
                     //as its not checked for in endpoint validation
@@ -74,7 +74,7 @@ public class ShiftService(ShiftsDbContext context)
                 await transaction.CommitAsync();
                 return ToResponse(shift);
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 throw;
@@ -127,32 +127,23 @@ public class ShiftService(ShiftsDbContext context)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeRoleIds(List<Guid> employeeRoleIds)
+    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
     {
-
-        var shiftIds = await context.ShiftAssignments
-            .Where(sa => employeeRoleIds.Contains(sa.EmployeeRoleId))
-            .Select(sa => sa.ShiftId)
-            .Distinct()
+        //fix så den tager Shifts ud og ikke shift assignments først.
+        var shiftAssignments = await context.ShiftAssignments
+            .AsNoTracking()
+            .Where(sa => sa.EmployeeRoleId == employeeRoleId)
             .ToListAsync();
 
-        var shifts = await context.Shifts
-            .Where(s => shiftIds.Contains(s.ShiftId))
-            .ToListAsync();
-
-        var assignments = await context.ShiftAssignments
-            .Where(sa => shiftIds.Contains(sa.ShiftId))
-            .ToListAsync();
-
-        var requirements = await context.ShiftRequirements
-            .Where(sr => shiftIds.Contains(sr.ShiftId))
-            .ToListAsync();
-
-        return shifts.Select(s => ToResponse(
-            s,
-            assignments.Where(sa => sa.ShiftId == s.ShiftId).ToList(),
-            requirements.Where(sr => sr.ShiftId == s.ShiftId).ToList()
-        )).ToList();
+        var shiftList = new List<ShiftResponse>();
+        foreach (ShiftAssignment sa in shiftAssignments)
+        {
+            var shift = await context.Shifts.AsNoTracking()
+                .Where(s => s.ShiftId == sa.ShiftId)
+                .FirstOrDefaultAsync();
+            shiftList.Add(ToResponse(shift));
+        }
+        return shiftList;
     }
 
     public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
@@ -182,15 +173,13 @@ public class ShiftService(ShiftsDbContext context)
         return result > 0;
     }
 
-    private static ShiftResponse ToResponse(Shift shift, List<ShiftAssignment>? sa = null, List<ShiftRequirement>? sr = null)
+    private static ShiftResponse ToResponse(Shift shift)
     {
         return new ShiftResponse
         {
             ShiftId = shift.ShiftId,
             StartTime = shift.StartTime,
             EndTime = shift.EndTime,
-            ShiftAssignments = sa,
-            ShiftRequirements = sr
         };
     }
 }

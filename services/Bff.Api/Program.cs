@@ -1,52 +1,9 @@
-using Timegrip.Bff.Api.Downstream;
-using Timegrip.Bff.Api.Endpoints;
-using Timegrip.Bff.Api.Gateway.Services;
-using Timegrip.Bff.Api.Observability;
-using Timegrip.Bff.Api.Proxy;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddMemoryCache();
-builder.Services.AddScoped<CorrelationContext>();
-builder.Services.AddTransient<DownstreamLoggingHandler>();
-
-builder.Services
-    .AddHttpClient<EmployeesApiClient>(client =>
-    {
-        client.BaseAddress = new Uri(GetServiceBaseUrl("EMPLOYEES_API_URL", "http://localhost:5001"));
-    })
-    .AddHttpMessageHandler<DownstreamLoggingHandler>()
-    .AddStandardResilienceHandler();
-
-builder.Services
-    .AddHttpClient<ShiftsApiClient>(client =>
-    {
-        client.BaseAddress = new Uri(GetServiceBaseUrl("SHIFTS_API_URL", "http://localhost:5002"));
-    })
-    .AddHttpMessageHandler<DownstreamLoggingHandler>()
-    .AddStandardResilienceHandler();
-
-builder.Services
-    .AddHttpClient("EmployeesProxy", client =>
-    {
-        client.BaseAddress = new Uri(GetServiceBaseUrl("EMPLOYEES_API_URL", "http://localhost:5001"));
-    })
-    .AddHttpMessageHandler<DownstreamLoggingHandler>()
-    .AddStandardResilienceHandler();
-
-builder.Services
-    .AddHttpClient("ShiftsProxy", client =>
-    {
-        client.BaseAddress = new Uri(GetServiceBaseUrl("SHIFTS_API_URL", "http://localhost:5002"));
-    })
-    .AddHttpMessageHandler<DownstreamLoggingHandler>()
-    .AddStandardResilienceHandler();
-
-builder.Services.AddScoped<EmployeeAggregationService>();
-builder.Services.AddScoped<ShiftAggregationService>();
-builder.Services.AddScoped<RoleCatalogService>();
-builder.Services.AddScoped<ProxyService>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -64,7 +21,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
@@ -72,13 +28,59 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.MapGet(
-    "/health",
-    () => Results.Ok(new { Status = "Healthy", Service = "Aggregated API Gateway" })
+app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Service = "Bff.Api" }));
+
+app.MapMethods(
+    "/api/employees/{**path}",
+    ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    (HttpContext context, IHttpClientFactory httpClientFactory, string? path) =>
+        ProxyRequest(
+            context,
+            httpClientFactory,
+            GetServiceBaseUrl("EMPLOYEES_API_URL", "http://localhost:5001"),
+            "employees",
+            path
+        )
 );
 
-app.MapAggregateEndpoints();
-app.MapProxyEndpoints();
+app.MapMethods(
+    "/api/roles/{**path}",
+    ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    (HttpContext context, IHttpClientFactory httpClientFactory, string? path) =>
+        ProxyRequest(
+            context,
+            httpClientFactory,
+            GetServiceBaseUrl("EMPLOYEES_API_URL", "http://localhost:5001"),
+            "roles",
+            path
+        )
+);
+
+app.MapMethods(
+    "/api/employee-roles/{**path}",
+    ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    (HttpContext context, IHttpClientFactory httpClientFactory, string? path) =>
+        ProxyRequest(
+            context,
+            httpClientFactory,
+            GetServiceBaseUrl("EMPLOYEES_API_URL", "http://localhost:5001"),
+            "employee-roles",
+            path
+        )
+);
+
+app.MapMethods(
+    "/api/shifts/{**path}",
+    ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    (HttpContext context, IHttpClientFactory httpClientFactory, string? path) =>
+        ProxyRequest(
+            context,
+            httpClientFactory,
+            GetServiceBaseUrl("SHIFTS_API_URL", "http://localhost:5002"),
+            "shifts",
+            path
+        )
+);
 
 app.Run();
 
@@ -94,4 +96,89 @@ static string[] GetFrontendOrigins()
         .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 }
 
-public partial class Program;
+static async Task ProxyRequest(
+    HttpContext context,
+    IHttpClientFactory httpClientFactory,
+    string serviceBaseUrl,
+    string routePrefix,
+    string? path
+)
+{
+    using var requestMessage = CreateProxyRequest(context, serviceBaseUrl, routePrefix, path);
+    using var responseMessage = await httpClientFactory
+        .CreateClient()
+        .SendAsync(
+            requestMessage,
+            HttpCompletionOption.ResponseHeadersRead,
+            context.RequestAborted
+        );
+
+    context.Response.StatusCode = (int)responseMessage.StatusCode;
+
+    foreach (var header in responseMessage.Headers)
+    {
+        context.Response.Headers[header.Key] = header.Value.ToArray();
+    }
+
+    foreach (var header in responseMessage.Content.Headers)
+    {
+        context.Response.Headers[header.Key] = header.Value.ToArray();
+    }
+
+    context.Response.Headers.Remove("transfer-encoding");
+
+    await responseMessage.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
+}
+
+static HttpRequestMessage CreateProxyRequest(
+    HttpContext context,
+    string serviceBaseUrl,
+    string routePrefix,
+    string? path
+)
+{
+    var queryString = context.Request.QueryString.HasValue
+        ? context.Request.QueryString.Value
+        : string.Empty;
+    var targetUri = new Uri($"{serviceBaseUrl}/{routePrefix}/{path}{queryString}");
+    var requestMessage = new HttpRequestMessage(new HttpMethod(context.Request.Method), targetUri);
+
+    if (
+        HttpMethods.IsPost(context.Request.Method)
+        || HttpMethods.IsPut(context.Request.Method)
+        || HttpMethods.IsPatch(context.Request.Method)
+    )
+    {
+        requestMessage.Content = new StreamContent(context.Request.Body);
+
+        if (!string.IsNullOrWhiteSpace(context.Request.ContentType))
+        {
+            requestMessage.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(
+                context.Request.ContentType
+            );
+        }
+    }
+
+    foreach (var header in context.Request.Headers)
+    {
+        if (
+            header.Key.Equals("Host", StringComparison.OrdinalIgnoreCase)
+            || header.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)
+            || header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            continue;
+        }
+
+        if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()))
+        {
+            requestMessage.Content?.Headers.TryAddWithoutValidation(
+                header.Key,
+                header.Value.ToArray()
+            );
+        }
+    }
+
+    requestMessage.Headers.Host = null;
+    return requestMessage;
+}
