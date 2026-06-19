@@ -172,7 +172,7 @@ export class Shifts implements OnInit {
   }
 
   loadShifts() {
-    this.http.get<any[]>('http://localhost:5000/api/aggregate/shifts')
+    this.http.get<any[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
           this.shifts = data;

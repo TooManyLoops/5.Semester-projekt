@@ -18,10 +18,15 @@ export class Employees implements OnInit {
   }
 
   loadEmployees() {
-    this.http.get<any[]>('http://localhost:5000/api/aggregate/employees')
+    this.http.get<any[]>('http://localhost:5000/api/employees/')
       .subscribe({
         next: data => {
-          this.employees = data;
+
+          this.employees = data.map(emp => ({
+            ...emp,
+            rolesText: ''
+          }));
+
           this.employees.forEach(emp => {
             this.http.get<any[]>(
               `http://localhost:5000/api/employee-roles/employee/${emp.employeeId}`

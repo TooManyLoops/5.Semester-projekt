@@ -34,16 +34,44 @@ export class EditEmployee implements OnInit {
   ngOnInit() {
     this.employeeId = this.route.snapshot.paramMap.get('id');
 
-    this.loadEmployeeDetails();
+    this.loadEmployee();
+    this.loadRoles();
+    this.loadEmployeeRoles();
   }
 
-  loadEmployeeDetails() {
-    this.http.get<any>(`http://localhost:5000/api/aggregate/employees/${this.employeeId}`)
+  loadEmployee() {
+    this.http.get<any>(`http://localhost:5000/api/employees/${this.employeeId}`)
       .subscribe({
         next: data => {
-          this.employee = data.employee;
-          this.roles = data.availableRoles;
-          this.employeeRoles = data.employee.roles;
+          this.employee = data;
+          this.cdr.detectChanges();
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+  }
+
+  loadRoles() {
+    this.http.get<any[]>('http://localhost:5000/api/roles/')
+      .subscribe({
+        next: data => {
+          this.roles = data;
+          this.cdr.detectChanges();
+        },
+        error: error => {
+          console.error(error);
+        }
+      });
+  }
+
+  loadEmployeeRoles() {
+    this.http.get<any[]>(
+      `http://localhost:5000/api/employee-roles/employee/${this.employeeId}`
+    )
+      .subscribe({
+        next: data => {
+          this.employeeRoles = data;
           this.cdr.detectChanges();
         },
         error: error => {
@@ -69,7 +97,7 @@ export class EditEmployee implements OnInit {
         next: () => {
           alert('Rolle tilføjet');
           this.selectedRoleId = '';
-          this.loadEmployeeDetails();
+          this.loadEmployeeRoles();
         },
         error: error => {
           console.error(error);

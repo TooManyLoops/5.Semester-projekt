@@ -14,7 +14,7 @@ public static class ShiftEndpoints
         shifts.MapPost("/", CreateShift).WithName("CreateShift");
         shifts.MapGet("/", GetShifts).WithName("GetShifts");
         shifts.MapGet("/{shiftId:guid}", GetShift).WithName("GetShift");
-        shifts.MapGet("/All/", GetAllShiftsForEmployeeRoleIds).WithName("GetAllShiftsForEmployeeId");
+        shifts.MapGet("/all/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
         shifts.MapPost("/Assign/", AssignShiftToEmployeeRole).WithName("AssignShiftToEmployeeRole");
 
         return app;
@@ -62,15 +62,15 @@ public static class ShiftEndpoints
     }
 
     //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
-    private static async Task<IResult> GetAllShiftsForEmployeeRoleIds(ShiftService service, List<Guid> employeeRoleIds)
+    private static async Task<IResult> GetAllShiftsForEmployeeId(ShiftService service, Guid employeeRoleId)
     {
-        if (employeeRoleIds.Count is 0)
+        if (employeeRoleId == Guid.Empty)
         {
-            return TypedResults.BadRequest("Missing Employee Role IDs");
+            return TypedResults.BadRequest("Invalid employee role ID");
         }
         try
         {
-            var result = await service.GetAllShiftsForEmployeeRoleIds(employeeRoleIds);
+            var result = await service.GetAllShiftsForEmployeeId(employeeRoleId);
             return TypedResults.Ok(result);
         }
         catch (ArgumentException ex)

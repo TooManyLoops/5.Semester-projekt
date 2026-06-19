@@ -1,38 +1,46 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Scalar.AspNetCore;
 using Timegrip.Shifts.Api.Data;
 using Timegrip.Shifts.Api.Endpoints;
 using Timegrip.Shifts.Api.Services;
+using Polly;
+using Polly.Retry;
+using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+// Define a retry policy with exponential backoff
+builder.Services.AddSingleton<AsyncRetryPolicy>(Policy
+    .Handle<HttpRequestException>()
+    .WaitAndRetryAsync(
+        retryCount: 3,
+        sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+        onRetry: (exception, retryCount) =>
+        {
+            Console.WriteLine($"Retrying request. Retry count: {retryCount}");
+        }));
+
 builder.Services.AddScoped<ShiftService>();
+builder.Services.AddHttpClient<VerificationService>();
+builder.Services.AddScoped<VerificationService>();
 builder.Services.AddDbContext<ShiftsDbContext>(options =>
-    options.UseSqlServer(
-        GetConnectionString(),
-        sql =>
-            sql.UseCompatibilityLevel(160)
-                .EnableRetryOnFailure()
-                .MigrationsHistoryTable(HistoryRepository.DefaultTableName, "Shift")
-    )
-);
+    options.UseSqlServer(GetConnectionString(), sql =>
+        sql.UseCompatibilityLevel(160)
+            .EnableRetryOnFailure()
+            .MigrationsHistoryTable(HistoryRepository.DefaultTableName, "Shift")));
 
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(
-        "AllowFrontend",
-        policy =>
-        {
-            policy
-                .WithOrigins(GetFrontendOrigins())
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        }
-    );
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(GetFrontendOrigins())
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
@@ -58,8 +66,7 @@ static string GetConnectionString()
     if (string.IsNullOrWhiteSpace(connectionString))
     {
         throw new InvalidOperationException(
-            $"CONNECTION_STRING_SHIFT not found. Current directory: {Directory.GetCurrentDirectory()}"
-        );
+            $"CONNECTION_STRING_SHIFT not found. Current directory: {Directory.GetCurrentDirectory()}");
     }
 
     return connectionString;
