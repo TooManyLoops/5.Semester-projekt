@@ -48,13 +48,50 @@ public sealed class ShiftAggregationService(
             ShiftId = shift.ShiftId,
             StartTime = shift.StartTime,
             EndTime = shift.EndTime,
-            ShiftRequirements = (shift.ShiftRequirements ?? [])
+            ShiftRequirements = GetRequirements(shift)
                 .Select(requirement => ToRequirementAggregate(requirement, rolesById))
                 .ToList(),
-            ShiftAssignments = (shift.ShiftAssignments ?? [])
+            ShiftAssignments = GetAssignments(shift)
                 .Select(ToAssignmentAggregate)
                 .ToList(),
         };
+    }
+
+    private static IEnumerable<ShiftRequirementDto> GetRequirements(ShiftDto shift)
+    {
+        if (shift.ShiftRequirements is { Count: > 0 })
+        {
+            return shift.ShiftRequirements;
+        }
+
+        return shift.RoleId is null
+            ? []
+            : [
+                new ShiftRequirementDto
+                {
+                    ShiftId = shift.ShiftId,
+                    RoleId = shift.RoleId.Value,
+                    Amount = 1,
+                },
+            ];
+    }
+
+    private static IEnumerable<ShiftAssignmentDto> GetAssignments(ShiftDto shift)
+    {
+        if (shift.ShiftAssignments is { Count: > 0 })
+        {
+            return shift.ShiftAssignments;
+        }
+
+        return !shift.IsAssigned || shift.EmployeeRoleId is null
+            ? []
+            : [
+                new ShiftAssignmentDto
+                {
+                    ShiftId = shift.ShiftId,
+                    EmployeeRoleId = shift.EmployeeRoleId.Value,
+                },
+            ];
     }
 
     private static ShiftRequirementAggregateResponse ToRequirementAggregate(

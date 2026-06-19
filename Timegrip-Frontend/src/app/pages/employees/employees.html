@@ -11,15 +11,18 @@
     <div class="filter-row">
         <label>Find medarbejder:</label>
 
-        <select [(ngModel)]="selectedLetter" name="selectedLetter" (change)="onLetterChange()">
+        <div class="employee-search">
+            <input type="text" name="employeeSearch" [(ngModel)]="employeeSearch"
+                (ngModelChange)="onEmployeeSearchChange()" (focus)="onEmployeeSearchChange()"
+                (blur)="hideEmployeeSuggestions()" autocomplete="off" placeholder="Søg på navn">
 
-            <option value="">Alle</option>
-
-            <option *ngFor="let letter of letters" [value]="letter">
-                {{ letter }}
-            </option>
-
-        </select>
+            <div *ngIf="showEmployeeSuggestions && employeeSuggestions.length > 0" class="employee-suggestions">
+                <button type="button" *ngFor="let employee of employeeSuggestions"
+                    (mousedown)="selectEmployeeSuggestion(employee)">
+                    {{ getEmployeeFullName(employee) }}
+                </button>
+            </div>
+        </div>
     </div>
 
     <table class="employee-table">

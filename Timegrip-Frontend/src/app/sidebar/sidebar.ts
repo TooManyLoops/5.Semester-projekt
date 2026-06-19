@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,8 +11,12 @@ export class Sidebar {
 
   userRole = localStorage.getItem('role');
 
-  toggleShiftMenu() {
+  constructor(private cdr: ChangeDetectorRef) { }
+
+  toggleShiftMenu(event?: MouseEvent) {
+    event?.stopPropagation();
     this.showShiftMenu = !this.showShiftMenu;
+    this.cdr.detectChanges();
   }
 
   logout() {

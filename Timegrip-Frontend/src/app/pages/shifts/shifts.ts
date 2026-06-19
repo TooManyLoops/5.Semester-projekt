@@ -68,19 +68,18 @@ export class Shifts implements OnInit {
         }
       });
 
-    this.loadRoles();
     this.loadEmployeesAndShifts();
   }
 
   openShiftRow: any = {
     employeeName: 'Ledige vagter',
-    monday: null,
-    tuesday: null,
-    wednesday: null,
-    thursday: null,
-    friday: null,
-    saturday: null,
-    sunday: null
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: []
   };
 
   goToSelectedWeek() {
@@ -175,7 +174,7 @@ export class Shifts implements OnInit {
     this.http.get<any[]>('http://localhost:5000/api/aggregate/shifts')
       .subscribe({
         next: data => {
-          this.shifts = data;
+          this.shifts = data.flatMap(shift => this.normalizeShift(shift));
           this.buildEmployeeSchedule();
           this.cdr.detectChanges();
         },
@@ -186,54 +185,26 @@ export class Shifts implements OnInit {
   }
 
   loadEmployeesAndShifts() {
-    this.http.get<any[]>('http://localhost:5000/api/employees/')
+    this.http.get<any>('http://localhost:5000/api/aggregate/forms/create-shift')
       .subscribe({
-        next: employees => {
-          this.employees = employees;
-          this.loadEmployeeRoles();
+        next: data => {
+          this.employees = data.employees;
+          this.roles = data.roles;
+          this.employeeRoles = this.employees.flatMap(employee =>
+            (employee.roles ?? []).map((role: any) => ({
+              employeeId: employee.employeeId,
+              employeeRoleId: role.employeeRoleId,
+              roleId: role.roleId,
+              roleName: role.name,
+              isPrimary: role.isPrimary
+            }))
+          );
+          this.cdr.detectChanges();
+          this.loadShifts();
         },
         error: error => {
           console.error(error);
         }
-      });
-  }
-
-  loadEmployeeRoles() {
-    this.employeeRoles = [];
-
-    let completedRequests = 0;
-
-    this.employees.forEach(employee => {
-      this.http.get<any[]>(
-        `http://localhost:5000/api/employee-roles/employee/${employee.employeeId}`
-      )
-        .subscribe({
-          next: roles => {
-            this.employeeRoles.push(...roles);
-
-            completedRequests++;
-
-            if (completedRequests === this.employees.length) {
-              this.loadShifts();
-            }
-          },
-          error: error => {
-            console.error(error);
-
-            completedRequests++;
-
-            if (completedRequests === this.employees.length) {
-              this.loadShifts();
-            }
-          }
-        });
-    });
-  }
-  loadRoles() {
-    this.http.get<any[]>('http://localhost:5000/api/roles/')
-      .subscribe({
-        next: data => this.roles = data,
-        error: error => console.error(error)
       });
   }
 
@@ -541,109 +512,83 @@ export class Shifts implements OnInit {
 
   assignSelectedShift() {
 
-    this.http.get<any[]>(
-      `http://localhost:5000/api/employee-roles/employee/${this.selectedEmployeeForShift}`
+    const matchingEmployeeRole = this.employeeRoles.find(er =>
+      er.employeeId === this.selectedEmployeeForShift &&
+      er.roleId === this.selectedOpenShift.roleId
+    );
+
+    if (!matchingEmployeeRole) {
+      alert('Medarbejderen har ikke den nødvendige rolle');
+      return;
+    }
+
+    const hasConflict = this.shifts.some(shift => {
+      if (!shift.isAssigned) {
+        return false;
+      }
+
+      const existingEmployeeRole = this.employeeRoles.find(er =>
+        er.employeeRoleId === shift.employeeRoleId
+      );
+
+      if (!existingEmployeeRole) {
+        return false;
+      }
+
+      if (
+        existingEmployeeRole.employeeId?.toLowerCase() !==
+        this.selectedEmployeeForShift?.toLowerCase()
+      ) {
+        return false;
+      }
+
+      const existingStart = new Date(shift.startTime);
+      const existingEnd = new Date(shift.endTime);
+
+      const newShift = this.shifts.find(s =>
+        s.shiftId === this.selectedOpenShift.shiftId
+      );
+
+      if (!newShift) {
+        return false;
+      }
+
+      const newStart = new Date(newShift.startTime);
+      const newEnd = new Date(newShift.endTime);
+
+      return newStart < existingEnd && newEnd > existingStart;
+    });
+
+    if (hasConflict) {
+      alert('Medarbejderen har allerede en vagt i dette tidsrum');
+      return;
+    }
+
+    const assignmentRequest = {
+      employeeRoleId: matchingEmployeeRole.employeeRoleId,
+      assignmentStatus: 1
+    };
+
+    this.http.post(
+      `http://localhost:5000/api/aggregate/shifts/${this.selectedOpenShift.shiftId}/assign`,
+      assignmentRequest
     )
       .subscribe({
+        next: () => {
+          this.selectedOpenShift = null;
+          this.selectedEmployeeForShift = '';
+          this.loadShifts();
 
-        next: employeeRoles => {
-
-          const matchingEmployeeRole = employeeRoles.find(er =>
-            er.roleId === this.selectedOpenShift.roleId
-          );
-
-          if (!matchingEmployeeRole) {
-            alert('Medarbejderen har ikke den nødvendige rolle');
-            return;
-          }
-
-          const hasConflict = this.shifts.some(shift => {
-            if (!shift.isAssigned) {
-              return false;
-            }
-
-            const existingEmployeeRole = this.employeeRoles.find(er =>
-              er.employeeRoleId === shift.employeeRoleId
-            );
-
-            if (!existingEmployeeRole) {
-              return false;
-            }
-
-            if (
-              existingEmployeeRole.employeeId?.toLowerCase() !==
-              this.selectedEmployeeForShift?.toLowerCase()
-            ) {
-              return false;
-            }
-
-            const existingStart = new Date(shift.startTime);
-            const existingEnd = new Date(shift.endTime);
-
-            const newShift = this.shifts.find(s =>
-              s.shiftId === this.selectedOpenShift.shiftId
-            );
-
-            if (!newShift) {
-              return false;
-            }
-
-            const newStart = new Date(newShift.startTime);
-            const newEnd = new Date(newShift.endTime);
-
-            const overlaps =
-              newStart < existingEnd &&
-              newEnd > existingStart;
-
-            console.log('Samme medarbejder:', existingEmployeeRole.employeeId, this.selectedEmployeeForShift);
-            console.log('Eksisterende:', existingStart, existingEnd);
-            console.log('Ny:', newStart, newEnd);
-            console.log('Overlap:', overlaps);
-
-            return overlaps;
-          });
-
-          if (hasConflict) {
-            alert('Medarbejderen har allerede en vagt i dette tidsrum');
-            return;
-          }
-
-          const assignmentRequest = {
-            shiftId: this.selectedOpenShift.shiftId,
-            employeeRoleId: matchingEmployeeRole.employeeRoleId,
-            assignmentStatus: 1
-          };
-
-          this.http.post(
-            'http://localhost:5000/api/shifts/Assign',
-            assignmentRequest
-          )
-            .subscribe({
-              next: () => {
-
-                this.selectedOpenShift = null;
-                this.selectedEmployeeForShift = '';
-
-                this.loadShifts();
-
-                setTimeout(() => {
-                  this.cdr.detectChanges();
-                }, 100);
-
-              },
-              error: error => {
-                console.error(error);
-                alert('Kunne ikke tildele vagten');
-              }
-            });
-
+          setTimeout(() => {
+            this.cdr.detectChanges();
+          }, 100);
         },
-
         error: error => {
           console.error(error);
+          alert('Kunne ikke tildele vagten');
         }
-
       });
+
 
   }
 
@@ -688,6 +633,47 @@ export class Shifts implements OnInit {
 
     this.assignSelectedShift();
 
+  }
+
+  private normalizeShift(shift: any): any[] {
+    if (!shift.shiftRequirements && !shift.shiftAssignments) {
+      return [shift];
+    }
+
+    const assignments = shift.shiftAssignments ?? [];
+    const requirements = shift.shiftRequirements ?? [];
+
+    if (assignments.length === 0) {
+      return requirements.flatMap((requirement: any) =>
+        Array.from({ length: requirement.amount || 1 }, () => ({
+          shiftId: shift.shiftId,
+          startTime: shift.startTime,
+          endTime: shift.endTime,
+          isAssigned: false,
+          roleId: requirement.roleId,
+          roleName: requirement.roleName
+        }))
+      );
+    }
+
+    return assignments.map((assignment: any) => {
+      const employeeRole = this.employeeRoles.find(er =>
+        er.employeeRoleId === assignment.employeeRoleId
+      );
+      const requirement = requirements.find((item: any) =>
+        item.roleId === employeeRole?.roleId
+      ) ?? requirements[0];
+
+      return {
+        shiftId: shift.shiftId,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        isAssigned: true,
+        employeeRoleId: assignment.employeeRoleId,
+        roleId: employeeRole?.roleId ?? requirement?.roleId,
+        roleName: requirement?.roleName
+      };
+    });
   }
 
 }
