@@ -2,6 +2,17 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, finalize, timeout } from 'rxjs/operators';
+import {
+  CreateShiftForm,
+  Employee,
+  EmployeeRole,
+  Role,
+  ScheduleRow,
+  Shift,
+  ShiftAssignment,
+  ShiftBlock,
+  ShiftRequirement
+} from '../../model';
 
 @Component({
   selector: 'app-shifts',
@@ -11,16 +22,16 @@ import { filter, finalize, timeout } from 'rxjs/operators';
 })
 export class Shifts implements OnInit {
 
-  shifts: any[] = [];
-  employees: any[] = [];
-  employeeRoles: any[] = [];
-  roles: any[] = [];
-  employeeSchedule: any[] = [];
+  shifts: Shift[] = [];
+  employees: Employee[] = [];
+  employeeRoles: EmployeeRole[] = [];
+  roles: Role[] = [];
+  employeeSchedule: ScheduleRow[] = [];
   currentWeekStart: Date = this.getMonday(new Date());
   selectedEmployeeId = '';
   selectedEmployeeForShift = '';
   showAllShifts = false;
-  selectedDayShifts: any[] = [];
+  selectedDayShifts: ShiftBlock[] = [];
   selectedDayName = '';
   isAssigningShift = false;
   isImportingShifts = false;
@@ -76,7 +87,7 @@ export class Shifts implements OnInit {
     this.loadEmployeesAndShifts();
   }
 
-  openShiftRow: any = {
+  openShiftRow: ScheduleRow = {
     employeeName: 'Ledige vagter',
     monday: [],
     tuesday: [],
@@ -166,7 +177,7 @@ export class Shifts implements OnInit {
     this.buildEmployeeSchedule();
   }
 
-  isShiftInCurrentWeek(shift: any): boolean {
+  isShiftInCurrentWeek(shift: Shift): boolean {
     const shiftDate = new Date(shift.startTime);
 
     const weekEnd = new Date(this.currentWeekStart);
@@ -176,7 +187,7 @@ export class Shifts implements OnInit {
   }
 
   loadShifts() {
-    this.http.get<any[]>('http://localhost:5000/api/aggregate/shifts')
+    this.http.get<Shift[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
           this.shifts = data.flatMap(shift => this.normalizeShift(shift));
@@ -190,13 +201,13 @@ export class Shifts implements OnInit {
   }
 
   loadEmployeesAndShifts() {
-    this.http.get<any>('http://localhost:5000/api/aggregate/forms/create-shift')
+    this.http.get<CreateShiftForm>('http://localhost:5000/api/aggregate/forms/create-shift')
       .subscribe({
         next: data => {
           this.employees = data.employees;
           this.roles = data.roles;
           this.employeeRoles = this.employees.flatMap(employee =>
-            (employee.roles ?? []).map((role: any) => ({
+            (employee.roles ?? []).map((role: EmployeeRole) => ({
               employeeId: employee.employeeId,
               employeeRoleId: role.employeeRoleId,
               roleId: role.roleId,
@@ -220,7 +231,7 @@ export class Shifts implements OnInit {
     });
   }
 
-  formatShiftTime(shift: any): string {
+  formatShiftTime(shift: Shift): string {
     return `${this.formatTime(shift.startTime)} - ${this.formatTime(shift.endTime)}`;
   }
 
@@ -236,7 +247,7 @@ export class Shifts implements OnInit {
   }
 
   buildEmployeeSchedule() {
-    const groupedByEmployee: any = {};
+    const groupedByEmployee: Record<string, ScheduleRow> = {};
 
     this.openShiftRow = {
       employeeName: 'Ledige vagter',
@@ -374,7 +385,13 @@ export class Shifts implements OnInit {
           return;
         }
 
-        const employeeName = this.getEmployeeNameFromEmployeeRoleId(shift.employeeRoleId);
+        const assignedEmployeeRoleId = shift.employeeRoleId;
+
+        if (!assignedEmployeeRoleId) {
+          return;
+        }
+
+        const employeeName = this.getEmployeeNameFromEmployeeRoleId(assignedEmployeeRoleId);
 
         if (!groupedByEmployee[employeeName]) {
           groupedByEmployee[employeeName] = {
@@ -502,9 +519,9 @@ export class Shifts implements OnInit {
     return `${employee.firstName} ${employee.lastName}`;
   }
 
-  selectedOpenShift: any = null;
+  selectedOpenShift: ShiftBlock | null = null;
 
-  selectOpenShift(shift: any) {
+  selectOpenShift(shift: ShiftBlock) {
     this.selectedOpenShift = shift;
     this.selectedEmployeeForShift = '';
 
@@ -516,10 +533,15 @@ export class Shifts implements OnInit {
   }
 
   assignSelectedShift() {
+    if (!this.selectedOpenShift) {
+      return;
+    }
+
+    const selectedOpenShift = this.selectedOpenShift;
 
     const matchingEmployeeRole = this.employeeRoles.find(er =>
       er.employeeId === this.selectedEmployeeForShift &&
-      er.roleId === this.selectedOpenShift.roleId
+      er.roleId === selectedOpenShift.roleId
     );
 
     if (!matchingEmployeeRole) {
@@ -551,7 +573,7 @@ export class Shifts implements OnInit {
       const existingEnd = new Date(shift.endTime);
 
       const newShift = this.shifts.find(s =>
-        s.shiftId === this.selectedOpenShift.shiftId
+        s.shiftId === selectedOpenShift.shiftId
       );
 
       if (!newShift) {
@@ -575,7 +597,7 @@ export class Shifts implements OnInit {
     };
 
     this.http.post(
-      `http://localhost:5000/api/aggregate/shifts/${this.selectedOpenShift.shiftId}/assign`,
+      `http://localhost:5000/api/aggregate/shifts/${selectedOpenShift.shiftId}/assign`,
       assignmentRequest
     )
       .subscribe({
@@ -597,13 +619,15 @@ export class Shifts implements OnInit {
 
   }
 
-  getEmployeesForSelectedOpenShift(): any[] {
+  getEmployeesForSelectedOpenShift(): Employee[] {
     if (!this.selectedOpenShift) {
       return [];
     }
 
+    const selectedOpenShift = this.selectedOpenShift;
+
     const employeeIdsWithRole = this.employeeRoles
-      .filter(er => er.roleId === this.selectedOpenShift.roleId)
+      .filter(er => er.roleId === selectedOpenShift.roleId)
       .map(er => er.employeeId);
 
     return this.employees.filter(employee =>
@@ -624,7 +648,7 @@ export class Shifts implements OnInit {
     return `${dayNames[dayOffset]} ${dateText}`;
   }
 
-  showMoreShifts(shifts: any[], dayName: string) {
+  showMoreShifts(shifts: ShiftBlock[], dayName: string) {
 
     this.selectedDayShifts = shifts;
     this.selectedDayName = dayName;
@@ -749,7 +773,7 @@ export class Shifts implements OnInit {
       });
   }
 
-  private normalizeShift(shift: any): any[] {
+  private normalizeShift(shift: Shift): Shift[] {
     if (!shift.shiftRequirements && !shift.shiftAssignments) {
       return [shift];
     }
@@ -758,7 +782,7 @@ export class Shifts implements OnInit {
     const requirements = shift.shiftRequirements ?? [];
 
     if (assignments.length === 0) {
-      return requirements.flatMap((requirement: any) =>
+      return requirements.flatMap((requirement: ShiftRequirement) =>
         Array.from({ length: requirement.amount || 1 }, () => ({
           shiftId: shift.shiftId,
           startTime: shift.startTime,
@@ -770,11 +794,11 @@ export class Shifts implements OnInit {
       );
     }
 
-    return assignments.map((assignment: any) => {
+    return assignments.map((assignment: ShiftAssignment) => {
       const employeeRole = this.employeeRoles.find(er =>
         er.employeeRoleId === assignment.employeeRoleId
       );
-      const requirement = requirements.find((item: any) =>
+      const requirement = requirements.find((item: ShiftRequirement) =>
         item.roleId === employeeRole?.roleId
       ) ?? requirements[0];
 

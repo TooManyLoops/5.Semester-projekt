@@ -15,7 +15,8 @@ public static class ShiftEndpoints
         shifts.MapPost("/", CreateShift).WithName("CreateShift");
         shifts.MapGet("/", GetShifts).WithName("GetShifts");
         shifts.MapGet("/{shiftId:guid}", GetShift).WithName("GetShift");
-        shifts.MapGet("/All/", GetAllShiftsForEmployeeRoleIds).WithName("GetAllShiftsForEmployeeId");
+        shifts.MapGet("/all/{employeeRoleId:guid}", GetAllShiftsForEmployeeId).WithName("GetAllShiftsForEmployeeId");
+        shifts.MapGet("/All/", GetAllShiftsForEmployeeRoleIds).WithName("GetAllShiftsForEmployeeRoleIds");
         shifts.MapPost("/Assign/", AssignShiftToEmployeeRole).WithName("AssignShiftToEmployeeRole");
 
         return app;
@@ -62,7 +63,7 @@ public static class ShiftEndpoints
             : TypedResults.Ok(result);
     }
 
-    //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
+    //Returns a list of all shifts that are assigned to one or more employee role IDs.
     private static async Task<IResult> GetAllShiftsForEmployeeRoleIds(
         ShiftService service,
         [FromQuery] Guid[] employeeRoleIds
@@ -75,6 +76,29 @@ public static class ShiftEndpoints
         try
         {
             var result = await service.GetAllShiftsForEmployeeRoleIds(employeeRoleIds.ToList());
+            return TypedResults.Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return TypedResults.Problem("Der skete en uventet fejl");
+        }
+
+    }
+
+    //Returns a list of all shifts that are assigned to a specific employee, identified by their employee role ID.
+    private static async Task<IResult> GetAllShiftsForEmployeeId(ShiftService service, Guid employeeRoleId)
+    {
+        if (employeeRoleId == Guid.Empty)
+        {
+            return TypedResults.BadRequest("Invalid employee role ID");
+        }
+        try
+        {
+            var result = await service.GetAllShiftsForEmployeeId(employeeRoleId);
             return TypedResults.Ok(result);
         }
         catch (ArgumentException ex)

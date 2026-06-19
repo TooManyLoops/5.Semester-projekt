@@ -17,12 +17,27 @@
 
         <div class="form-row">
             <label>Email</label>
-            <input type="text" [(ngModel)]="employee.email" name="email">
+            <div class="field-group">
+                <input type="email" [(ngModel)]="employee.email" name="email"
+                    (ngModelChange)="clearValidationError('email')"
+                    [class.invalid]="validationErrors.email">
+                <span *ngIf="validationErrors.email" class="error-message">
+                    {{ validationErrors.email }}
+                </span>
+            </div>
         </div>
 
         <div class="form-row">
             <label>Phone number</label>
-            <input type="text" [(ngModel)]="employee.phoneNumber" name="phoneNumber">
+            <div class="field-group">
+                <input type="text" [(ngModel)]="employee.phoneNumber" name="phoneNumber"
+                    (ngModelChange)="clearValidationError('phoneNumber')"
+                    [class.invalid]="validationErrors.phoneNumber"
+                    inputmode="numeric" maxlength="8">
+                <span *ngIf="validationErrors.phoneNumber" class="error-message">
+                    {{ validationErrors.phoneNumber }}
+                </span>
+            </div>
         </div>
 
         <div class="form-row">

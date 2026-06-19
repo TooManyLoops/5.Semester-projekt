@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Employee, EmployeeRole, OpenShift, Role, Shift } from '../../model';
 
 @Component({
   selector: 'app-open-shifts',
@@ -9,10 +10,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class OpenShifts implements OnInit {
 
-  openShifts: any[] = [];
-  roles: any[] = [];
-  employees: any[] = [];
-  selectedShift: any = null;
+  openShifts: OpenShift[] = [];
+  roles: Role[] = [];
+  employees: Employee[] = [];
+  selectedShift: OpenShift | null = null;
   selectedEmployeeId = ''
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
@@ -23,7 +24,7 @@ export class OpenShifts implements OnInit {
   }
 
   loadEmployees() {
-    this.http.get<any[]>('http://localhost:5000/api/employees/')
+    this.http.get<Employee[]>('http://localhost:5000/api/employees/')
       .subscribe({
         next: data => {
           this.employees = data;
@@ -35,7 +36,7 @@ export class OpenShifts implements OnInit {
   }
 
   loadRolesAndShifts() {
-    this.http.get<any[]>('http://localhost:5000/api/roles/')
+    this.http.get<Role[]>('http://localhost:5000/api/roles/')
       .subscribe({
         next: roles => {
           this.roles = roles;
@@ -48,7 +49,7 @@ export class OpenShifts implements OnInit {
   }
 
   loadOpenShifts() {
-    this.http.get<any[]>('http://localhost:5000/api/shifts/')
+    this.http.get<Shift[]>('http://localhost:5000/api/shifts/')
       .subscribe({
         next: data => {
           this.openShifts = data
@@ -66,7 +67,7 @@ export class OpenShifts implements OnInit {
       });
   }
 
-  joinShift(shift: any) {
+  joinShift(shift: OpenShift) {
 
     const employeeId = prompt(
       'Indtast medarbejderens ID'
@@ -76,7 +77,7 @@ export class OpenShifts implements OnInit {
       return;
     }
 
-    this.http.get<any[]>(
+    this.http.get<EmployeeRole[]>(
       `http://localhost:5000/api/employee-roles/employee/${employeeId}`
     )
       .subscribe({
@@ -124,14 +125,16 @@ export class OpenShifts implements OnInit {
       return;
     }
 
-    this.http.get<any[]>(
+    const selectedShift = this.selectedShift;
+
+    this.http.get<EmployeeRole[]>(
       `http://localhost:5000/api/employee-roles/employee/${this.selectedEmployeeId}`
     )
       .subscribe({
         next: employeeRoles => {
 
           const matchingEmployeeRole = employeeRoles.find(er =>
-            er.roleId === this.selectedShift.roleId
+            er.roleId === selectedShift.roleId
           );
 
           if (!matchingEmployeeRole) {
@@ -140,7 +143,7 @@ export class OpenShifts implements OnInit {
           }
 
           const assignmentRequest = {
-            shiftId: this.selectedShift.shiftId,
+            shiftId: selectedShift.shiftId,
             employeeRoleId: matchingEmployeeRole.employeeRoleId,
             assignmentStatus: 1
           };
@@ -170,7 +173,7 @@ export class OpenShifts implements OnInit {
       });
   }
 
-  getRoleName(shift: any): string {
+  getRoleName(shift: Shift): string {
 
     const roleId = shift.roleId;
 

@@ -154,6 +154,11 @@ public class ShiftService(ShiftsDbContext context)
         )).ToList();
     }
 
+    public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeId(Guid employeeRoleId)
+    {
+        return await GetAllShiftsForEmployeeRoleIds([employeeRoleId]);
+    }
+
     public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
     {
         var shift = await GetShift(assignmentRequest.ShiftId);

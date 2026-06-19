@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Employee, EmployeeRole, Role, RoleRequirement } from '../../model';
 
 @Component({
   selector: 'app-create-shift',
@@ -10,13 +11,13 @@ import { Router } from '@angular/router';
 })
 export class CreateShift implements OnInit {
 
-  roles: any[] = [];
-  roleRequirements: any[] = [];
-  filteredEmployees: any[] = [];
-  employees: any[] = [];
+  roles: Role[] = [];
+  roleRequirements: RoleRequirement[] = [];
+  filteredEmployees: Employee[] = [];
+  employees: Employee[] = [];
   times: string[] = [];
   today = '';
-  employeeRoles: any[] = [];
+  employeeRoles: EmployeeRole[] = [];
 
   shift = {
     date: '',
@@ -36,7 +37,8 @@ export class CreateShift implements OnInit {
   }
 
   ngOnInit() {
-    this.loadCreateShiftForm();
+    this.loadRoles();
+    this.loadEmployees();
   }
 
   generateTimes() {
@@ -55,26 +57,42 @@ export class CreateShift implements OnInit {
     }
   }
 
-  loadCreateShiftForm() {
-    this.http.get<any>('http://localhost:5000/api/aggregate/forms/create-shift')
+  loadRoles() {
+    this.http.get<Role[]>('http://localhost:5000/api/roles/')
       .subscribe({
         next: data => {
-          this.roles = data.roles;
-          this.employees = data.employees;
+          this.roles = data;
+
           this.roleRequirements = this.roles.map(role => ({
             roleId: role.roleId,
             roleName: role.name,
             count: 0
           }));
-          this.employeeRoles = this.employees.flatMap(employee =>
-            (employee.roles ?? []).map((role: any) => ({
-              employeeId: employee.employeeId,
-              employeeRoleId: role.employeeRoleId,
-              roleId: role.roleId,
-              roleName: role.name,
-              isPrimary: role.isPrimary
-            }))
-          );
+
+          this.cdr.detectChanges();
+        },
+        error: error => console.error(error)
+      });
+  }
+
+  loadEmployees() {
+    this.http.get<Employee[]>('http://localhost:5000/api/employees/')
+      .subscribe({
+        next: data => {
+          this.employees = data;
+          this.filteredEmployees = data;
+
+          this.employees.forEach(employee => {
+            this.http.get<EmployeeRole[]>(
+              `http://localhost:5000/api/employee-roles/employee/${employee.employeeId}`
+            )
+              .subscribe({
+                next: roles => {
+                  this.employeeRoles.push(...roles);
+                },
+                error: error => console.error(error)
+              });
+          });
         },
         error: error => console.error(error)
       });
