@@ -36,8 +36,7 @@ export class CreateShift implements OnInit {
   }
 
   ngOnInit() {
-    this.loadRoles();
-    this.loadEmployees();
+    this.loadCreateShiftForm();
   }
 
   generateTimes() {
@@ -56,42 +55,12 @@ export class CreateShift implements OnInit {
     }
   }
 
-  loadRoles() {
-    this.http.get<any[]>('http://localhost:5000/api/roles/')
+  loadCreateShiftForm() {
+    this.http.get<any>('http://localhost:5000/api/aggregate/forms/create-shift')
       .subscribe({
         next: data => {
-          this.roles = data;
-
-          this.roleRequirements = this.roles.map(role => ({
-            roleId: role.roleId,
-            roleName: role.name,
-            count: 0
-          }));
-
-          this.cdr.detectChanges();
-        },
-        error: error => console.error(error)
-      });
-  }
-
-  loadEmployees() {
-    this.http.get<any[]>('http://localhost:5000/api/employees/')
-      .subscribe({
-        next: data => {
-          this.employees = data;
-          this.filteredEmployees = data;
-
-          this.employees.forEach(employee => {
-            this.http.get<any[]>(
-              `http://localhost:5000/api/employee-roles/employee/${employee.employeeId}`
-            )
-              .subscribe({
-                next: roles => {
-                  this.employeeRoles.push(...roles);
-                },
-                error: error => console.error(error)
-              });
-          });
+          this.roles = data.roles;
+          this.employees = data.employees;
         },
         error: error => console.error(error)
       });

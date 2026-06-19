@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>5</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>520</x>
+      <y>20</y>
+      <w>455</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>Core Domain</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>540</x>
+      <y>150</y>
+      <w>150</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>_Employee_
+--
+employeeId : GUID
+firstName : String
+lastName : String
+email : String
+phoneNumber : String
+status : EmployeeStatus
+hiredAt : Date</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>535</x>
+      <y>270</y>
+      <w>135</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>_&lt;&lt;enumeration&gt;&gt;_
+_EmployeeStatus_
+--
+ACTIVE
+INACTIVE
+TERMINATED
+ON_LEAVE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>725</x>
+      <y>150</y>
+      <w>145</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>_Employment_
+--
+employmentId : GUID
+employeeId : GUID
+employmentType : EmploymentType
+weeklyHours : Int
+startDate : Date
+endDate? : Date</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>720</x>
+      <y>270</y>
+      <w>135</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>_&lt;&lt;enumeration&gt;&gt;_
+_EmploymentType_
+--
+FULL_TIME
+PART_TIME
+TEMPORARY
+CONTRACTOR
+INTERN</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>545</x>
+      <y>55</y>
+      <w>140</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>_EmployeeRole_
+--
+employeeRoleId : GUID
+employeeId : GUID
+roleId : GUID
+isPrimary : Boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>755</x>
+      <y>55</y>
+      <w>135</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>_Role_
+--
+roleId : GUID
+name : String
+description : String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>20</y>
+      <w>475</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>Shift Schedule Domain</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>35</x>
+      <y>130</y>
+      <w>135</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>_Shift_
+--
+shiftId : GUID
+startTime : DateTime
+endTime : DateTime</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>255</x>
+      <y>95</y>
+      <w>165</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>_ShiftAssignment_
+--
+shiftAssignmentId : GUID
+shiftId : GUID
+employeeRoleId : GUID
+status : AssignmentStatus
+assignedAt : DateTime</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>255</x>
+      <y>205</y>
+      <w>150</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>_ShiftRequirement_
+--
+shiftRequirementId : GUID
+shiftId : GUID
+roleId : GUID
+amount : Byte</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>255</x>
+      <y>20</y>
+      <w>135</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>_&lt;&lt;enumeration&gt;&gt;_
+_AssignmentStatus_
+--
+PLANNED
+CONFIRMED
+DECLINED
+CANCELLED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>685</x>
+      <y>180</y>
+      <w>45</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>610</x>
+      <y>105</y>
+      <w>15</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>75</y>
+      <w>80</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>225</y>
+      <w>15</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>785</x>
+      <y>215</y>
+      <w>15</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>165</x>
+      <y>125</y>
+      <w>95</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10.0;10.0;170.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>165</x>
+      <y>155</y>
+      <w>95</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10.0;10.0;95.0;10.0;95.0;160.0;170.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>315</x>
+      <y>80</y>
+      <w>15</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>405</x>
+      <y>125</y>
+      <w>155</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>id reference</panel_attributes>
+    <additional_attributes>10.0;10.0;290.0;10.0;290.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>90</y>
+      <w>360</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>id reference</panel_attributes>
+    <additional_attributes>10.0;300.0;220.0;300.0;220.0;10.0;700.0;10.0</additional_attributes>
+  </element>
+</diagram>

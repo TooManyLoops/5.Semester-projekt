@@ -2,4 +2,7 @@
   <Project Path="services/Bff.Api/Bff.Api.csproj" />
   <Project Path="services/Employees.Api/Employees.Api.csproj" />
   <Project Path="services/Shifts.Api/Shifts.Api.csproj" />
+  <Project Path="tests/Bff.Api.Tests/Bff.Api.Tests.csproj" />
+  <Project Path="tests/Employees.Api.Tests/Employees.Api.Tests.csproj" />
+  <Project Path="tests/Shifts.Api.Tests/Shifts.Api.Tests.csproj" />
 </Solution>

@@ -1,0 +1,116 @@
+using System.Net.Http.Headers;
+using Timegrip.Bff.Api.Gateway.Services;
+
+namespace Timegrip.Bff.Api.Proxy;
+
+public sealed class ProxyService(
+    IHttpClientFactory httpClientFactory,
+    RoleCatalogService roleCatalog
+)
+{
+    public async Task ProxyRequest(
+        HttpContext context,
+        string clientName,
+        string routePrefix,
+        string? path
+    )
+    {
+        using var requestMessage = CreateProxyRequest(context, routePrefix, path);
+        using var responseMessage = await httpClientFactory
+            .CreateClient(clientName)
+            .SendAsync(
+                requestMessage,
+                HttpCompletionOption.ResponseHeadersRead,
+                context.RequestAborted
+            );
+
+        context.Response.StatusCode = (int)responseMessage.StatusCode;
+
+        if (ShouldInvalidateRolesCache(context, routePrefix, responseMessage))
+        {
+            roleCatalog.InvalidateRoles();
+        }
+
+        foreach (var header in responseMessage.Headers)
+        {
+            context.Response.Headers[header.Key] = header.Value.ToArray();
+        }
+
+        foreach (var header in responseMessage.Content.Headers)
+        {
+            context.Response.Headers[header.Key] = header.Value.ToArray();
+        }
+
+        context.Response.Headers.Remove("transfer-encoding");
+
+        await responseMessage.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
+    }
+
+    private static bool ShouldInvalidateRolesCache(
+        HttpContext context,
+        string routePrefix,
+        HttpResponseMessage responseMessage
+    )
+    {
+        return routePrefix.Equals("roles", StringComparison.OrdinalIgnoreCase)
+            && responseMessage.IsSuccessStatusCode
+            && (
+                HttpMethods.IsPost(context.Request.Method)
+                || HttpMethods.IsPut(context.Request.Method)
+                || HttpMethods.IsPatch(context.Request.Method)
+                || HttpMethods.IsDelete(context.Request.Method)
+            );
+    }
+
+    private static HttpRequestMessage CreateProxyRequest(
+        HttpContext context,
+        string routePrefix,
+        string? path
+    )
+    {
+        var queryString = context.Request.QueryString.HasValue
+            ? context.Request.QueryString.Value
+            : string.Empty;
+        var targetUri = $"{routePrefix}/{path}{queryString}";
+        var requestMessage = new HttpRequestMessage(new HttpMethod(context.Request.Method), targetUri);
+
+        if (
+            HttpMethods.IsPost(context.Request.Method)
+            || HttpMethods.IsPut(context.Request.Method)
+            || HttpMethods.IsPatch(context.Request.Method)
+        )
+        {
+            requestMessage.Content = new StreamContent(context.Request.Body);
+
+            if (!string.IsNullOrWhiteSpace(context.Request.ContentType))
+            {
+                requestMessage.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(
+                    context.Request.ContentType
+                );
+            }
+        }
+
+        foreach (var header in context.Request.Headers)
+        {
+            if (
+                header.Key.Equals("Host", StringComparison.OrdinalIgnoreCase)
+                || header.Key.Equals("Content-Type", StringComparison.OrdinalIgnoreCase)
+                || header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                continue;
+            }
+
+            if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()))
+            {
+                requestMessage.Content?.Headers.TryAddWithoutValidation(
+                    header.Key,
+                    header.Value.ToArray()
+                );
+            }
+        }
+
+        requestMessage.Headers.Host = null;
+        return requestMessage;
+    }
+}

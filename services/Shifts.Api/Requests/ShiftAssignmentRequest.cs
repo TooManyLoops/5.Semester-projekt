@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Timegrip.Shifts.Api.Enums;
-
+using System.ComponentModel.DataAnnotations;
 using Timegrip.Shifts.Api.Enums;
 
 namespace Timegrip.Shifts.Api.Requests;

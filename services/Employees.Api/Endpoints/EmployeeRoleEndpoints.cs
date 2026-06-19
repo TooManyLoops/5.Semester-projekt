@@ -67,8 +67,7 @@ public static class EmployeeRoleEndpoints
         }
         else
         {
-            return TypedResults.NotFound(new
-                { Message = "Employee was not found or is not active.", EmployeeRoleId = employeeRoleId });
+            return TypedResults.NotFound();
         }
     }
 
