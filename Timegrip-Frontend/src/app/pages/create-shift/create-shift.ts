@@ -61,6 +61,20 @@ export class CreateShift implements OnInit {
         next: data => {
           this.roles = data.roles;
           this.employees = data.employees;
+          this.roleRequirements = this.roles.map(role => ({
+            roleId: role.roleId,
+            roleName: role.name,
+            count: 0
+          }));
+          this.employeeRoles = this.employees.flatMap(employee =>
+            (employee.roles ?? []).map((role: any) => ({
+              employeeId: employee.employeeId,
+              employeeRoleId: role.employeeRoleId,
+              roleId: role.roleId,
+              roleName: role.name,
+              isPrimary: role.isPrimary
+            }))
+          );
         },
         error: error => console.error(error)
       });

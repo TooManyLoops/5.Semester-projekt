@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -13,7 +13,7 @@ export class App {
 
   isLoginPage = false;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private cdr: ChangeDetectorRef) {
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd)
@@ -21,6 +21,7 @@ export class App {
 
       .subscribe(() => {
         this.isLoginPage = this.router.url === '/login';
+        this.cdr.detectChanges();
       });
 
   }

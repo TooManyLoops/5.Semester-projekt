@@ -1,5 +1,6 @@
 .sidebar {
     width: 240px;
+    box-sizing: border-box;
     background-color: #4b5563;
     padding-top: 20px;
     display: flex;
@@ -11,7 +12,11 @@
 .sidebar button {
     background: transparent;
     border: none;
+    box-sizing: border-box;
     color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 16px;
     padding: 18px 24px;
     text-align: left;
@@ -31,23 +36,30 @@
 }
 
 .sidebar-item-with-menu {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 48px;
     align-items: center;
     width: 100%;
 }
 
 .main-sidebar-button {
-    flex: 1;
+    min-width: 0;
+    width: 100%;
 }
 
 .dots-button {
     background: transparent;
     border: none;
     color: #e5e7eb;
-    width: 40px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 56px;
+    padding: 0;
     cursor: pointer;
     font-size: 18px;
     text-align: center;
+    z-index: 1;
 }
 
 .dots-button:hover {

@@ -54,6 +54,46 @@ public sealed class ShiftAggregationServiceTests
     }
 
     [Fact]
+    public async Task GetShifts_WhenShiftUsesFlatResponse_ShouldCreateAggregateShape()
+    {
+        var shiftId = Guid.NewGuid();
+        var roleId = Guid.NewGuid();
+        var employeeRoleId = Guid.NewGuid();
+
+        var employeesHandler = new StubHttpMessageHandler()
+            .MapJson("/roles/", new[]
+            {
+                new { RoleId = roleId, Name = "Chef", Description = "Kitchen" },
+            });
+
+        var shiftsHandler = new StubHttpMessageHandler()
+            .MapJson("/shifts/", new[]
+            {
+                new
+                {
+                    ShiftId = shiftId,
+                    StartTime = DateTime.UtcNow.AddHours(1),
+                    EndTime = DateTime.UtcNow.AddHours(9),
+                    RoleId = roleId,
+                    IsAssigned = true,
+                    EmployeeRoleId = employeeRoleId,
+                },
+            });
+
+        var service = CreateService(employeesHandler, shiftsHandler);
+
+        var result = await service.GetShifts(CancellationToken.None);
+
+        result.Should().ContainSingle();
+        result[0].ShiftRequirements.Should().ContainSingle(requirement =>
+            requirement.RoleId == roleId && requirement.RoleName == "Chef"
+        );
+        result[0].ShiftAssignments.Should().ContainSingle(assignment =>
+            assignment.EmployeeRoleId == employeeRoleId
+        );
+    }
+
+    [Fact]
     public async Task AssignShift_WhenEmployeeRoleDoesNotExist_ShouldReturnNotFoundResult()
     {
         var employeeRoleId = Guid.NewGuid();
