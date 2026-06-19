@@ -22,8 +22,25 @@ export class Employees implements OnInit {
       .subscribe({
         next: data => {
           this.employees = data;
+          this.employees.forEach(emp => {
+            this.http.get<any[]>(
+              `http://localhost:5000/api/employee-roles/employee/${emp.employeeId}`
+            )
+              .subscribe({
+                next: roles => {
+                  emp.rolesText = roles
+                    .map(role => role.roleName)
+                    .join(', ');
 
-          this.cdr.detectChanges();
+                  this.cdr.detectChanges();
+                },
+                error: error => {
+                  console.error(error);
+                }
+              });
+
+          });
+
         },
         error: error => {
           console.error(error);

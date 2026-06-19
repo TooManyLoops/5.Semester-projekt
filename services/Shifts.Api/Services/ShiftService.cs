@@ -8,7 +8,7 @@ namespace Timegrip.Shifts.Api.Services;
 
 public class ShiftService(ShiftsDbContext context)
 {
-    
+
     public async Task<ShiftResponse> ValidateCreateShift(ShiftRequest request)
     {
         if (!(request.StartTime >= DateTime.Now) || !(request.EndTime > request.StartTime))
@@ -27,7 +27,7 @@ public class ShiftService(ShiftsDbContext context)
     }
 
     private async Task<ShiftResponse> CreateShift(ShiftRequest request)
-    {   
+    {
         var shift = new Shift
         {
             ShiftId = Guid.NewGuid(),
@@ -84,21 +84,52 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<List<ShiftResponse>> GetShifts()
     {
-        return await context.Shifts.AsNoTracking()
-            .Select(shift => ToResponse(shift))
+        return await context.Shifts
+            .AsNoTracking()
+            .Select(shift => new ShiftResponse
+            {
+                ShiftId = shift.ShiftId,
+                StartTime = shift.StartTime,
+                EndTime = shift.EndTime,
+
+                RoleId = context.ShiftRequirements
+                    .Where(requirement => requirement.ShiftId == shift.ShiftId)
+                    .Select(requirement => (Guid?)requirement.RoleId)
+                    .FirstOrDefault(),
+
+                EmployeeRoleId = context.ShiftAssignments
+                    .Where(assignment => assignment.ShiftId == shift.ShiftId)
+                    .Select(assignment => (Guid?)assignment.EmployeeRoleId)
+                    .FirstOrDefault(),
+
+                IsAssigned = context.ShiftAssignments
+                    .Any(assignment => assignment.ShiftId == shift.ShiftId)
+            })
             .ToListAsync();
     }
 
     public async Task<ShiftResponse?> GetShift(Guid shiftId)
     {
-        return await context.Shifts.AsNoTracking()
+        return await context.Shifts
+            .AsNoTracking()
             .Where(shift => shift.ShiftId == shiftId)
-            .Select(shift => ToResponse(shift))
+            .Select(shift => new ShiftResponse
+            {
+                ShiftId = shift.ShiftId,
+                StartTime = shift.StartTime,
+                EndTime = shift.EndTime,
+
+                RoleId = context.ShiftRequirements
+                    .Where(requirement => requirement.ShiftId == shift.ShiftId)
+                    .Select(requirement => (Guid?)requirement.RoleId)
+                    .FirstOrDefault()
+            })
             .FirstOrDefaultAsync();
     }
 
     public async Task<List<ShiftResponse>> GetAllShiftsForEmployeeRoleIds(List<Guid> employeeRoleIds)
     {
+
         var shiftIds = await context.ShiftAssignments
             .Where(sa => employeeRoleIds.Contains(sa.EmployeeRoleId))
             .Select(sa => sa.ShiftId)
@@ -126,6 +157,12 @@ public class ShiftService(ShiftsDbContext context)
 
     public async Task<bool> AssignShiftToEmployeeRole(ShiftAssignmentRequest assignmentRequest)
     {
+        var validationResult = await verificationService.VerifyEmployeeRoleById(assignmentRequest.EmployeeRoleId);
+        if (validationResult is false)
+        {
+            throw new Exception("Can't find employeeRole. Either wrong employeeRoleId or doesnt exist");
+        }
+
         var shift = await GetShift(assignmentRequest.ShiftId);
         if (shift is null)
         {
@@ -137,14 +174,14 @@ public class ShiftService(ShiftsDbContext context)
             ShiftAssignmentId = Guid.NewGuid(),
             ShiftId = assignmentRequest.ShiftId,
             EmployeeRoleId = assignmentRequest.EmployeeRoleId,
-            Status = (byte) assignmentRequest.AssignmentStatus,
+            Status = (byte)assignmentRequest.AssignmentStatus,
             AssignedAt = DateTime.UtcNow
         };
         context.ShiftAssignments.Add(shiftAssignment);
         var result = await context.SaveChangesAsync();
         return result > 0;
     }
-    
+
     private static ShiftResponse ToResponse(Shift shift, List<ShiftAssignment>? sa = null, List<ShiftRequirement>? sr = null)
     {
         return new ShiftResponse

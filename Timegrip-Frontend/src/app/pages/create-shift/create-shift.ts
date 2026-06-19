@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -11,10 +11,12 @@ import { Router } from '@angular/router';
 export class CreateShift implements OnInit {
 
   roles: any[] = [];
+  roleRequirements: any[] = [];
+  filteredEmployees: any[] = [];
   employees: any[] = [];
-
   times: string[] = [];
   today = '';
+  employeeRoles: any[] = [];
 
   shift = {
     date: '',
@@ -26,6 +28,7 @@ export class CreateShift implements OnInit {
 
   constructor(
     private http: HttpClient,
+    private cdr: ChangeDetectorRef,
     private router: Router
   ) {
     this.generateTimes();
@@ -63,34 +66,59 @@ export class CreateShift implements OnInit {
       });
   }
 
+  filterEmployeesByRole() {
+    if (!this.shift.roleId) {
+      this.filteredEmployees = this.employees;
+      return;
+    }
+
+    const employeeIdsWithRole = this.employeeRoles
+      .filter(er => er.roleId === this.shift.roleId)
+      .map(er => er.employeeId);
+
+    this.filteredEmployees = this.employees.filter(employee =>
+      employeeIdsWithRole.includes(employee.employeeId)
+    );
+
+    this.shift.employeeId = '';
+  }
+
   addShift() {
-    const request = {
-      startTime: `${this.shift.date}T${this.shift.startTime}:00`,
-      endTime: `${this.shift.date}T${this.shift.endTime}:00`,
-      shiftRequirements: [
-        {
-          roleId: this.shift.roleId,
-          amount: 1
-        }
-      ]
-    };
+    const selectedRoles = this.roleRequirements.filter(role => role.count > 0);
 
-    console.log('REQUEST SENDT:', request);
+    if (selectedRoles.length === 0) {
+      alert('Vælg mindst én rolle');
+      return;
+    }
 
-    this.http.post('http://localhost:5000/api/shifts/', request)
-      .subscribe({
-        next: response => {
-          alert('Vagt oprettet');
-          console.log(response);
-          this.router.navigate(['/shifts']);
-        },
-        error: error => {
-          console.error(error);
-          console.log('ERROR STATUS:', error.status);
-          console.log('ERROR BODY:', error.error);
-          console.log('DATA SENDT:', request);
-          alert('Fejl ved oprettelse af vagt');
-        }
-      });
+    selectedRoles.forEach(role => {
+      for (let i = 0; i < role.count; i++) {
+
+        const request = {
+          startTime: `${this.shift.date}T${this.shift.startTime}:00`,
+          endTime: `${this.shift.date}T${this.shift.endTime}:00`,
+          shiftRequirements: [
+            {
+              roleId: role.roleId,
+              amount: 1
+            }
+          ]
+        };
+
+        this.http.post('http://localhost:5000/api/shifts/', request)
+          .subscribe({
+            next: response => {
+              console.log('Vagt oprettet:', response);
+            },
+            error: error => {
+              console.error(error);
+              alert('Fejl ved oprettelse af vagt');
+            }
+          });
+      }
+    });
+
+    alert('Vagter oprettet');
+    this.router.navigate(['/shifts']);
   }
 }

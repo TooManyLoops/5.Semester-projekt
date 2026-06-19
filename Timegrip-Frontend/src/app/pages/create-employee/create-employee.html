@@ -29,9 +29,9 @@
             <label>Rolle</label>
 
             <select [(ngModel)]="selectedRoleId" name="selectedRoleId">
-                <option value="">Vælg rolle</option>
+                <option [ngValue]="''">Vælg rolle</option>
 
-                <option *ngFor="let role of roles" [value]="role.roleId">
+                <option *ngFor="let role of roles" [ngValue]="role.roleId">
                     {{ role.name }}
                 </option>
             </select>

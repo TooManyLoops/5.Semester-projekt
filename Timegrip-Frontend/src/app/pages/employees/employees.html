@@ -3,7 +3,7 @@
     <div class="page-header">
         <h1>Medarbejdere</h1>
 
-        <button class="add-button" routerLink="/employees/create">
+        <button class="create-button" routerLink="/employees/create">
             Tilføj ny medarbejdere
         </button>
     </div>
@@ -39,7 +39,7 @@
                 <td>{{ emp.firstName }} {{ emp.lastName }}</td>
                 <td>{{ emp.email }}</td>
                 <td>{{ emp.phoneNumber }}</td>
-                <td>{{ emp.rolesText || 'Ingen rolle' }}</td>
+                <td>{{ emp.rolesText }}</td>
                 <td>{{ getStatusText(emp.employeeStatus) }}</td>
                 <td>
                     <button class="edit-button" [routerLink]="['/employees/edit', emp.employeeId]">
@@ -53,11 +53,11 @@
     <div class="pagination">
 
         <button (click)="goToFirstPage()" [disabled]="currentPage === 1">
-            Første
+            ⏮
         </button>
 
         <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">
-            Tilbage
+            ←
         </button>
 
         <span>
@@ -65,11 +65,11 @@
         </span>
 
         <button (click)="goToNextPage()" [disabled]="currentPage === totalPages || totalPages === 0">
-            Frem
+            →
         </button>
 
         <button (click)="goToLastPage()" [disabled]="currentPage === totalPages || totalPages === 0">
-            Sidste
+            ⏭
         </button>
 
     </div>

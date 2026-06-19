@@ -33,28 +33,12 @@
             </select>
         </div>
 
-        <div class="form-row">
-            <label>Rolle</label>
+        <h3>Antal vagter pr. rolle</h3>
 
-            <select [(ngModel)]="shift.roleId" name="roleId">
-                <option value="">Vælg rolle</option>
+        <div class="form-row" *ngFor="let role of roleRequirements">
+            <label>{{ role.roleName }}</label>
 
-                <option *ngFor="let role of roles" [value]="role.roleId">
-                    {{ role.name }}
-                </option>
-            </select>
-        </div>
-
-        <div class="form-row">
-            <label>Medarbejder</label>
-
-            <select [(ngModel)]="shift.employeeId" name="employeeId">
-                <option value="">Ingen medarbejder</option>
-
-                <option *ngFor="let employee of employees" [value]="employee.employeeId">
-                    {{ employee.firstName }} {{ employee.lastName }}
-                </option>
-            </select>
+            <input type="number" min="0" [(ngModel)]="role.count" name="count-{{ role.roleId }}">
         </div>
 
         <div class="button-row">
