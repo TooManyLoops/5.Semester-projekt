@@ -1,6 +1,6 @@
 <div class="page">
 
-    <h1>Tilføj nye medarbejdere</h1>
+    <h1>Tilføj ny medarbejder</h1>
 
     <form class="employee-form" (ngSubmit)="addEmployee()">
 
@@ -19,8 +19,7 @@
             <label>Email</label>
             <div class="field-group">
                 <input type="email" [(ngModel)]="employee.email" name="email"
-                    (ngModelChange)="clearValidationError('email')"
-                    [class.invalid]="validationErrors.email">
+                    (ngModelChange)="clearValidationError('email')" [class.invalid]="validationErrors.email">
                 <span *ngIf="validationErrors.email" class="error-message">
                     {{ validationErrors.email }}
                 </span>
@@ -31,8 +30,7 @@
             <label>Phone number</label>
             <div class="field-group">
                 <input type="text" [(ngModel)]="employee.phoneNumber" name="phoneNumber"
-                    (ngModelChange)="clearValidationError('phoneNumber')"
-                    [class.invalid]="validationErrors.phoneNumber"
+                    (ngModelChange)="clearValidationError('phoneNumber')" [class.invalid]="validationErrors.phoneNumber"
                     inputmode="numeric" maxlength="8">
                 <span *ngIf="validationErrors.phoneNumber" class="error-message">
                     {{ validationErrors.phoneNumber }}
