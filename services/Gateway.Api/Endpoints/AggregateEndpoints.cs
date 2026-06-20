@@ -103,14 +103,6 @@ public static class AggregateEndpoints
                         );
                         return result.IsValid ? Results.Ok(result) : Results.BadRequest(result);
                     }
-                    catch (InvalidDataException exception)
-                    {
-                        return Results.BadRequest(new { Message = exception.Message });
-                    }
-                    catch (InvalidOperationException exception)
-                    {
-                        return Results.BadRequest(new { Message = exception.Message });
-                    }
                     catch (Exception exception) when (TryMapGatewayException(exception, out var mapped))
                     {
                         return mapped;

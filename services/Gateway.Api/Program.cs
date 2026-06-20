@@ -31,6 +31,14 @@ builder.Services
     .AddHttpMessageHandler<DownstreamLoggingHandler>()
     .AddStandardResilienceHandler();
 
+builder.Services
+    .AddHttpClient<ImportApiClient>(client =>
+    {
+        client.BaseAddress = new Uri(GetServiceBaseUrl("IMPORT_API_URL", "http://localhost:5003"));
+    })
+    .AddHttpMessageHandler<DownstreamLoggingHandler>()
+    .AddStandardResilienceHandler();
+
 // Named clients are used by proxy routes to preserve existing CRUD endpoints through the gateway.
 builder.Services
     .AddHttpClient("EmployeesProxy", client =>

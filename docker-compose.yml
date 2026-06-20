@@ -31,11 +31,27 @@ services:
       FRONTEND_ORIGIN: "http://localhost:62892;http://127.0.0.1:62892"
       EMPLOYEES_API_URL: "http://employees-api:8080"
       SHIFTS_API_URL: "http://shifts-api:8080"
+      IMPORT_API_URL: "http://import-api:8080"
     ports:
       - "5000:8080"
     depends_on:
       - employees-api
       - shifts-api
+      - import-api
+    networks:
+      - backend
+
+  import-api:
+    build:
+      context: .
+      dockerfile: services/Import.Api/Dockerfile
+    container_name: import-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "5003:8080"
     networks:
       - backend
 

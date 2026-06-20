@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="services/Gateway.Api/Gateway.Api.csproj" />
+  <Project Path="services/Import.Api/Import.Api.csproj" />
   <Project Path="services/Employees.Api/Employees.Api.csproj" />
   <Project Path="services/Shifts.Api/Shifts.Api.csproj" />
   <Project Path="tests/Gateway.Api.Tests/Gateway.Api.Tests.csproj" />

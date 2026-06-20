@@ -1,6 +1,6 @@
-using Timegrip.Gateway.Api.Aggregation.Responses;
+using Timegrip.Import.Api.Responses;
 
-namespace Timegrip.Gateway.Api.Aggregation.Services;
+namespace Timegrip.Import.Api.Models;
 
 internal sealed class ShiftImportParseResult
 {

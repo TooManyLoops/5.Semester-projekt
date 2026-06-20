@@ -3,7 +3,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace Timegrip.Gateway.Api.Aggregation.Services;
+namespace Timegrip.Import.Api.Services;
 
 internal static partial class XlsxWorksheetReader
 {

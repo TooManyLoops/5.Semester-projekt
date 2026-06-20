@@ -1,5 +1,6 @@
-namespace Timegrip.Gateway.Api.Aggregation.Responses;
+namespace Timegrip.Import.Api.Responses;
 
+// Result returned to Gateway.Api after validating an Excel shift import.
 public sealed class ShiftImportResponse
 {
     public int ParsedRows { get; set; }
@@ -13,5 +14,7 @@ public sealed class ShiftImportResponse
     public List<string> UnknownRoles { get; set; } = [];
     public List<ShiftImportRowErrorResponse> Warnings { get; set; } = [];
     public List<ShiftImportRowErrorResponse> Errors { get; set; } = [];
+    public List<ImportedShiftResponse> ParsedShifts { get; set; } = [];
+
     public bool IsValid => UnknownRoles.Count == 0 && Errors.Count == 0;
 }

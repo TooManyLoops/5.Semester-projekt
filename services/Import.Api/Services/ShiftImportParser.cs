@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text;
-using Timegrip.Gateway.Api.Aggregation.Responses;
-using Timegrip.Gateway.Api.Downstream.Models;
-using Timegrip.Gateway.Api.Downstream.Requests;
+using Timegrip.Import.Api.Models;
+using Timegrip.Import.Api.Requests;
+using Timegrip.Import.Api.Responses;
 
-namespace Timegrip.Gateway.Api.Aggregation.Services;
+namespace Timegrip.Import.Api.Services;
 
 internal static class ShiftImportParser
 {
@@ -63,7 +63,7 @@ internal static class ShiftImportParser
 
     public static ShiftImportParseResult Parse(
         List<List<string>> rows,
-        IReadOnlyCollection<RoleDto> roles
+        IReadOnlyCollection<RoleReferenceRequest> roles
     )
     {
         var result = new ShiftImportParseResult();
@@ -156,7 +156,7 @@ internal static class ShiftImportParser
     private static List<RoleColumn> GetRoleColumns(
         IReadOnlyList<string> headers,
         IReadOnlyList<string> normalizedHeaders,
-        IReadOnlyCollection<RoleDto> roles
+        IReadOnlyCollection<RoleReferenceRequest> roles
     )
     {
         var rolesByName = roles
@@ -202,14 +202,14 @@ internal static class ShiftImportParser
         return unknownRoles;
     }
 
-    private static List<ShiftRequirementDownstreamRequest> GetRequirements(
+    private static List<ImportedShiftRequirement> GetRequirements(
         IReadOnlyList<string> row,
         IReadOnlyCollection<RoleColumn> roleColumns,
         int rowNumber,
         List<ShiftImportRowErrorResponse> errors
     )
     {
-        var requirements = new List<ShiftRequirementDownstreamRequest>();
+        var requirements = new List<ImportedShiftRequirement>();
 
         foreach (var roleColumn in roleColumns)
         {
@@ -229,7 +229,7 @@ internal static class ShiftImportParser
                 continue;
             }
 
-            requirements.Add(new ShiftRequirementDownstreamRequest
+            requirements.Add(new ImportedShiftRequirement
             {
                 RoleId = roleColumn.Role.RoleId,
                 Amount = amount,
@@ -349,5 +349,5 @@ internal static class ShiftImportParser
         return builder.ToString();
     }
 
-    private sealed record RoleColumn(int Index, string Header, RoleDto Role);
+    private sealed record RoleColumn(int Index, string Header, RoleReferenceRequest Role);
 }
