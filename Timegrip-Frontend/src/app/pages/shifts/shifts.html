@@ -51,7 +51,8 @@
 
             <label *ngIf="loggedInRole === 'leader'" class="import-button">
                 {{ isImportingShifts ? 'Importerer...' : 'Upload Excel' }}
-                <input type="file" accept=".xlsx" [disabled]="isImportingShifts" (click)="clearShiftImportInput($event)" (change)="importShifts($event)">
+                <input type="file" accept=".xlsx" [disabled]="isImportingShifts" (click)="clearShiftImportInput($event)"
+                    (change)="importShifts($event)">
             </label>
 
             <button *ngIf="loggedInRole === 'leader'" class="create-button" type="button" routerLink="/shifts/create">
@@ -565,6 +566,36 @@
             <div class="legend-item">
                 <span class="legend-color opvasker"></span>
                 <span>Opvasker</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color Lukkeansvarlig"></span>
+                <span>7001 - Lukkeansvarlig</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color Lukkeansvarlig_p80"></span>
+                <span>7001 - Lukkeansvarlig_p80</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color Salgsassistent"></span>
+                <span>7002 - Salgsassistent</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color Salgsassistent_p80"></span>
+                <span>7002 - Salgsassistent_p80</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color Butiksassistent_u-18år"></span>
+                <span>7003 - Butiksassistent u-18 år</span>
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-color Butiksassistent_u-18_år_p80"></span>
+                <span>7003 - Butiksassistent u-18 år_p80</span>
             </div>
 
         </div>

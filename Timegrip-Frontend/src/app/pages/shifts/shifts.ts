@@ -487,6 +487,24 @@ export class Shifts implements OnInit {
       case 'Opvasker':
         return '#f8efd4';
 
+      case '7001 - Lukkeansvarlig':
+        return '#b4c6ef';
+
+      case '7001 - Lukkeansvarlig_p80':
+        return '#f9c2ed';
+
+      case '7002 - Salgsassistent':
+        return '#f8ba91';
+
+      case '7002 - Salgsassistent_p80':
+        return '#aaf0aa';
+
+      case '7003 - Butiksassistent u-18 år':
+        return '#de9cfa';
+
+      case '7003 - Butiksassistent u-18 år_p80':
+        return '#f78989';
+
       default:
         return '#6f83b8';
     }
