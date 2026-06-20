@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Timegrip.Import.Api.Requests;
 using Timegrip.Import.Api.Services;
 
@@ -14,8 +15,8 @@ public static class ImportEndpoints
                 "/shifts/parse",
                 async (
                     ShiftImportService service,
-                    IFormFile file,
-                    string roles,
+                    [FromForm] IFormFile file,
+                    [FromForm] string roles,
                     CancellationToken cancellationToken
                 ) =>
                 {

@@ -44,13 +44,13 @@ public sealed class ImportApiClient(HttpClient httpClient)
             cancellationToken
         );
 
-        var result = await response.Content.ReadFromJsonAsync<ShiftImportParseResponse>(
-            DownstreamJson.Options,
-            cancellationToken
-        );
-
         if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest)
         {
+            var result = await response.Content.ReadFromJsonAsync<ShiftImportParseResponse>(
+                DownstreamJson.Options,
+                cancellationToken
+            );
+
             return result
                 ?? throw new DownstreamApiException(
                     ServiceName,
