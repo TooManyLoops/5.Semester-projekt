@@ -31,6 +31,13 @@ BEGIN TRY
     DECLARE @KokRoleId uniqueidentifier;
     DECLARE @TjenerRoleId uniqueidentifier;
     DECLARE @OpvaskerRoleId uniqueidentifier;
+    DECLARE @LukkeansvarligRoleId uniqueidentifier;
+    DECLARE @Lukkeansvarligp80RoleId uniqueidentifier;
+    DECLARE @SalgsassistentRoleId uniqueidentifier;
+    DECLARE @Salgsassistentp80RoleId uniqueidentifier;
+    DECLARE @ButiksassistentRoleId uniqueidentifier;
+    DECLARE @Butiksassistentp80RoleId uniqueidentifier;
+
 
     DECLARE @Employees TABLE (
         [employeeNumber] int IDENTITY(1,1) NOT NULL,
@@ -74,28 +81,39 @@ BEGIN TRY
     WHERE [role_name] = N'Opvasker'
     ORDER BY [role_Id];
 
+    SELECT TOP (1) @LukkeansvarligRoleId = [role_Id]
+    FROM [EmployeeDB].[Employee].[Roles]
+    WHERE [role_name] = N'7001 - Lukkeansvarlig'
+    ORDER BY [role_Id];
+
+    SELECT TOP (1) @Salgsassistentp80RoleId = [role_Id]
+    FROM [EmployeeDB].[Employee].[Roles]
+    WHERE [role_name] = N'7002 - Salgsassistent_p80'
+    ORDER BY [role_Id];
+
+    SELECT TOP (1) @SalgsassistentRoleId = [role_Id]
+    FROM [EmployeeDB].[Employee].[Roles]
+    WHERE [role_name] = N'7002 - Salgsassistent'
+    ORDER BY [role_Id];
+
+    SELECT TOP (1) @ButiksassistentRoleId = [role_Id]
+    FROM [EmployeeDB].[Employee].[Roles]
+    WHERE [role_name] = N'7003 - Butiksassistent u-18 år'
+    ORDER BY [role_Id];
+
+    SELECT TOP (1) @Butiksassistentp80RoleId = [role_Id]
+    FROM [EmployeeDB].[Employee].[Roles]
+    WHERE [role_name] = N'7003 - Butiksassistent u-18 år_p80'
+    ORDER BY [role_Id];
+
+    SELECT TOP (1) @Lukkeansvarligp80RoleId = [role_Id]
+    FROM [EmployeeDB].[Employee].[Roles]
+    WHERE [role_name] = N'7001 - Lukkeansvarlig_p80'
+    ORDER BY [role_Id]
+
     IF @KokRoleId IS NULL OR @TjenerRoleId IS NULL OR @OpvaskerRoleId IS NULL
     BEGIN
         THROW 51000, 'Rollerne Kok, Tjener og Opvasker skal findes i [EmployeeDB].[Employee].[Roles]. Rollelisten bliver ikke aendret af dette script.', 1;
-    END;
-
-    IF EXISTS (
-        SELECT 1
-        FROM (
-            VALUES
-                (CONVERT(uniqueidentifier, '38955A85-4E36-46B3-AE78-2B9A5DE58345')),
-                (CONVERT(uniqueidentifier, 'A21E62BF-35DF-4FD6-A887-8EA4A38336C8')),
-                (CONVERT(uniqueidentifier, '90250EBC-11EA-42C3-AFBF-C72AF647E694')),
-                (CONVERT(uniqueidentifier, '8FA308C1-C508-4ADF-92AB-437FED318AC3')),
-                (CONVERT(uniqueidentifier, 'CFD0EF63-63AE-4764-A58D-DB7502B42C82')),
-                (CONVERT(uniqueidentifier, '34098948-2F4A-4753-8709-DBC3C79FC3E5')),
-                (CONVERT(uniqueidentifier, '4D63BE12-7270-4131-B1C8-87845B74B612'))
-        ) AS requiredRoles ([role_Id])
-        LEFT JOIN [EmployeeDB].[Employee].[Roles] r ON r.[role_Id] = requiredRoles.[role_Id]
-        WHERE r.[role_Id] IS NULL
-    )
-    BEGIN
-        THROW 51001, 'En eller flere af de angivne rolle-ider findes ikke i [EmployeeDB].[Employee].[Roles].', 1;
     END;
 
     IF OBJECT_ID(N'[ShiftDB].[Shift].[ShiftAssignments]', N'U') IS NOT NULL
@@ -140,20 +158,20 @@ BEGIN TRY
         (NEWID(), NEWID(), N'Alma', N'Bak', N'abak@hotmail.com', N'13579247', @OpvaskerRoleId),
         (NEWID(), NEWID(), N'William', N'Lind', N'wlind@yahoo.com', N'24681359', @OpvaskerRoleId),
         (NEWID(), NEWID(), N'Clara', N'Nygaard', N'cnygaard@gmail.com', N'35792460', @OpvaskerRoleId),
-        (NEWID(), NEWID(), N'Anders', N'Jensen', N'ajensen@hotmail.com', N'46813579', CONVERT(uniqueidentifier, '38955A85-4E36-46B3-AE78-2B9A5DE58345')),
-        (NEWID(), NEWID(), N'Maria', N'Hansen', N'mhansen@gmail.com', N'57924681', CONVERT(uniqueidentifier, '38955A85-4E36-46B3-AE78-2B9A5DE58345')),
-        (NEWID(), NEWID(), N'Jonas', N'Pedersen', N'jpedersen@yahoo.com', N'68135794', CONVERT(uniqueidentifier, 'A21E62BF-35DF-4FD6-A887-8EA4A38336C8')),
-        (NEWID(), NEWID(), N'Sofia', N'Christensen', N'schristensen@gmail.com', N'79246815', CONVERT(uniqueidentifier, 'A21E62BF-35DF-4FD6-A887-8EA4A38336C8')),
-        (NEWID(), NEWID(), N'Mikkel', N'Larsen', N'mlarsen@hotmail.com', N'81357926', CONVERT(uniqueidentifier, '90250EBC-11EA-42C3-AFBF-C72AF647E694')),
-        (NEWID(), NEWID(), N'Laura', N'Rasmussen', N'lrasmussen@yahoo.com', N'92468137', CONVERT(uniqueidentifier, '90250EBC-11EA-42C3-AFBF-C72AF647E694')),
-        (NEWID(), NEWID(), N'Emil', N'Andersen', N'eandersen@gmail.com', N'13579248', CONVERT(uniqueidentifier, '8FA308C1-C508-4ADF-92AB-437FED318AC3')),
-        (NEWID(), NEWID(), N'Nina', N'Madsen', N'nmadsen@hotmail.com', N'24681357', CONVERT(uniqueidentifier, '8FA308C1-C508-4ADF-92AB-437FED318AC3')),
-        (NEWID(), NEWID(), N'Kasper', N'Nielsen', N'knielsen@yahoo.com', N'35792468', CONVERT(uniqueidentifier, 'CFD0EF63-63AE-4764-A58D-DB7502B42C82')),
-        (NEWID(), NEWID(), N'Sarah', N'Sorensen', N'ssorensen@gmail.com', N'46813570', CONVERT(uniqueidentifier, 'CFD0EF63-63AE-4764-A58D-DB7502B42C82')),
-        (NEWID(), NEWID(), N'Oscar', N'Poulsen', N'opoulsen@hotmail.com', N'57924682', CONVERT(uniqueidentifier, '34098948-2F4A-4753-8709-DBC3C79FC3E5')),
-        (NEWID(), NEWID(), N'Caroline', N'Madsen', N'cmadsen@gmail.com', N'68135793', CONVERT(uniqueidentifier, '34098948-2F4A-4753-8709-DBC3C79FC3E5')),
-        (NEWID(), NEWID(), N'Tobias', N'Christiansen', N'tchristiansen@hotmail.com', N'79246814', CONVERT(uniqueidentifier, '4D63BE12-7270-4131-B1C8-87845B74B612')),
-        (NEWID(), NEWID(), N'Amalie', N'Rasmussen', N'arasmussen@yahoo.com', N'81357925', CONVERT(uniqueidentifier, '4D63BE12-7270-4131-B1C8-87845B74B612')),
+        (NEWID(), NEWID(), N'Anders', N'Jensen', N'ajensen@hotmail.com', N'46813579', @LukkeansvarligRoleId),
+        (NEWID(), NEWID(), N'Maria', N'Hansen', N'mhansen@gmail.com', N'57924681', @LukkeansvarligRoleId),
+        (NEWID(), NEWID(), N'Jonas', N'Pedersen', N'jpedersen@yahoo.com', N'68135794', @Lukkeansvarligp80RoleId),
+        (NEWID(), NEWID(), N'Sofia', N'Christensen', N'schristensen@gmail.com', N'79246815', @Lukkeansvarligp80RoleId),
+        (NEWID(), NEWID(), N'Mikkel', N'Larsen', N'mlarsen@hotmail.com', N'81357926', @SalgsassistentRoleId),
+        (NEWID(), NEWID(), N'Laura', N'Rasmussen', N'lrasmussen@yahoo.com', N'92468137', @SalgsassistentRoleId),
+        (NEWID(), NEWID(), N'Emil', N'Andersen', N'eandersen@gmail.com', N'13579248', @Salgsassistentp80RoleId),
+        (NEWID(), NEWID(), N'Nina', N'Madsen', N'nmadsen@hotmail.com', N'24681357', @Salgsassistentp80RoleId),
+        (NEWID(), NEWID(), N'Kasper', N'Nielsen', N'knielsen@yahoo.com', N'35792468', @ButiksassistentRoleId),
+        (NEWID(), NEWID(), N'Sarah', N'Sorensen', N'ssorensen@gmail.com', N'46813570', @ButiksassistentRoleId),
+        (NEWID(), NEWID(), N'Oscar', N'Poulsen', N'opoulsen@hotmail.com', N'57924682', @Butiksassistentp80RoleId),
+        (NEWID(), NEWID(), N'Caroline', N'Madsen', N'cmadsen@gmail.com', N'68135793', @Butiksassistentp80RoleId),
+        (NEWID(), NEWID(), N'Tobias', N'Christiansen', N'tchristiansen@hotmail.com', N'79246814', @Butiksassistentp80RoleId),
+        (NEWID(), NEWID(), N'Amalie', N'Rasmussen', N'arasmussen@yahoo.com', N'81357925', @LukkeansvarligRoleId),
         (NEWID(), NEWID(), N'Mikkel', N'Ostergaard', N'mostergaard@hotmail.com', N'92468138', @OpvaskerRoleId);
 
     INSERT INTO [EmployeeDB].[Employee].[Employees] (
@@ -181,7 +199,8 @@ BEGIN TRY
         [role_Id],
         [isPrimary]
     )
-    SELECT
+   
+   SELECT
         [employeeRole_Id],
         [employee_Id],
         [role_Id],
