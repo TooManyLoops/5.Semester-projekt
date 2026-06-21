@@ -5,8 +5,8 @@
     - Deletes shifts, shift requirements, shift assignments, employees,
       employments, and employee-role links.
     - Does not insert, update, or delete rows in [EmployeeDB].[Employee].[Roles].
-    - Creates 35 realistic demo employees.
-    - Assigns employees only to Kok, Tjener, and Opvasker.
+    - Creates 29 realistic demo employees.
+    - Gives each of the selected non-schedule roles at least two employees.
     - Keeps the login employee id from login.ts and assigns that employee to Kok.
     - Creates assigned shifts for ISO weeks 25, 26, and 27 of 2026.
     - Uses 5-8 employees per week in the schedule, with some employees
@@ -40,11 +40,7 @@ BEGIN TRY
         [lastName] nvarchar(100) NOT NULL,
         [email] nvarchar(255) NOT NULL,
         [phoneNr] nvarchar(20) NOT NULL,
-        [role_name] nvarchar(100) NOT NULL
-    );
-
-    DECLARE @ShiftDates TABLE (
-        [workDate] date NOT NULL
+        [role_Id] uniqueidentifier NOT NULL
     );
 
     DECLARE @ShiftSeeds TABLE (
@@ -83,6 +79,25 @@ BEGIN TRY
         THROW 51000, 'Rollerne Kok, Tjener og Opvasker skal findes i [EmployeeDB].[Employee].[Roles]. Rollelisten bliver ikke aendret af dette script.', 1;
     END;
 
+    IF EXISTS (
+        SELECT 1
+        FROM (
+            VALUES
+                (CONVERT(uniqueidentifier, '38955A85-4E36-46B3-AE78-2B9A5DE58345')),
+                (CONVERT(uniqueidentifier, 'A21E62BF-35DF-4FD6-A887-8EA4A38336C8')),
+                (CONVERT(uniqueidentifier, '90250EBC-11EA-42C3-AFBF-C72AF647E694')),
+                (CONVERT(uniqueidentifier, '8FA308C1-C508-4ADF-92AB-437FED318AC3')),
+                (CONVERT(uniqueidentifier, 'CFD0EF63-63AE-4764-A58D-DB7502B42C82')),
+                (CONVERT(uniqueidentifier, '34098948-2F4A-4753-8709-DBC3C79FC3E5')),
+                (CONVERT(uniqueidentifier, '4D63BE12-7270-4131-B1C8-87845B74B612'))
+        ) AS requiredRoles ([role_Id])
+        LEFT JOIN [EmployeeDB].[Employee].[Roles] r ON r.[role_Id] = requiredRoles.[role_Id]
+        WHERE r.[role_Id] IS NULL
+    )
+    BEGIN
+        THROW 51001, 'En eller flere af de angivne rolle-ider findes ikke i [EmployeeDB].[Employee].[Roles].', 1;
+    END;
+
     IF OBJECT_ID(N'[ShiftDB].[Shift].[ShiftAssignments]', N'U') IS NOT NULL
         DELETE FROM [ShiftDB].[Shift].[ShiftAssignments];
 
@@ -108,44 +123,38 @@ BEGIN TRY
         [lastName],
         [email],
         [phoneNr],
-        [role_name]
+        [role_Id]
     )
     VALUES
-        (@LoginEmployeeId, @LoginEmployeeRoleId, N'Stefan', N'Kokholm', N'skokholm@gmail.com', N'22554411', N'Kok'),
-        (NEWID(), NEWID(), N'Maja', N'Lund', N'mlund@hotmail.com', N'28741152', N'Kok'),
-        (NEWID(), NEWID(), N'Nikolaj', N'Berg', N'nberg@yahoo.com', N'31458967', N'Kok'),
-        (NEWID(), NEWID(), N'Frederik', N'Holm', N'fholm@gmail.com', N'42617385', N'Kok'),
-        (NEWID(), NEWID(), N'Camilla', N'Iversen', N'civersen@hotmail.com', N'53628419', N'Kok'),
-        (NEWID(), NEWID(), N'Oliver', N'Kruse', N'okruse@yahoo.com', N'61739528', N'Kok'),
-        (NEWID(), NEWID(), N'Line', N'Vestergaard', N'lvestergaard@gmail.com', N'72841639', N'Kok'),
-        (NEWID(), NEWID(), N'Rasmus', N'Moller', N'rmoller@hotmail.com', N'83952741', N'Kok'),
-        (NEWID(), NEWID(), N'Julie', N'Brandt', N'jbrandt@yahoo.com', N'24681357', N'Kok'),
-        (NEWID(), NEWID(), N'Mathias', N'Dahl', N'mdahl@gmail.com', N'35792468', N'Kok'),
-        (NEWID(), NEWID(), N'Sara', N'Friis', N'sfriis@hotmail.com', N'46813579', N'Kok'),
-        (NEWID(), NEWID(), N'Thomas', N'Skov', N'tskov@yahoo.com', N'57924681', N'Kok'),
-        (NEWID(), NEWID(), N'Emma', N'Nielsen', N'enielsen@gmail.com', N'68135792', N'Tjener'),
-        (NEWID(), NEWID(), N'Lucas', N'Hansen', N'lhansen@hotmail.com', N'79246813', N'Tjener'),
-        (NEWID(), NEWID(), N'Sofie', N'Larsen', N'slarsen@yahoo.com', N'81357924', N'Tjener'),
-        (NEWID(), NEWID(), N'Victor', N'Andersen', N'vandersen@gmail.com', N'92468135', N'Tjener'),
-        (NEWID(), NEWID(), N'Ida', N'Pedersen', N'ipedersen@hotmail.com', N'13579246', N'Tjener'),
-        (NEWID(), NEWID(), N'Malthe', N'Jensen', N'mjensen@yahoo.com', N'24681358', N'Tjener'),
-        (NEWID(), NEWID(), N'Caroline', N'Madsen', N'cmadsen@gmail.com', N'35792469', N'Tjener'),
-        (NEWID(), NEWID(), N'Tobias', N'Christiansen', N'tchristiansen@hotmail.com', N'46813570', N'Tjener'),
-        (NEWID(), NEWID(), N'Amalie', N'Rasmussen', N'arasmussen@yahoo.com', N'57924682', N'Tjener'),
-        (NEWID(), NEWID(), N'Magnus', N'Sorensen', N'msorensen@gmail.com', N'68135793', N'Tjener'),
-        (NEWID(), NEWID(), N'Freja', N'Thomsen', N'fthomsen@hotmail.com', N'79246814', N'Tjener'),
-        (NEWID(), NEWID(), N'Anton', N'Knudsen', N'aknudsen@yahoo.com', N'81357925', N'Tjener'),
-        (NEWID(), NEWID(), N'Noah', N'Eriksen', N'neriksen@gmail.com', N'92468136', N'Opvasker'),
-        (NEWID(), NEWID(), N'Alma', N'Bak', N'abak@hotmail.com', N'13579247', N'Opvasker'),
-        (NEWID(), NEWID(), N'William', N'Lind', N'wlind@yahoo.com', N'24681359', N'Opvasker'),
-        (NEWID(), NEWID(), N'Clara', N'Nygaard', N'cnygaard@gmail.com', N'35792460', N'Opvasker'),
-        (NEWID(), NEWID(), N'Oscar', N'Poulsen', N'opoulsen@hotmail.com', N'46813571', N'Opvasker'),
-        (NEWID(), NEWID(), N'Laura', N'Schmidt', N'lschmidt@yahoo.com', N'57924683', N'Opvasker'),
-        (NEWID(), NEWID(), N'Elias', N'Lauridsen', N'elauridsen@gmail.com', N'68135794', N'Opvasker'),
-        (NEWID(), NEWID(), N'Anna', N'Frost', N'afrost@hotmail.com', N'79246815', N'Opvasker'),
-        (NEWID(), NEWID(), N'Emil', N'Jakobsen', N'ejakobsen@yahoo.com', N'81357926', N'Opvasker'),
-        (NEWID(), NEWID(), N'Josefine', N'Bjerre', N'jbjerre@gmail.com', N'92468137', N'Opvasker'),
-        (NEWID(), NEWID(), N'Mikkel', N'Ostergaard', N'mostergaard@hotmail.com', N'13579248', N'Opvasker');
+        (@LoginEmployeeId, @LoginEmployeeRoleId, N'Stefan', N'Kokholm', N'skokholm@gmail.com', N'22554411', @KokRoleId),
+        (NEWID(), NEWID(), N'Maja', N'Lund', N'mlund@hotmail.com', N'28741152', @KokRoleId),
+        (NEWID(), NEWID(), N'Nikolaj', N'Berg', N'nberg@yahoo.com', N'31458967', @KokRoleId),
+        (NEWID(), NEWID(), N'Frederik', N'Holm', N'fholm@gmail.com', N'42617385', @KokRoleId),
+        (NEWID(), NEWID(), N'Camilla', N'Iversen', N'civersen@hotmail.com', N'53628419', @KokRoleId),
+        (NEWID(), NEWID(), N'Emma', N'Nielsen', N'enielsen@gmail.com', N'68135792', @TjenerRoleId),
+        (NEWID(), NEWID(), N'Lucas', N'Hansen', N'lhansen@hotmail.com', N'79246813', @TjenerRoleId),
+        (NEWID(), NEWID(), N'Sofie', N'Larsen', N'slarsen@yahoo.com', N'81357924', @TjenerRoleId),
+        (NEWID(), NEWID(), N'Victor', N'Andersen', N'vandersen@gmail.com', N'92468135', @TjenerRoleId),
+        (NEWID(), NEWID(), N'Ida', N'Pedersen', N'ipedersen@hotmail.com', N'13579246', @TjenerRoleId),
+        (NEWID(), NEWID(), N'Noah', N'Eriksen', N'neriksen@gmail.com', N'92468136', @OpvaskerRoleId),
+        (NEWID(), NEWID(), N'Alma', N'Bak', N'abak@hotmail.com', N'13579247', @OpvaskerRoleId),
+        (NEWID(), NEWID(), N'William', N'Lind', N'wlind@yahoo.com', N'24681359', @OpvaskerRoleId),
+        (NEWID(), NEWID(), N'Clara', N'Nygaard', N'cnygaard@gmail.com', N'35792460', @OpvaskerRoleId),
+        (NEWID(), NEWID(), N'Anders', N'Jensen', N'ajensen@hotmail.com', N'46813579', CONVERT(uniqueidentifier, '38955A85-4E36-46B3-AE78-2B9A5DE58345')),
+        (NEWID(), NEWID(), N'Maria', N'Hansen', N'mhansen@gmail.com', N'57924681', CONVERT(uniqueidentifier, '38955A85-4E36-46B3-AE78-2B9A5DE58345')),
+        (NEWID(), NEWID(), N'Jonas', N'Pedersen', N'jpedersen@yahoo.com', N'68135794', CONVERT(uniqueidentifier, 'A21E62BF-35DF-4FD6-A887-8EA4A38336C8')),
+        (NEWID(), NEWID(), N'Sofia', N'Christensen', N'schristensen@gmail.com', N'79246815', CONVERT(uniqueidentifier, 'A21E62BF-35DF-4FD6-A887-8EA4A38336C8')),
+        (NEWID(), NEWID(), N'Mikkel', N'Larsen', N'mlarsen@hotmail.com', N'81357926', CONVERT(uniqueidentifier, '90250EBC-11EA-42C3-AFBF-C72AF647E694')),
+        (NEWID(), NEWID(), N'Laura', N'Rasmussen', N'lrasmussen@yahoo.com', N'92468137', CONVERT(uniqueidentifier, '90250EBC-11EA-42C3-AFBF-C72AF647E694')),
+        (NEWID(), NEWID(), N'Emil', N'Andersen', N'eandersen@gmail.com', N'13579248', CONVERT(uniqueidentifier, '8FA308C1-C508-4ADF-92AB-437FED318AC3')),
+        (NEWID(), NEWID(), N'Nina', N'Madsen', N'nmadsen@hotmail.com', N'24681357', CONVERT(uniqueidentifier, '8FA308C1-C508-4ADF-92AB-437FED318AC3')),
+        (NEWID(), NEWID(), N'Kasper', N'Nielsen', N'knielsen@yahoo.com', N'35792468', CONVERT(uniqueidentifier, 'CFD0EF63-63AE-4764-A58D-DB7502B42C82')),
+        (NEWID(), NEWID(), N'Sarah', N'Sorensen', N'ssorensen@gmail.com', N'46813570', CONVERT(uniqueidentifier, 'CFD0EF63-63AE-4764-A58D-DB7502B42C82')),
+        (NEWID(), NEWID(), N'Oscar', N'Poulsen', N'opoulsen@hotmail.com', N'57924682', CONVERT(uniqueidentifier, '34098948-2F4A-4753-8709-DBC3C79FC3E5')),
+        (NEWID(), NEWID(), N'Caroline', N'Madsen', N'cmadsen@gmail.com', N'68135793', CONVERT(uniqueidentifier, '34098948-2F4A-4753-8709-DBC3C79FC3E5')),
+        (NEWID(), NEWID(), N'Tobias', N'Christiansen', N'tchristiansen@hotmail.com', N'79246814', CONVERT(uniqueidentifier, '4D63BE12-7270-4131-B1C8-87845B74B612')),
+        (NEWID(), NEWID(), N'Amalie', N'Rasmussen', N'arasmussen@yahoo.com', N'81357925', CONVERT(uniqueidentifier, '4D63BE12-7270-4131-B1C8-87845B74B612')),
+        (NEWID(), NEWID(), N'Mikkel', N'Ostergaard', N'mostergaard@hotmail.com', N'92468138', @OpvaskerRoleId);
 
     INSERT INTO [EmployeeDB].[Employee].[Employees] (
         [employee_Id],
@@ -173,15 +182,11 @@ BEGIN TRY
         [isPrimary]
     )
     SELECT
-        e.[employeeRole_Id],
-        e.[employee_Id],
-        CASE e.[role_name]
-            WHEN N'Kok' THEN @KokRoleId
-            WHEN N'Tjener' THEN @TjenerRoleId
-            WHEN N'Opvasker' THEN @OpvaskerRoleId
-        END,
+        [employeeRole_Id],
+        [employee_Id],
+        [role_Id],
         1
-    FROM @Employees e;
+    FROM @Employees;
 
     INSERT INTO @ShiftSeeds (
         [shift_Id],
@@ -191,31 +196,29 @@ BEGIN TRY
     )
     VALUES
         (NEWID(), 1, CONVERT(datetime2, '2026-06-15T08:00:00'), CONVERT(datetime2, '2026-06-15T16:00:00')),
-        (NEWID(), 13, CONVERT(datetime2, '2026-06-15T11:00:00'), CONVERT(datetime2, '2026-06-15T19:00:00')),
-        (NEWID(), 25, CONVERT(datetime2, '2026-06-16T12:00:00'), CONVERT(datetime2, '2026-06-16T20:00:00')),
+        (NEWID(), 6, CONVERT(datetime2, '2026-06-15T11:00:00'), CONVERT(datetime2, '2026-06-15T19:00:00')),
+        (NEWID(), 11, CONVERT(datetime2, '2026-06-16T12:00:00'), CONVERT(datetime2, '2026-06-16T20:00:00')),
         (NEWID(), 2, CONVERT(datetime2, '2026-06-17T08:00:00'), CONVERT(datetime2, '2026-06-17T16:00:00')),
         (NEWID(), 1, CONVERT(datetime2, '2026-06-18T08:00:00'), CONVERT(datetime2, '2026-06-18T16:00:00')),
-        (NEWID(), 14, CONVERT(datetime2, '2026-06-19T11:00:00'), CONVERT(datetime2, '2026-06-19T19:00:00')),
-        (NEWID(), 26, CONVERT(datetime2, '2026-06-20T12:00:00'), CONVERT(datetime2, '2026-06-20T20:00:00')),
-        (NEWID(), 15, CONVERT(datetime2, '2026-06-21T11:00:00'), CONVERT(datetime2, '2026-06-21T19:00:00')),
-
+        (NEWID(), 7, CONVERT(datetime2, '2026-06-19T11:00:00'), CONVERT(datetime2, '2026-06-19T19:00:00')),
+        (NEWID(), 12, CONVERT(datetime2, '2026-06-20T12:00:00'), CONVERT(datetime2, '2026-06-20T20:00:00')),
+        (NEWID(), 8, CONVERT(datetime2, '2026-06-21T11:00:00'), CONVERT(datetime2, '2026-06-21T19:00:00')),
         (NEWID(), 1, CONVERT(datetime2, '2026-06-22T08:00:00'), CONVERT(datetime2, '2026-06-22T16:00:00')),
-        (NEWID(), 16, CONVERT(datetime2, '2026-06-22T11:00:00'), CONVERT(datetime2, '2026-06-22T19:00:00')),
-        (NEWID(), 27, CONVERT(datetime2, '2026-06-23T12:00:00'), CONVERT(datetime2, '2026-06-23T20:00:00')),
+        (NEWID(), 9, CONVERT(datetime2, '2026-06-22T11:00:00'), CONVERT(datetime2, '2026-06-22T19:00:00')),
+        (NEWID(), 13, CONVERT(datetime2, '2026-06-23T12:00:00'), CONVERT(datetime2, '2026-06-23T20:00:00')),
         (NEWID(), 3, CONVERT(datetime2, '2026-06-24T08:00:00'), CONVERT(datetime2, '2026-06-24T16:00:00')),
         (NEWID(), 1, CONVERT(datetime2, '2026-06-25T08:00:00'), CONVERT(datetime2, '2026-06-25T16:00:00')),
-        (NEWID(), 17, CONVERT(datetime2, '2026-06-26T11:00:00'), CONVERT(datetime2, '2026-06-26T19:00:00')),
-        (NEWID(), 28, CONVERT(datetime2, '2026-06-27T12:00:00'), CONVERT(datetime2, '2026-06-27T20:00:00')),
-        (NEWID(), 13, CONVERT(datetime2, '2026-06-28T11:00:00'), CONVERT(datetime2, '2026-06-28T19:00:00')),
-
+        (NEWID(), 10, CONVERT(datetime2, '2026-06-26T11:00:00'), CONVERT(datetime2, '2026-06-26T19:00:00')),
+        (NEWID(), 14, CONVERT(datetime2, '2026-06-27T12:00:00'), CONVERT(datetime2, '2026-06-27T20:00:00')),
+        (NEWID(), 6, CONVERT(datetime2, '2026-06-28T11:00:00'), CONVERT(datetime2, '2026-06-28T19:00:00')),
         (NEWID(), 1, CONVERT(datetime2, '2026-06-29T08:00:00'), CONVERT(datetime2, '2026-06-29T16:00:00')),
-        (NEWID(), 18, CONVERT(datetime2, '2026-06-29T11:00:00'), CONVERT(datetime2, '2026-06-29T19:00:00')),
-        (NEWID(), 29, CONVERT(datetime2, '2026-06-30T12:00:00'), CONVERT(datetime2, '2026-06-30T20:00:00')),
+        (NEWID(), 7, CONVERT(datetime2, '2026-06-29T11:00:00'), CONVERT(datetime2, '2026-06-29T19:00:00')),
+        (NEWID(), 11, CONVERT(datetime2, '2026-06-30T12:00:00'), CONVERT(datetime2, '2026-06-30T20:00:00')),
         (NEWID(), 4, CONVERT(datetime2, '2026-07-01T08:00:00'), CONVERT(datetime2, '2026-07-01T16:00:00')),
         (NEWID(), 1, CONVERT(datetime2, '2026-07-02T08:00:00'), CONVERT(datetime2, '2026-07-02T16:00:00')),
-        (NEWID(), 19, CONVERT(datetime2, '2026-07-03T11:00:00'), CONVERT(datetime2, '2026-07-03T19:00:00')),
-        (NEWID(), 30, CONVERT(datetime2, '2026-07-04T12:00:00'), CONVERT(datetime2, '2026-07-04T20:00:00')),
-        (NEWID(), 25, CONVERT(datetime2, '2026-07-05T12:00:00'), CONVERT(datetime2, '2026-07-05T20:00:00'));
+        (NEWID(), 8, CONVERT(datetime2, '2026-07-03T11:00:00'), CONVERT(datetime2, '2026-07-03T19:00:00')),
+        (NEWID(), 12, CONVERT(datetime2, '2026-07-04T12:00:00'), CONVERT(datetime2, '2026-07-04T20:00:00')),
+        (NEWID(), 2, CONVERT(datetime2, '2026-07-05T08:00:00'), CONVERT(datetime2, '2026-07-05T16:00:00'));
 
     INSERT INTO @SeededAssignments (
         [shift_Id],
@@ -226,13 +229,12 @@ BEGIN TRY
     )
     SELECT
         ss.[shift_Id],
-        er.[employeeRole_Id],
-        er.[role_Id],
+        e.[employeeRole_Id],
+        e.[role_Id],
         ss.[startTime],
         ss.[endTime]
     FROM @ShiftSeeds ss
-    INNER JOIN @Employees e ON e.[employeeNumber] = ss.[employeeNumber]
-    INNER JOIN [EmployeeDB].[Employee].[EmployeeRoles] er ON er.[employeeRole_Id] = e.[employeeRole_Id];
+    INNER JOIN @Employees e ON e.[employeeNumber] = ss.[employeeNumber];
 
     INSERT INTO [ShiftDB].[Shift].[Shifts] (
         [Shift_Id],
@@ -288,6 +290,15 @@ BEGIN TRY
         r.[role_name],
         e.[lastName],
         e.[firstName];
+
+    SELECT
+        r.[role_Id],
+        r.[role_name],
+        COUNT(er.[employeeRole_Id]) AS [employee_count]
+    FROM [EmployeeDB].[Employee].[Roles] r
+    INNER JOIN [EmployeeDB].[Employee].[EmployeeRoles] er ON er.[role_Id] = r.[role_Id]
+    GROUP BY r.[role_Id], r.[role_name]
+    ORDER BY r.[role_name], r.[role_Id];
 
     SELECT
         r.[role_name],
