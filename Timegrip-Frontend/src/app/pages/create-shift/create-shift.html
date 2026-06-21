@@ -1,0 +1,52 @@
+<div class="page">
+
+    <h1>Opret vagt</h1>
+
+    <form class="shift-form" (ngSubmit)="addShift()">
+
+        <div class="form-row">
+            <label>Dato</label>
+            <input type="date" [(ngModel)]="shift.date" name="date" [min]="today">
+        </div>
+
+        <div class="form-row">
+            <label>Starttid</label>
+
+            <select [(ngModel)]="shift.startTime" name="startTime">
+                <option value="">Vælg starttid</option>
+
+                <option *ngFor="let time of times" [value]="time">
+                    {{ time }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>Sluttid</label>
+
+            <select [(ngModel)]="shift.endTime" name="endTime">
+                <option value="">Vælg sluttid</option>
+
+                <option *ngFor="let time of times" [value]="time">
+                    {{ time }}
+                </option>
+            </select>
+        </div>
+
+        <h3>Antal vagter pr. rolle</h3>
+
+        <div class="form-row" *ngFor="let role of roleRequirements">
+            <label>{{ role.roleName }}</label>
+
+            <input type="number" min="0" [(ngModel)]="role.count" name="count-{{ role.roleId }}">
+        </div>
+
+        <div class="button-row">
+            <button type="submit">
+                Gem vagt
+            </button>
+        </div>
+
+    </form>
+
+</div>

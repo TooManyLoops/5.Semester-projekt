@@ -1,0 +1,80 @@
+<div class="page">
+
+    <div class="page-header">
+        <h1>Medarbejdere</h1>
+
+        <button class="create-button" routerLink="/employees/create">
+            Tilføj ny medarbejder
+        </button>
+    </div>
+
+    <div class="filter-row">
+        <label>Find medarbejder:</label>
+
+        <div class="employee-search">
+            <input type="text" name="employeeSearch" [(ngModel)]="employeeSearch"
+                (ngModelChange)="onEmployeeSearchChange()" (focus)="onEmployeeSearchChange()"
+                (blur)="hideEmployeeSuggestions()" autocomplete="off" placeholder="Søg på navn">
+
+            <div *ngIf="showEmployeeSuggestions && employeeSuggestions.length > 0" class="employee-suggestions">
+                <button type="button" *ngFor="let employee of employeeSuggestions"
+                    (mousedown)="selectEmployeeSuggestion(employee)">
+                    {{ getEmployeeFullName(employee) }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <table class="employee-table">
+        <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Email</th>
+                <th>Telefon nummer</th>
+                <th>Roller</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let emp of pageEmployees">
+                <td>{{ emp.firstName }} {{ emp.lastName }}</td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.phoneNumber }}</td>
+                <td>{{ emp.rolesText }}</td>
+                <td>{{ getStatusText(emp.employeeStatus) }}</td>
+                <td>
+                    <button class="edit-button" [routerLink]="['/employees/edit', emp.employeeId]">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+
+        <button (click)="goToFirstPage()" [disabled]="currentPage === 1">
+            ⏮
+        </button>
+
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">
+            ←
+        </button>
+
+        <span>
+            Side {{ currentPage }} af {{ totalPages || 1 }}
+        </span>
+
+        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages || totalPages === 0">
+            →
+        </button>
+
+        <button (click)="goToLastPage()" [disabled]="currentPage === totalPages || totalPages === 0">
+            ⏭
+        </button>
+
+    </div>
+
+</div>

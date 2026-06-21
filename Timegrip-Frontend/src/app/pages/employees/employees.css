@@ -1,0 +1,155 @@
+.page {
+    padding: 30px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.create-button {
+    background-color: #96768f;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background-color: #cca1c3;
+}
+
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.employee-table th,
+.employee-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.edit-button {
+    margin-right: 8px;
+    padding: 6px 10px;
+}
+
+.employee-table thead {
+    background-color: #4b5563;
+    color: white;
+}
+
+.employee-table tbody tr:nth-child(even) {
+    background-color: #f3f4f6;
+}
+
+.employee-table tbody tr:nth-child(odd) {
+    background-color: white;
+}
+
+.employee-table tbody tr:hover {
+    background-color: #e5e7eb;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.filter-row label {
+    font-weight: bold;
+}
+
+.employee-search {
+    position: relative;
+    width: min(360px, 100%);
+}
+
+.employee-search input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    font-size: 14px;
+    height: 42px;
+}
+
+.employee-suggestions {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.employee-suggestions button {
+    border: none;
+    background: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.employee-suggestions button:hover {
+    background-color: #f3f4f6;
+}
+
+.pagination {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination button {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111827;
+}

@@ -1,0 +1,74 @@
+<div class="page">
+
+    <h1>Tilføj ny medarbejder</h1>
+
+    <form class="employee-form" (ngSubmit)="addEmployee()">
+
+        <div class="form-row">
+            <label>First name</label>
+            <input type="text" [(ngModel)]="employee.firstName" name="firstName">
+        </div>
+
+
+        <div class="form-row">
+            <label>Last name</label>
+            <input type="text" [(ngModel)]="employee.lastName" name="lastName">
+        </div>
+
+        <div class="form-row">
+            <label>Email</label>
+            <div class="field-group">
+                <input type="email" [(ngModel)]="employee.email" name="email"
+                    (ngModelChange)="clearValidationError('email')" [class.invalid]="validationErrors.email">
+                <span *ngIf="validationErrors.email" class="error-message">
+                    {{ validationErrors.email }}
+                </span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>Phone number</label>
+            <div class="field-group">
+                <input type="text" [(ngModel)]="employee.phoneNumber" name="phoneNumber"
+                    (ngModelChange)="clearValidationError('phoneNumber')" [class.invalid]="validationErrors.phoneNumber"
+                    inputmode="numeric" maxlength="8">
+                <span *ngIf="validationErrors.phoneNumber" class="error-message">
+                    {{ validationErrors.phoneNumber }}
+                </span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>Rolle</label>
+
+            <select [(ngModel)]="selectedRoleId" name="selectedRoleId">
+                <option [ngValue]="''">Vælg rolle</option>
+
+                <option *ngFor="let role of roles" [ngValue]="role.roleId">
+                    {{ role.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label>Status</label>
+
+            <select [(ngModel)]="employee.employeeStatus" name="employeeStatus">
+
+                <option [ngValue]="1">Active</option>
+                <option [ngValue]="2">Inactive</option>
+                <option [ngValue]="3">Terminated</option>
+                <option [ngValue]="4">On Leave</option>
+
+            </select>
+        </div>
+
+        <div class="button-row">
+            <button type="submit">
+                Save Employee
+            </button>
+        </div>
+
+    </form>
+
+</div>

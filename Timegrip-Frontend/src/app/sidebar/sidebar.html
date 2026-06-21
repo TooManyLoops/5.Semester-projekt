@@ -1,0 +1,71 @@
+<nav class="sidebar">
+    <button>
+        <i class="bi bi-speedometer2"></i>
+        Dashboard
+    </button>
+
+    <button *ngIf="userRole === 'leader'" routerLink="/employees" routerLinkActive="active">
+
+        <i class="bi bi-people"></i>
+        Medarbejdere
+    </button>
+
+    <div class="sidebar-item-with-menu">
+
+        <button routerLink="/shifts" routerLinkActive="active" class="main-sidebar-button">
+            <i class="bi bi-calendar3"></i>
+            Vagtplan
+        </button>
+
+        <button type="button" class="dots-button" (click)="toggleShiftMenu($event)" aria-label="Åbn vagtmenu">
+            ⋮
+        </button>
+
+    </div>
+
+    <div *ngIf="showShiftMenu" class="submenu">
+
+        <button *ngIf="userRole === 'employee'" routerLink="/my-shifts" routerLinkActive="active">
+            Min vagtplan
+        </button>
+
+        <button *ngIf="userRole === 'leader'" routerLink="/shifts/create" routerLinkActive="active">
+            Opret vagter
+        </button>
+
+        <button *ngIf="userRole === 'leader'" routerLink="/shifts/approvals" routerLinkActive="active">
+            Godkend vagter
+        </button>
+
+    </div>
+    <button>
+        <i class="bi bi-pencil-square"></i>
+        Registreringer
+    </button>
+
+    <button>
+        <i class="bi bi-person"></i>
+        Mine Data
+    </button>
+
+    <button>
+        <i class="bi bi-chat-dots"></i>
+        Beskeder
+    </button>
+
+    <button>
+        <i class="bi bi-building-gear"></i>
+        Firmanyt
+    </button>
+
+    <button>
+        <i class="bi bi-gear"></i>
+        Indstillinger
+    </button>
+
+    <button (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+        Log ud
+    </button>
+
+</nav>

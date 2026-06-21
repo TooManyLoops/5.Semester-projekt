@@ -1,0 +1,94 @@
+.page {
+    padding: 30px;
+}
+
+.shift-table {
+    width: 75%;
+    min-width: 700px;
+    border-collapse: collapse;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shift-table th {
+    background-color: #4b5563;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.shift-table th:first-child,
+.shift-table td:first-child {
+    width: 250px;
+    white-space: nowrap;
+}
+
+.shift-table th:nth-child(2),
+.shift-table td:nth-child(2) {
+    width: 140px;
+    white-space: nowrap;
+}
+
+.shift-table th:nth-child(3),
+.shift-table td:nth-child(3) {
+    width: 140px;
+    white-space: nowrap;
+}
+
+.shift-table th:last-child,
+.shift-table td:last-child {
+    width: 120px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.shift-table td {
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+}
+
+.join-button {
+    background-color: #96768f;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.join-button:hover {
+    background-color: #cca1c3;
+}
+
+.assign-box {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.form-row label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-row input,
+.form-row select {
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+}
+
+.button-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
